@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SED - The Stream Editor | Complete Guide</title>
+    <style>
+        /* === BASE STYLES === */
+        * {
+            margin:  0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background:  linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+            color: #e6edf3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #161b22;
+            border-radius: 16px;
+            padding: 50px;
+            box-shadow: 0 10px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid #30363d;
+        }
+
+        /* === TYPOGRAPHY === */
+        h1 {
+            color: #00d9ff;
+            font-size: 2.8em;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8b949e;
+            font-size:  1.2em;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        h2 {
+            color: #00d9ff;
+            font-size: 1.9em;
+            font-weight: 700;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #00d9ff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h3 {
+            color:  #58a6ff;
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-top: 35px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #f0883e;
+            font-size: 1.15em;
+            font-weight: 600;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #e6edf3;
+            font-weight: 500;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+
+        strong {
+            color:  #ffffff;
+            font-weight: 700;
+        }
+
+        /* === HIGHLIGHTED TEXT === */
+        .highlight {
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        .warn {
+            color: #f85149;
+            font-weight: 700;
+        }
+
+        .success {
+            color:  #3fb950;
+            font-weight: 600;
+        }
+
+        /* === TLDR BOX === */
+        .tldr {
+            background: linear-gradient(135deg, #1a3a2a 0%, #0d2818 100%);
+            border-left: 5px solid #3fb950;
+            padding: 20px 25px;
+            margin: 20px 0;
+            border-radius: 0 12px 12px 0;
+            font-size: 1.05em;
+        }
+
+        .tldr::before {
+            content: "💡 TL;DR: ";
+            color: #3fb950;
+            font-weight:  700;
+        }
+
+        /* === WARNING BOX === */
+        .warning {
+            background: linear-gradient(135deg, #3d2a1a 0%, #2d1a0a 100%);
+            border-left: 5px solid #f0883e;
+            padding: 20px 25px;
+            margin: 20px 0;
+            border-radius:  0 12px 12px 0;
+        }
+
+        .warning::before {
+            content: "⚠️ Warning: ";
+            color: #f0883e;
+            font-weight: 700;
+        }
+
+        .danger {
+            background:  linear-gradient(135deg, #3d1a1a 0%, #2d0a0a 100%);
+            border-left:  5px solid #f85149;
+            padding: 20px 25px;
+            margin: 20px 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+        /* === PRO TIP BOX === */
+        .pro-tip {
+            background: linear-gradient(135deg, #1a2a3d 0%, #0a1a2d 100%);
+            border-left:  5px solid #58a6ff;
+            padding: 20px 25px;
+            margin: 20px 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .pro-tip::before {
+            content: "🚀 Pro Tip: ";
+            color: #58a6ff;
+            font-weight: 700;
+        }
+
+        /* === CODE BLOCKS === */
+        pre {
+            background:  #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 20px 25px;
+            overflow-x: auto;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        pre::before {
+            content: "BASH";
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.7em;
+            color: #484f58;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.95em;
+            color: #7ee787;
+        }
+
+        pre code {
+            color: #7ee787;
+            line-height: 1.6;
+        }
+
+        p code, li code, td code {
+            background: #0d1117;
+            padding: 3px 8px;
+            border-radius: 5px;
+            border: 1px solid #30363d;
+            color: #7ee787;
+            font-size: 0.9em;
+        }
+
+        /* === COMMENT IN CODE === */
+        .code-comment {
+            color: #8b949e;
+        }
+
+        /* === TABLES === */
+        table {
+            width:  100%;
+            border-collapse: collapse;
+            margin:  20px 0;
+            background: #0d1117;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+        }
+
+        th {
+            background: linear-gradient(135deg, #238636 0%, #1a7f37 100%);
+            color: #ffffff;
+            font-weight: 700;
+            padding:  15px 20px;
+            text-align: left;
+            font-size: 0.95em;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding:  14px 20px;
+            border-bottom: 1px solid #21262d;
+            color: #e6edf3;
+            font-weight: 500;
+        }
+
+        tr:last-child td {
+            border-bottom:  none;
+        }
+
+        tr:hover {
+            background: #161b22;
+        }
+
+        /* === LISTS === */
+        ul, ol {
+            margin:  15px 0 15px 25px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: #e6edf3;
+            font-weight: 500;
+        }
+
+        li::marker {
+            color:  #3fb950;
+        }
+
+        /* === SECTION DIVIDER === */
+        hr {
+            border:  none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #30363d, transparent);
+            margin: 40px 0;
+        }
+
+        /* === EXERCISE BOXES === */
+        .exercise {
+            background: #1c2128;
+            border:  2px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .exercise-title {
+            color: #f0883e;
+            font-size: 1.15em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap:  10px;
+        }
+
+        .task {
+            background: #0d1117;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin:  15px 0;
+            border-left:  4px solid #ffd700;
+        }
+
+        .task::before {
+            content: "📋 Task: ";
+            color: #ffd700;
+            font-weight:  700;
+        }
+
+        /* === SOLUTION (COLLAPSIBLE) === */
+        details {
+            background:  #0d1117;
+            border:  1px solid #238636;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        summary {
+            background: linear-gradient(135deg, #1a3a2a 0%, #0d2818 100%);
+            color: #3fb950;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap:  10px;
+            transition: background 0.3s ease;
+        }
+
+        summary:hover {
+            background:  linear-gradient(135deg, #1f4a35 0%, #0f3020 100%);
+        }
+
+        summary::marker {
+            color:  #3fb950;
+        }
+
+        details[open] summary {
+            border-bottom: 1px solid #238636;
+        }
+
+        .solution-content {
+            padding: 20px;
+        }
+
+        .breakdown {
+            background:  #161b22;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #58a6ff;
+        }
+
+        .breakdown::before {
+            content: "🔍 Breakdown: ";
+            display: block;
+            color: #58a6ff;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* === COMPARISON TABLE === */
+        .compare-table th {
+            background:  linear-gradient(135deg, #6e40c9 0%, #553098 100%);
+        }
+
+        .compare-table .yes {
+            color: #3fb950;
+            font-weight: 700;
+        }
+
+        .compare-table .no {
+            color: #f85149;
+            font-weight: 700;
+        }
+
+        .compare-table .partial {
+            color:  #f0883e;
+            font-weight: 700;
+        }
+
+        /* === CHEAT SHEET === */
+        .cheatsheet {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 30px;
+            margin:  30px 0;
+        }
+
+        .cheatsheet h3 {
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .cheat-section {
+            margin-bottom: 20px;
+        }
+
+        .cheat-section h4 {
+            color:  #00d9ff;
+            font-size: 1em;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        /* === CHALLENGE BOX === */
+        .challenge {
+            background: linear-gradient(135deg, #2d1f3d 0%, #1a1025 100%);
+            border: 2px solid #8957e5;
+            border-radius: 12px;
+            padding:  25px;
+            margin: 25px 0;
+        }
+
+        .challenge-title {
+            color: #d2a8ff;
+            font-size: 1.15em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        /* === KEY TAKEAWAYS === */
+        .takeaways {
+            background: linear-gradient(135deg, #1a3d2a 0%, #0d2518 100%);
+            border: 2px solid #3fb950;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .takeaways h3 {
+            color: #3fb950;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .takeaways li {
+            margin-bottom: 12px;
+        }
+
+        /* === FOOTER === */
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #30363d;
+            color: #8b949e;
+        }
+
+        .footer .motto {
+            color: #ffd700;
+            font-style: italic;
+            font-size: 1.1em;
+            margin-top: 15px;
+        }
+
+        /* === TOC === */
+        .toc {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin: 30px 0;
+        }
+
+        .toc h3 {
+            color: #ffd700;
+            margin-bottom:  15px;
+            font-size: 1.2em;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin:  0;
+            padding: 0;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #58a6ff;
+            text-decoration:  none;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color:  #79c0ff;
+            text-decoration: underline;
+        }
+
+        /* === SCROLLBAR === */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width:  768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <h1>🛠️ SED — The Stream Editor</h1>
+        <p class="subtitle">Complete Guide | From Zero to Hero</p>
+
+        <!-- TABLE OF CONTENTS -->
+        <div class="toc">
+            <h3>📑 Table of Contents</h3>
+            <ul>
+                <li><a href="#intro">1. Introduction — What, Why, History</a></li>
+                <li><a href="#install">2. Installation Guide</a></li>
+                <li><a href="#syntax">3. General Syntax</a></li>
+                <li><a href="#flags">4. All Options & Flags</a></li>
+                <li><a href="#concepts">5. Core Concepts</a></li>
+                <li><a href="#sample">6. Sample Data Setup</a></li>
+                <li><a href="#practice">7. Practice Exercises</a></li>
+                <li><a href="#compare">8. SED vs AWK vs GREP</a></li>
+                <li><a href="#challenges">9. Challenge Exercises</a></li>
+                <li><a href="#cheatsheet">10. Quick Reference Cheat Sheet</a></li>
+                <li><a href="#takeaways">11. Key Takeaways</a></li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <!-- SECTION 1: INTRODUCTION -->
+        <h2 id="intro">📖 Introduction</h2>
+
+        <h3>What is SED? </h3>
+        <p><strong>SED</strong> stands for <span class="highlight">S</span>tream <span class="highlight">ED</span>itor — a powerful, non-interactive text processing tool used to perform basic text transformations on an input stream (a file or input from a pipeline).</p>
+
+        <div class="tldr">
+            SED reads input line-by-line, applies specified operations (like find-replace, delete, insert), and outputs the result — all without opening a text editor.
+        </div>
+
+        <h3>Why SED?</h3>
+        <table>
+            <tr>
+                <th>Reason</th>
+                <th>Explanation</th>
+            </tr>
+            <tr>
+                <td><strong>Speed</strong></td>
+                <td>Processes massive files line-by-line without loading entire file into memory</td>
+            </tr>
+            <tr>
+                <td><strong>Automation</strong></td>
+                <td>Perfect for scripts — no manual editing needed</td>
+            </tr>
+            <tr>
+                <td><strong>Precision</strong></td>
+                <td>Regex-powered pattern matching for surgical edits</td>
+            </tr>
+            <tr>
+                <td><strong>Pipelines</strong></td>
+                <td>Works seamlessly with other tools (<code>grep</code>, <code>awk</code>, <code>cat</code>, etc.)</td>
+            </tr>
+            <tr>
+                <td><strong>Portability</strong></td>
+                <td>Available on virtually every Unix/Linux system</td>
+            </tr>
+        </table>
+
+        <h3>History — Who Created SED?</h3>
+        <ul>
+            <li><strong>Creator:</strong> Lee E. McMahon</li>
+            <li><strong>When:</strong> 1973-1974</li>
+            <li><strong>Where:</strong> Bell Labs (same place that gave us Unix, C, and <code>awk</code>)</li>
+            <li><strong>Based on:</strong> The <code>ed</code> line editor (hence "stream ed-itor")</li>
+        </ul>
+        <p>SED was one of the earliest tools to support <span class="highlight">regular expressions (regex)</span>, making it a pioneer in text processing. </p>
+
+        <h3>Who Uses SED? </h3>
+        <table>
+            <tr>
+                <th>Role</th>
+                <th>Use Case</th>
+            </tr>
+            <tr>
+                <td><strong>SysAdmins</strong></td>
+                <td>Config file modifications, log parsing</td>
+            </tr>
+            <tr>
+                <td><strong>DevOps Engineers</strong></td>
+                <td>CI/CD pipeline text transformations</td>
+            </tr>
+            <tr>
+                <td><strong>Penetration Testers</strong></td>
+                <td>Parsing tool outputs, cleaning wordlists</td>
+            </tr>
+            <tr>
+                <td><strong>Developers</strong></td>
+                <td>Batch code refactoring, data cleaning</td>
+            </tr>
+            <tr>
+                <td><strong>Data Analysts</strong></td>
+                <td>CSV/text preprocessing</td>
+            </tr>
+        </table>
+
+        <hr>
+
+        <!-- SECTION 2: INSTALLATION -->
+        <h2 id="install">💻 Installation</h2>
+
+        <h3>Check if SED is Installed</h3>
+        <pre><code>sed --version
+<span class="code-comment"># or</span>
+which sed</code></pre>
+
+        <h3>Installation by OS</h3>
+
+        <h4>🐧 Linux (Debian/Ubuntu/Kali)</h4>
+        <pre><code><span class="code-comment"># Usually pre-installed.  If not: </span>
+sudo apt update && sudo apt install sed</code></pre>
+
+        <h4>🐧 Linux (Fedora/RHEL/CentOS)</h4>
+        <pre><code>sudo dnf install sed
+<span class="code-comment"># or</span>
+sudo yum install sed</code></pre>
+
+        <h4>🍎 macOS</h4>
+        <pre><code><span class="code-comment"># macOS has BSD sed (slightly different syntax)</span>
+<span class="code-comment"># For GNU sed (recommended for compatibility):</span>
+brew install gnu-sed
+
+<span class="code-comment"># Use as 'gsed' or add to PATH: </span>
+export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"</code></pre>
+
+        <h4>🪟 Windows</h4>
+        <p><strong>Option 1: WSL (Recommended)</strong></p>
+        <pre><code><span class="code-comment"># Enable WSL, install Ubuntu, sed comes pre-installed</span>
+wsl --install</code></pre>
+        <p><strong>Option 2:</strong> Git Bash — Install Git for Windows (includes sed)</p>
+        <p><strong>Option 3:</strong> GnuWin32 — Download from gnuwin32.sourceforge.net</p>
+        <p><strong>Option 4:</strong> Cygwin — Install Cygwin with sed package</p>
+
+        <div class="pro-tip">
+            <strong>Loki's Setup:</strong> Since you have VirtualBox Kali Linux, <code>sed</code> is already there! Just fire up your Kali VM. 
+        </div>
+
+        <hr>
+
+        <!-- SECTION 3: SYNTAX -->
+        <h2 id="syntax">📐 General Syntax</h2>
+
+        <pre><code>sed [OPTIONS] 'COMMAND' [INPUT_FILE]</code></pre>
+        <p>Or with pipeline:</p>
+        <pre><code>cat file. txt | sed 'COMMAND'</code></pre>
+
+        <h3>Syntax Breakdown</h3>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>sed</code></td>
+                <td>The command itself</td>
+            </tr>
+            <tr>
+                <td><code>[OPTIONS]</code></td>
+                <td>Flags that modify behavior (<code>-i</code>, <code>-n</code>, <code>-e</code>, etc.)</td>
+            </tr>
+            <tr>
+                <td><code>'COMMAND'</code></td>
+                <td>The operation to perform (in single quotes)</td>
+            </tr>
+            <tr>
+                <td><code>[INPUT_FILE]</code></td>
+                <td>File to process (optional if using pipeline)</td>
+            </tr>
+        </table>
+
+        <h3>Command Structure</h3>
+        <pre><code>sed '[ADDRESS]OPERATION[/PATTERN/REPLACEMENT/[FLAGS]]'</code></pre>
+        <table>
+            <tr>
+                <th>Part</th>
+                <th>Meaning</th>
+            </tr>
+            <tr>
+                <td><code>ADDRESS</code></td>
+                <td>Which lines to operate on (line number, range, or pattern)</td>
+            </tr>
+            <tr>
+                <td><code>OPERATION</code></td>
+                <td>What to do (<code>s</code>=substitute, <code>d</code>=delete, <code>p</code>=print, etc. )</td>
+            </tr>
+            <tr>
+                <td><code>PATTERN</code></td>
+                <td>What to find (supports regex)</td>
+            </tr>
+            <tr>
+                <td><code>REPLACEMENT</code></td>
+                <td>What to replace with</td>
+            </tr>
+            <tr>
+                <td><code>FLAGS</code></td>
+                <td>Modifiers (<code>g</code>=global, <code>i</code>=case-insensitive, etc.)</td>
+            </tr>
+        </table>
+
+        <hr>
+
+        <!-- SECTION 4: FLAGS -->
+        <h2 id="flags">🚩 All Options & Flags</h2>
+
+        <h3>Command-Line Options</h3>
+        <table>
+            <tr>
+                <th>Flag</th>
+                <th>Long Form</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>-n</code></td>
+                <td><code>--quiet</code> / <code>--silent</code></td>
+                <td>Suppress automatic printing; only print when explicitly requested with <code>p</code></td>
+            </tr>
+            <tr>
+                <td><code>-e</code></td>
+                <td><code>--expression=SCRIPT</code></td>
+                <td>Add multiple commands in one sed call</td>
+            </tr>
+            <tr>
+                <td><code>-f</code></td>
+                <td><code>--file=SCRIPT_FILE</code></td>
+                <td>Read commands from a file</td>
+            </tr>
+            <tr>
+                <td><code>-i</code></td>
+                <td><code>--in-place[=SUFFIX]</code></td>
+                <td>Edit file in-place (modify original file)</td>
+            </tr>
+            <tr>
+                <td><code>-i. bak</code></td>
+                <td>—</td>
+                <td>Edit in-place but create backup with <code>.bak</code> extension</td>
+            </tr>
+            <tr>
+                <td><code>-r</code> / <code>-E</code></td>
+                <td><code>--regexp-extended</code></td>
+                <td>Use Extended Regular Expressions (ERE)</td>
+            </tr>
+            <tr>
+                <td><code>-s</code></td>
+                <td><code>--separate</code></td>
+                <td>Treat each file as separate stream</td>
+            </tr>
+            <tr>
+                <td><code>-u</code></td>
+                <td><code>--unbuffered</code></td>
+                <td>Load minimal data and flush output buffers frequently</td>
+            </tr>
+            <tr>
+                <td><code>-z</code></td>
+                <td><code>--null-data</code></td>
+                <td>Separate lines by NUL character (not newline)</td>
+            </tr>
+            <tr>
+                <td><code>--help</code></td>
+                <td>—</td>
+                <td>Display help message</td>
+            </tr>
+            <tr>
+                <td><code>--version</code></td>
+                <td>—</td>
+                <td>Display version info</td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <code>-i</code> modifies the original file!  Always test without <code>-i</code> first or use <code>-i.bak</code> for backup. 
+        </div>
+
+        <h3>Substitution Flags (used with <code>s</code> command)</h3>
+        <table>
+            <tr>
+                <th>Flag</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>g</code></td>
+                <td><strong>Global</strong> — Replace ALL occurrences in line (not just first)</td>
+            </tr>
+            <tr>
+                <td><code>p</code></td>
+                <td><strong>Print</strong> — Print the modified line</td>
+            </tr>
+            <tr>
+                <td><code>i</code> / <code>I</code></td>
+                <td><strong>Case-insensitive</strong> matching</td>
+            </tr>
+            <tr>
+                <td><code>NUMBER</code></td>
+                <td>Replace only the Nth occurrence (e.g., <code>2</code> = second match)</td>
+            </tr>
+            <tr>
+                <td><code>w FILE</code></td>
+                <td><strong>Write</strong> — Write modified lines to FILE</td>
+            </tr>
+        </table>
+
+        <hr>
+
+        <!-- SECTION 5: CORE CONCEPTS -->
+        <h2 id="concepts">📚 Core Concepts</h2>
+
+        <h3>1. Pattern Space vs Hold Space</h3>
+        <table>
+            <tr>
+                <th>Space</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><strong>Pattern Space</strong></td>
+                <td>Temporary buffer where current line is held for processing</td>
+            </tr>
+            <tr>
+                <td><strong>Hold Space</strong></td>
+                <td>Secondary buffer for storing data across lines (advanced)</td>
+            </tr>
+        </table>
+        <div class="pro-tip">
+            Think of Pattern Space as your "workspace" and Hold Space as a "clipboard."
+        </div>
+
+        <h3>2. Addressing — Targeting Specific Lines</h3>
+        <table>
+            <tr>
+                <th>Address Type</th>
+                <th>Example</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Line Number</td>
+                <td><code>5</code></td>
+                <td>Only line 5</td>
+            </tr>
+            <tr>
+                <td>Line Range</td>
+                <td><code>5,10</code></td>
+                <td>Lines 5 through 10</td>
+            </tr>
+            <tr>
+                <td>Start to End</td>
+                <td><code>5,$</code></td>
+                <td>Line 5 to last line (<code>$</code> = last line)</td>
+            </tr>
+            <tr>
+                <td>Pattern</td>
+                <td><code>/error/</code></td>
+                <td>Lines containing "error"</td>
+            </tr>
+            <tr>
+                <td>Pattern Range</td>
+                <td><code>/start/,/end/</code></td>
+                <td>From line matching "start" to line matching "end"</td>
+            </tr>
+            <tr>
+                <td>Step</td>
+                <td><code>1~2</code></td>
+                <td>Every odd line (start at 1, step by 2)</td>
+            </tr>
+            <tr>
+                <td>Negation</td>
+                <td><code>5! </code></td>
+                <td>All lines EXCEPT line 5</td>
+            </tr>
+        </table>
+
+        <h3>3. SED Commands (Operations)</h3>
+        <table>
+            <tr>
+                <th>Command</th>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>s</code></td>
+                <td>Substitute</td>
+                <td>Find and replace</td>
+            </tr>
+            <tr>
+                <td><code>d</code></td>
+                <td>Delete</td>
+                <td>Remove lines</td>
+            </tr>
+            <tr>
+                <td><code>p</code></td>
+                <td>Print</td>
+                <td>Output lines (use with <code>-n</code>)</td>
+            </tr>
+            <tr>
+                <td><code>a</code></td>
+                <td>Append</td>
+                <td>Add text AFTER current line</td>
+            </tr>
+            <tr>
+                <td><code>i</code></td>
+                <td>Insert</td>
+                <td>Add text BEFORE current line</td>
+            </tr>
+            <tr>
+                <td><code>c</code></td>
+                <td>Change</td>
+                <td>Replace entire line with new text</td>
+            </tr>
+            <tr>
+                <td><code>y</code></td>
+                <td>Transform</td>
+                <td>Character-by-character replacement (like <code>tr</code>)</td>
+            </tr>
+            <tr>
+                <td><code>q</code></td>
+                <td>Quit</td>
+                <td>Stop processing after current line</td>
+            </tr>
+            <tr>
+                <td><code>r</code></td>
+                <td>Read</td>
+                <td>Insert contents of another file</td>
+            </tr>
+            <tr>
+                <td><code>w</code></td>
+                <td>Write</td>
+                <td>Write pattern space to file</td>
+            </tr>
+            <tr>
+                <td><code>=</code></td>
+                <td>Line Number</td>
+                <td>Print current line number</td>
+            </tr>
+            <tr>
+                <td><code>n</code></td>
+                <td>Next</td>
+                <td>Skip to next line</td>
+            </tr>
+            <tr>
+                <td><code>N</code></td>
+                <td>Append Next</td>
+                <td>Append next line to pattern space</td>
+            </tr>
+            <tr>
+                <td><code>h</code></td>
+                <td>Hold</td>
+                <td>Copy pattern space to hold space</td>
+            </tr>
+            <tr>
+                <td><code>H</code></td>
+                <td>Hold Append</td>
+                <td>Append pattern space to hold space</td>
+            </tr>
+            <tr>
+                <td><code>g</code></td>
+                <td>Get</td>
+                <td>Copy hold space to pattern space</td>
+            </tr>
+            <tr>
+                <td><code>G</code></td>
+                <td>Get Append</td>
+                <td>Append hold space to pattern space</td>
+            </tr>
+            <tr>
+                <td><code>x</code></td>
+                <td>Exchange</td>
+                <td>Swap pattern and hold spaces</td>
+            </tr>
+        </table>
+
+        <h3>4. Regular Expressions in SED</h3>
+
+        <h4>Basic Regex (BRE) — Default</h4>
+        <table>
+            <tr>
+                <th>Symbol</th>
+                <th>Meaning</th>
+            </tr>
+            <tr>
+                <td><code>.</code></td>
+                <td>Any single character</td>
+            </tr>
+            <tr>
+                <td><code>*</code></td>
+                <td>Zero or more of previous character</td>
+            </tr>
+            <tr>
+                <td><code>^</code></td>
+                <td>Start of line</td>
+            </tr>
+            <tr>
+                <td><code>$</code></td>
+                <td>End of line</td>
+            </tr>
+            <tr>
+                <td><code>[ ]</code></td>
+                <td>Character class</td>
+            </tr>
+            <tr>
+                <td><code>[^ ]</code></td>
+                <td>Negated character class</td>
+            </tr>
+            <tr>
+                <td><code>\( \)</code></td>
+                <td>Capture group (escaped parentheses)</td>
+            </tr>
+            <tr>
+                <td><code>\1</code>, <code>\2</code></td>
+                <td>Backreference to capture group</td>
+            </tr>
+            <tr>
+                <td><code>\{n\}</code></td>
+                <td>Exactly n occurrences</td>
+            </tr>
+            <tr>
+                <td><code>\{n,m\}</code></td>
+                <td>Between n and m occurrences</td>
+            </tr>
+        </table>
+
+        <h4>Extended Regex (ERE) — Use with <code>-E</code> or <code>-r</code></h4>
+        <table>
+            <tr>
+                <th>Symbol</th>
+                <th>Meaning</th>
+            </tr>
+            <tr>
+                <td><code>+</code></td>
+                <td>One or more of previous character</td>
+            </tr>
+            <tr>
+                <td><code>?</code></td>
+                <td>Zero or one of previous character</td>
+            </tr>
+            <tr>
+                <td><code>( )</code></td>
+                <td>Capture group (no escaping needed)</td>
+            </tr>
+            <tr>
+                <td><code>|</code></td>
+                <td>OR operator</td>
+            </tr>
+            <tr>
+                <td><code>{n,m}</code></td>
+                <td>Quantifier (no escaping needed)</td>
+            </tr>
+        </table>
+
+        <h3>5. Delimiters</h3>
+        <p>The <code>/</code> is the default delimiter, but you can use <strong>ANY character</strong>: </p>
+        <pre><code><span class="code-comment"># Default</span>
+sed 's/old/new/'
+
+<span class="code-comment"># Using | as delimiter (useful when pattern contains /)</span>
+sed 's|/path/to/old|/path/to/new|'
+
+<span class="code-comment"># Using # as delimiter</span>
+sed 's#old#new#'
+
+<span class="code-comment"># Using @ as delimiter</span>
+sed 's@old@new@'</code></pre>
+
+        <div class="pro-tip">
+            When working with file paths, use <code>|</code> or <code>#</code> to avoid escaping slashes. 
+        </div>
+
+        <h3>6. Special Characters in Replacement</h3>
+        <table>
+            <tr>
+                <th>Character</th>
+                <th>Meaning</th>
+            </tr>
+            <tr>
+                <td><code>&</code></td>
+                <td>The entire matched pattern</td>
+            </tr>
+            <tr>
+                <td><code>\1</code> — <code>\9</code></td>
+                <td>Backreference to capture groups</td>
+            </tr>
+            <tr>
+                <td><code>\U</code></td>
+                <td>Uppercase the replacement</td>
+            </tr>
+            <tr>
+                <td><code>\L</code></td>
+                <td>Lowercase the replacement</td>
+            </tr>
+            <tr>
+                <td><code>\u</code></td>
+                <td>Uppercase first character</td>
+            </tr>
+            <tr>
+                <td><code>\l</code></td>
+                <td>Lowercase first character</td>
+            </tr>
+            <tr>
+                <td><code>\E</code></td>
+                <td>End case conversion</td>
+            </tr>
+        </table>
+
+        <hr>
+
+        <!-- SECTION 6: SAMPLE DATA -->
+        <h2 id="sample">🧪 Sample Data Setup</h2>
+
+        <p>Create a file called <code>emp.csv</code> with <span class="highlight">35 employee records</span> and <span class="highlight">7 fields</span>:</p>
+        <p><strong>Fields:</strong> <code>EmpID, Name, Department, Designation, Salary, JoinDate, City</code></p>
+
+        <pre><code>cat &lt;&lt; 'EOF' &gt; emp.csv
+EmpID,Name,Department,Designation,Salary,JoinDate,City
+E001,Raj Kumar,IT,Developer,75000,2020-03-15,Mumbai
+E002,Priya Sharma,HR,Manager,85000,2019-07-22,Delhi
+E003,Amit Singh,IT,Senior Developer,95000,2018-01-10,Bangalore
+E004,Sneha Patel,Finance,Analyst,65000,2021-05-18,Chennai
+E005,Vikram Reddy,IT,Team Lead,110000,2017-09-05,Hyderabad
+E006,Anjali Gupta,Marketing,Executive,55000,2022-02-14,Pune
+E007,Rahul Verma,IT,Developer,72000,2020-08-30,Mumbai
+E008,Kavita Nair,HR,Recruiter,48000,2021-11-25,Kochi
+E009,Suresh Menon,Finance,Manager,98000,2016-04-12,Bangalore
+E010,Deepa Krishnan,IT,Developer,70000,2020-06-08,Chennai
+E011,Arjun Mehta,Sales,Executive,52000,2022-01-20,Delhi
+E012,Pooja Iyer,IT,QA Engineer,68000,2019-10-15,Hyderabad
+E013,Manoj Tiwari,Operations,Supervisor,62000,2018-12-03,Lucknow
+E014,Ritu Saxena,Marketing,Manager,92000,2017-03-28,Mumbai
+E015,Karthik Rajan,IT,DevOps Engineer,105000,2019-05-10,Bangalore
+E016,Neha Agarwal,Finance,Analyst,63000,2021-07-14,Noida
+E017,Sanjay Dubey,IT,Senior Developer,98000,2018-08-22,Pune
+E018,Meera Joshi,HR,Manager,88000,2017-11-30,Mumbai
+E019,Varun Kapoor,Sales,Manager,95000,2016-06-18,Delhi
+E020,Lakshmi Rao,IT,Developer,74000,2020-04-25,Hyderabad
+E021,Gaurav Mishra,Operations,Manager,90000,2018-02-08,Kolkata
+E022,Swati Bose,Marketing,Analyst,58000,2021-09-12,Kolkata
+E023,Nikhil Jain,IT,Architect,130000,2015-10-20,Bangalore
+E024,Divya Pillai,Finance,Senior Analyst,82000,2019-01-15,Chennai
+E025,Rohit Choudhary,IT,Team Lead,108000,2018-04-30,Gurgaon
+E026,Aarti Deshmukh,HR,Executive,45000,2022-03-08,Pune
+E027,Prasad Kulkarni,IT,Developer,71000,2020-12-18,Bangalore
+E028,Nandini Hegde,Sales,Executive,54000,2021-06-22,Mysore
+E029,Abhishek Pandey,IT,QA Lead,88000,2019-02-28,Noida
+E030,Shruti Malhotra,Marketing,Senior Executive,72000,2020-01-10,Delhi
+E031,Rajesh Nambiar,Finance,Manager,96000,2017-07-25,Kochi
+E032,Pallavi Sinha,IT,Developer,69000,2021-03-05,Patna
+E033,Venkat Subramanian,Operations,Analyst,60000,2020-09-14,Chennai
+E034,Geeta Reddy,IT,Senior Developer,97000,2018-06-12,Hyderabad
+E035,Anand Sharma,IT,CTO,180000,2014-01-01,Mumbai
+EOF</code></pre>
+
+        <p><strong>Verify the file:</strong></p>
+        <pre><code>cat emp. csv | head -5      <span class="code-comment"># View first 5 lines</span>
+wc -l emp. csv              <span class="code-comment"># Should show 36 (header + 35 records)</span></code></pre>
+
+        <hr>
+
+        <!-- SECTION 7: PRACTICE -->
+        <h2 id="practice">🎯 Practice Exercises</h2>
+
+        <div class="pro-tip">
+            <strong>Instructions for Loki: </strong> Try each exercise FIRST on your own, then check the solution below.  This builds real muscle memory! 
+        </div>
+
+        <!-- SECTION A -->
+        <h3>📌 SECTION A: Basic Substitution (<code>s</code> command)</h3>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise A1: Simple Replacement</div>
+            <div class="task">Replace all occurrences of "IT" with "Technology" in the output. </div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 's/IT/Technology/g' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>s</code> — substitute command</li>
+                            <li><code>/IT/</code> — pattern to find</li>
+                            <li><code>/Technology/</code> — replacement text</li>
+                            <li><code>g</code> — global flag (replace ALL occurrences in each line)</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise A2: Replace Only First Occurrence</div>
+            <div class="task">Replace only the FIRST occurrence of "Developer" with "Dev" in each line.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 's/Developer/Dev/' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li>Without <code>g</code> flag, only the first match per line is replaced. </li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise A3: Replace Specific Occurrence</div>
+            <div class="task">Replace only the 2nd occurrence of "a" with "@" in each line. </div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 's/a/@/2' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>2</code> — replace only the 2nd occurrence</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise A4: Case-Insensitive Replacement</div>
+            <div class="task">Replace "manager" (any case) with "BOSS".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 's/manager/BOSS/gi' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>i</code> — case-insensitive matching</li>
+                            <li><code>g</code> — all occurrences</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise A5: Using Different Delimiters</div>
+            <div class="task">Replace "2020-03-15" with "15/03/2020" (date format change).</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 's|2020-03-15|15/03/2020|' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li>Using <code>|</code> as delimiter to avoid escaping <code>/</code> in the replacement</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- SECTION B -->
+        <h3>📌 SECTION B:  Addressing (Line Selection)</h3>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise B1: Print Specific Line</div>
+            <div class="task">Print only line 5 (E004's record).</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '5p' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>-n</code> — suppress automatic printing</li>
+                            <li><code>5</code> — address (line 5)</li>
+                            <li><code>p</code> — print command</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise B2: Print Line Range</div>
+            <div class="task">Print lines 10 to 15.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '10,15p' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>10,15</code> — range from line 10 to 15</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise B3: Print From Line to End</div>
+            <div class="task">Print from line 30 to the last line.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '30,$p' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>$</code> — represents the last line</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise B4: Print Every Odd Line</div>
+            <div class="task">Print only odd-numbered lines (1, 3, 5, 7...).</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '1~2p' emp. csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>1~2</code> — start at line 1, then every 2nd line</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise B5: Print Lines Matching Pattern</div>
+            <div class="task">Print only lines containing "Mumbai".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '/Mumbai/p' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>/Mumbai/</code> — pattern address</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise B6: Print Lines NOT Matching Pattern</div>
+            <div class="task">Print all lines that do NOT contain "IT".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '/IT/!p' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>! </code> — negation (NOT)</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- SECTION C -->
+        <h3>📌 SECTION C:  Delete Command (<code>d</code>)</h3>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise C1: Delete Header Row</div>
+            <div class="task">Delete the first line (header) and display the rest.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '1d' emp. csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>1</code> — line 1</li>
+                            <li><code>d</code> — delete command</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise C2: Delete Last Line</div>
+            <div class="task">Delete the last line. </div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '$d' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise C3: Delete Line Range</div>
+            <div class="task">Delete lines 5 to 10.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '5,10d' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise C4: Delete Lines Matching Pattern</div>
+            <div class="task">Delete all employees from "Bangalore".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '/Bangalore/d' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise C5: Delete Empty Lines</div>
+            <div class="task">Delete all empty lines from a file.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '/^$/d' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>^$</code> — regex for empty line (start immediately followed by end)</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise C6: Delete Lines Matching Multiple Patterns</div>
+            <div class="task">Delete lines containing "HR" OR "Finance".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '/HR/d; /Finance/d' emp.csv
+<span class="code-comment"># OR</span>
+sed -e '/HR/d' -e '/Finance/d' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <!-- SECTION D -->
+        <h3>📌 SECTION D:  Insert, Append, Change (<code>i</code>, <code>a</code>, <code>c</code>)</h3>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise D1: Insert Line Before</div>
+            <div class="task">Insert a comment line before the header.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '1i # Employee Database - Confidential' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>1</code> — line 1</li>
+                            <li><code>i</code> — insert before</li>
+                            <li>Text follows immediately</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise D2: Append Line After</div>
+            <div class="task">Append "--- END OF RECORDS ---" after the last line.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '$a --- END OF RECORDS ---' emp. csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise D3: Change Entire Line</div>
+            <div class="task">Replace line 5 with "RECORD REDACTED".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '5c RECORD REDACTED' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise D4: Change Lines Matching Pattern</div>
+            <div class="task">Replace any line containing "CTO" with "[EXECUTIVE DATA HIDDEN]".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '/CTO/c [EXECUTIVE DATA HIDDEN]' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <!-- SECTION E -->
+        <h3>📌 SECTION E: Advanced Substitution (Regex & Backreferences)</h3>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise E1: Extract Employee Names Only</div>
+            <div class="task">Print only the Name field (2nd column).</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n 's/^[^,]*,\([^,]*\),. */\1/p' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>^[^,]*,</code> — match EmpID and first comma</li>
+                            <li><code>\([^,]*\)</code> — capture group 1: Name (everything until next comma)</li>
+                            <li><code>,.*</code> — match rest of line</li>
+                            <li><code>\1</code> — backreference to captured Name</li>
+                            <li><code>-n</code> with <code>p</code> — only print modified lines</li>
+                        </ul>
+                    </div>
+                    <p><strong>Alternative (Extended Regex):</strong></p>
+                    <pre><code>sed -E -n 's/^[^,]*,([^,]*),.*/\1/p' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise E2: Swap First and Last Names</div>
+            <div class="task">For names like "Raj Kumar", swap to "Kumar Raj".</div>
+            <details>
+                                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -E 's/,([A-Za-z]+) ([A-Za-z]+),/,\2 \1,/g' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>([A-Za-z]+)</code> — capture first name</li>
+                            <li><code> </code> — space</li>
+                            <li><code>([A-Za-z]+)</code> — capture last name</li>
+                            <li><code>\2 \1</code> — swap order</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise E3: Mask Salary (Privacy)</div>
+            <div class="task">Replace salary amounts with "XXXXX" for privacy.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -E 's/,[0-9]{5,6},/,XXXXX,/g' emp. csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>[0-9]{5,6}</code> — match 5-6 digit numbers (salaries)</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise E4: Add Currency Symbol to Salary</div>
+            <div class="task">Add "₹" before each salary amount.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -E 's/,([0-9]{5,6}),/,₹\1,/g' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li>Capture the number, prefix with ₹ in replacement</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise E5: Using & (Matched Pattern)</div>
+            <div class="task">Wrap all department names in square brackets.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -E 's/,(IT|HR|Finance|Marketing|Sales|Operations),/,[\1],/g' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>&</code> represents the entire matched pattern</li>
+                            <li>Here we use capture group for precision</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise E6: Generate Email from Name</div>
+            <div class="task">Create email addresses from names (e.g., "Raj Kumar" → "raj.kumar@company.com").</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code><span class="code-comment"># Extract names and create email format</span>
+sed -E -n 's/^[^,]*,([A-Za-z]+) ([A-Za-z]+),.*/\L\1.\2\E@company.com/p' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>\L.. .\E</code> — convert to lowercase</li>
+                            <li><code>\1.\2</code> — firstname.lastname format</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- SECTION F -->
+        <h3>📌 SECTION F: Working with Multiple Commands</h3>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise F1: Multiple Substitutions</div>
+            <div class="task">Replace "IT" with "Tech" AND "HR" with "Human Resources".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code><span class="code-comment"># Method 1: Semicolon separation</span>
+sed 's/IT/Tech/g; s/HR/Human Resources/g' emp.csv
+
+<span class="code-comment"># Method 2: Multiple -e flags</span>
+sed -e 's/IT/Tech/g' -e 's/HR/Human Resources/g' emp.csv
+
+<span class="code-comment"># Method 3: Using sed script file</span>
+echo -e 's/IT/Tech/g\ns/HR/Human Resources/g' > commands.sed
+sed -f commands.sed emp. csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise F2: Delete and Replace in One Command</div>
+            <div class="task">Delete the header AND replace "Developer" with "SDE".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '1d; s/Developer/SDE/g' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <!-- SECTION G -->
+        <h3>📌 SECTION G: In-Place Editing (<code>-i</code>)</h3>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise G1: Edit File with Backup</div>
+            <div class="task">Replace all "Mumbai" with "Bombay" in the actual file (with backup).</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code><span class="code-comment"># Create backup first! </span>
+cp emp.csv emp_backup.csv
+
+<span class="code-comment"># Edit in-place with backup</span>
+sed -i. bak 's/Mumbai/Bombay/g' emp.csv
+
+<span class="code-comment"># Verify</span>
+grep "Bombay" emp. csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>-i.bak</code> — edit in-place, create backup with . bak extension</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="danger">
+            <strong>⚠️ DANGER:</strong> Using <code>-i</code> without backup suffix modifies the file permanently with NO UNDO!  Always test without <code>-i</code> first. 
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise G2: macOS vs Linux In-Place Edit</div>
+            <div class="task">Note the syntax difference between systems.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code><span class="code-comment"># Linux (GNU sed)</span>
+sed -i 's/old/new/g' file.txt
+
+<span class="code-comment"># macOS (BSD sed) - requires empty string for no backup</span>
+sed -i '' 's/old/new/g' file.txt
+
+<span class="code-comment"># macOS with backup</span>
+sed -i '. bak' 's/old/new/g' file.txt</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <!-- SECTION H -->
+        <h3>📌 SECTION H: Real-World Scenarios</h3>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H1: CSV to Tab-Separated</div>
+            <div class="task">Convert emp.csv from comma-separated to tab-separated.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 's/,/\t/g' emp.csv > emp. tsv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H2: Remove Trailing Whitespace</div>
+            <div class="task">Remove trailing spaces/tabs from each line.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 's/[[:space:]]*$//' filename.txt</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>[[:space: ]]</code> — matches any whitespace (space, tab)</li>
+                            <li><code>*$</code> — zero or more at end of line</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H3: Remove Leading Whitespace</div>
+            <div class="task">Remove leading spaces/tabs from each line.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 's/^[[:space: ]]*//' filename. txt</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H4: Add Line Numbers</div>
+            <div class="task">Add line numbers to each line.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed = emp.csv | sed 'N; s/\n/\t/'</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>=</code> — prints line number</li>
+                            <li><code>N</code> — append next line to pattern space</li>
+                            <li><code>s/\n/\t/</code> — replace newline with tab</li>
+                        </ul>
+                    </div>
+                    <p><strong>Alternative (simpler tools):</strong></p>
+                    <pre><code>nl emp.csv
+<span class="code-comment"># or</span>
+cat -n emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H5: Extract IT Department Only</div>
+            <div class="task">Print only IT department employees.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '/,IT,/p' emp. csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H6: Print Lines Between Patterns</div>
+            <div class="task">Print all lines between E010 and E020 (inclusive).</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '/^E010/,/^E020/p' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>/pattern1/,/pattern2/</code> — range between two patterns</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H7: Comment Out Lines</div>
+            <div class="task">Add "#" at the beginning of lines containing "Finance".</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '/Finance/s/^/#/' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>/Finance/</code> — address:  lines containing Finance</li>
+                            <li><code>s/^/#/</code> — substitute start of line with #</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H8: Double Space a File</div>
+            <div class="task">Add an empty line after each line.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 'G' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>G</code> — append hold space (empty by default) to pattern space</li>
+                            <li>This adds a newline after each line</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H9: Remove Double Spacing</div>
+            <div class="task">Remove empty lines (single space the file).</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '/^$/d' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="exercise">
+            <div class="exercise-title">📝 Exercise H10: Uppercase All Text</div>
+            <div class="task">Convert all text to uppercase.</div>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed 's/. */\U&/' emp.csv</code></pre>
+                    <div class="breakdown">
+                        <ul>
+                            <li><code>.*</code> — match entire line</li>
+                            <li><code>\U</code> — uppercase what follows</li>
+                            <li><code>&</code> — the entire matched pattern</li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <hr>
+
+        <!-- SECTION 8:  COMPARISON -->
+        <h2 id="compare">⚔️ SED vs AWK vs GREP</h2>
+
+        <h3>Comparison Table</h3>
+        <table class="compare-table">
+            <tr>
+                <th>Task</th>
+                <th>GREP</th>
+                <th>SED</th>
+                <th>AWK</th>
+            </tr>
+            <tr>
+                <td>Search/filter lines</td>
+                <td class="yes">✅ Best</td>
+                <td class="yes">✅ Good</td>
+                <td class="yes">✅ Good</td>
+            </tr>
+            <tr>
+                <td>Simple find/replace</td>
+                <td class="no">❌</td>
+                <td class="yes">✅ Best</td>
+                <td class="yes">✅ Good</td>
+            </tr>
+            <tr>
+                <td>Complex find/replace</td>
+                <td class="no">❌</td>
+                <td class="yes">✅ Best</td>
+                <td class="yes">✅ Good</td>
+            </tr>
+            <tr>
+                <td>Field/column extraction</td>
+                <td class="no">❌</td>
+                <td class="partial">⚠️ Possible</td>
+                <td class="yes">✅ Best</td>
+            </tr>
+            <tr>
+                <td>Numeric comparisons</td>
+                <td class="no">❌</td>
+                <td class="no">❌</td>
+                <td class="yes">✅ Best</td>
+            </tr>
+            <tr>
+                <td>Arithmetic operations</td>
+                <td class="no">❌</td>
+                <td class="no">❌</td>
+                <td class="yes">✅ Best</td>
+            </tr>
+            <tr>
+                <td>Line insertion/deletion</td>
+                <td class="no">❌</td>
+                <td class="yes">✅ Best</td>
+                <td class="yes">✅ Good</td>
+            </tr>
+            <tr>
+                <td>In-place file editing</td>
+                <td class="no">❌</td>
+                <td class="yes">✅ Best</td>
+                <td class="partial">⚠️ Limited</td>
+            </tr>
+            <tr>
+                <td>Speed on large files</td>
+                <td class="yes">✅ Fastest</td>
+                <td class="yes">✅ Fast</td>
+                <td class="partial">⚠️ Slower</td>
+            </tr>
+        </table>
+
+        <h3>When to Use What? </h3>
+        <table>
+            <tr>
+                <th>Scenario</th>
+                <th>Best Tool</th>
+            </tr>
+            <tr>
+                <td>"Find all lines with error"</td>
+                <td><code>grep</code></td>
+            </tr>
+            <tr>
+                <td>"Replace all foo with bar"</td>
+                <td><code>sed</code></td>
+            </tr>
+            <tr>
+                <td>"Print 3rd column of CSV"</td>
+                <td><code>awk</code></td>
+            </tr>
+            <tr>
+                <td>"Sum of all values in column"</td>
+                <td><code>awk</code></td>
+            </tr>
+            <tr>
+                <td>"Delete lines 5-10"</td>
+                <td><code>sed</code></td>
+            </tr>
+            <tr>
+                <td>"Find IPs in log file"</td>
+                <td><code>grep -E</code></td>
+            </tr>
+            <tr>
+                <td>"Transform date format"</td>
+                <td><code>sed</code></td>
+            </tr>
+            <tr>
+                <td>"Filter rows where col3 > 100"</td>
+                <td><code>awk</code></td>
+            </tr>
+        </table>
+
+        <h3>Combined Power Examples</h3>
+        <pre><code><span class="code-comment"># Example 1: Find and count IT employees</span>
+grep ",IT," emp.csv | wc -l
+
+<span class="code-comment"># Example 2: Extract IT employee names</span>
+grep ",IT," emp.csv | sed -E 's/^[^,]*,([^,]*),.*$/\1/'
+
+<span class="code-comment"># Example 3: Average salary of IT department</span>
+grep ",IT," emp.csv | awk -F',' '{sum+=$5; count++} END {print sum/count}'
+
+<span class="code-comment"># Example 4: Pipeline magic - IT devs in Mumbai, sorted by salary</span>
+grep ",IT," emp.csv | grep "Mumbai" | awk -F',' '{print $5, $2}' | sort -nr</code></pre>
+
+        <div class="pro-tip">
+            <strong>Remember:</strong> These tools work BEST together in pipelines. Master each, then combine them for ultimate text processing power!
+        </div>
+
+        <hr>
+
+        <!-- SECTION 9: CHALLENGES -->
+        <h2 id="challenges">🏆 Challenge Exercises</h2>
+        <p>Try these <span class="highlight">WITHOUT looking at solutions</span> first!  These test your complete understanding. </p>
+
+        <div class="challenge">
+            <div class="challenge-title">🎯 Challenge 1: Log File Cleanup</div>
+            <p>Create a fake log file and clean it: </p>
+            <pre><code>echo -e "2024-01-01 INFO Starting\n2024-01-01 DEBUG Details\n2024-01-01 ERROR Failed\n2024-01-01 DEBUG More\n2024-01-01 INFO Done" > test. log</code></pre>
+            <p><strong>Task:</strong> Remove all DEBUG lines AND replace INFO with [INFO]. </p>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '/DEBUG/d; s/INFO/[INFO]/g' test. log</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="challenge">
+            <div class="challenge-title">🎯 Challenge 2: Config File Update</div>
+            <p>Create a config file:</p>
+            <pre><code>echo -e "host=localhost\nport=8080\ndebug=true\ntimeout=30" > config.ini</code></pre>
+            <p><strong>Task:</strong> Change port to 3000 AND debug to false (in-place with backup).</p>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -i. bak 's/port=8080/port=3000/; s/debug=true/debug=false/' config.ini</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="challenge">
+            <div class="challenge-title">🎯 Challenge 3: Data Masking</div>
+            <p><strong>Task:</strong> In emp.csv, mask all dates to show only year (2020-03-15 → 2020-XX-XX).</p>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -E 's/([0-9]{4})-[0-9]{2}-[0-9]{2}/\1-XX-XX/g' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="challenge">
+            <div class="challenge-title">🎯 Challenge 4: Multi-line Header</div>
+            <p><strong>Task:</strong> Add a 3-line header comment to emp.csv:</p>
+            <pre><code># Employee Database
+# Last Updated: 2024
+# Confidential</code></pre>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed '1i # Employee Database\n# Last Updated: 2024\n# Confidential' emp. csv
+
+<span class="code-comment"># Or with multiple -e: </span>
+sed -e '1i # Employee Database' -e '1i # Last Updated:  2024' -e '1i # Confidential' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="challenge">
+            <div class="challenge-title">🎯 Challenge 5: Extract and Transform</div>
+            <p><strong>Task:</strong> Extract only CTO record, swap the name, and uppercase the designation.</p>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '/CTO/p' emp.csv | sed -E 's/,([A-Za-z]+) ([A-Za-z]+),/,\2 \1,/' | sed 's/CTO/\U&/'</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="challenge">
+            <div class="challenge-title">🎯 Challenge 6: Numbering Non-Empty Lines</div>
+            <p><strong>Task:</strong> Add line numbers only to lines that contain "Developer".</p>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '/Developer/=' emp.csv | sed 'N; s/\n/ - /' 
+
+<span class="code-comment"># Better approach with grep + nl:</span>
+grep -n "Developer" emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <div class="challenge">
+            <div class="challenge-title">🎯 Challenge 7: Reverse Pattern Match</div>
+            <p><strong>Task:</strong> Print all lines that do NOT contain "Developer" AND do NOT contain "Manager".</p>
+            <details>
+                <summary>🔑 Click for Solution</summary>
+                <div class="solution-content">
+                    <pre><code>sed -n '/Developer/! {/Manager/! p}' emp.csv
+
+<span class="code-comment"># Or with delete: </span>
+sed '/Developer/d; /Manager/d' emp.csv</code></pre>
+                </div>
+            </details>
+        </div>
+
+        <hr>
+
+        <!-- SECTION 10: CHEAT SHEET -->
+        <h2 id="cheatsheet">📋 Quick Reference Cheat Sheet</h2>
+
+        <div class="cheatsheet">
+            <h3>🚀 SED CHEAT SHEET</h3>
+
+            <div class="cheat-section">
+                <h4>SUBSTITUTION</h4>
+                <pre><code>sed 's/old/new/'          <span class="code-comment"># Replace first occurrence</span>
+sed 's/old/new/g'         <span class="code-comment"># Replace all occurrences</span>
+sed 's/old/new/gi'        <span class="code-comment"># Case-insensitive, all occurrences</span>
+sed 's/old/new/2'         <span class="code-comment"># Replace 2nd occurrence only</span>
+sed 's/old/new/gp'        <span class="code-comment"># Replace and print</span>
+sed 's|/old|/new|'        <span class="code-comment"># Use | delimiter for paths</span></code></pre>
+            </div>
+
+            <div class="cheat-section">
+                <h4>ADDRESSING</h4>
+                <pre><code>sed '5s/old/new/'         <span class="code-comment"># Only on line 5</span>
+sed '5,10s/old/new/'      <span class="code-comment"># Lines 5-10</span>
+sed '5,$s/old/new/'       <span class="code-comment"># Line 5 to end</span>
+sed '/pattern/s/old/new/' <span class="code-comment"># Lines matching pattern</span>
+sed '1~2s/old/new/'       <span class="code-comment"># Every odd line</span>
+sed '0~2s/old/new/'       <span class="code-comment"># Every even line</span></code></pre>
+            </div>
+
+            <div class="cheat-section">
+                <h4>DELETION</h4>
+                <pre><code>sed '5d'                  <span class="code-comment"># Delete line 5</span>
+sed '5,10d'               <span class="code-comment"># Delete lines 5-10</span>
+sed '$d'                  <span class="code-comment"># Delete last line</span>
+sed '/pattern/d'          <span class="code-comment"># Delete matching lines</span>
+sed '/^$/d'               <span class="code-comment"># Delete empty lines</span>
+sed '/^#/d'               <span class="code-comment"># Delete comment lines</span></code></pre>
+            </div>
+
+            <div class="cheat-section">
+                <h4>PRINTING</h4>
+                <pre><code>sed -n '5p'               <span class="code-comment"># Print line 5 only</span>
+sed -n '5,10p'            <span class="code-comment"># Print lines 5-10</span>
+sed -n '/pattern/p'       <span class="code-comment"># Print matching lines</span>
+sed -n '/start/,/end/p'   <span class="code-comment"># Print between patterns</span></code></pre>
+            </div>
+
+            <div class="cheat-section">
+                <h4>INSERT / APPEND / CHANGE</h4>
+                <pre><code>sed '5i New line'         <span class="code-comment"># Insert before line 5</span>
+sed '5a New line'         <span class="code-comment"># Append after line 5</span>
+sed '5c New line'         <span class="code-comment"># Replace line 5</span>
+sed '$a End of file'      <span class="code-comment"># Append at end</span></code></pre>
+            </div>
+
+            <div class="cheat-section">
+                <h4>IN-PLACE EDITING</h4>
+                <pre><code>sed -i 's/old/new/g' file      <span class="code-comment"># Edit directly (Linux)</span>
+sed -i.bak 's/old/new/g' file  <span class="code-comment"># Edit with backup</span>
+sed -i '' 's/old/new/g' file   <span class="code-comment"># Edit directly (macOS)</span></code></pre>
+            </div>
+
+            <div class="cheat-section">
+                <h4>MULTIPLE COMMANDS</h4>
+                <pre><code>sed 's/a/A/g; s/b/B/g'         <span class="code-comment"># Semicolon separated</span>
+sed -e 's/a/A/' -e 's/b/B/'    <span class="code-comment"># Multiple -e flags</span>
+sed -f script.sed file         <span class="code-comment"># Commands from file</span></code></pre>
+            </div>
+
+            <div class="cheat-section">
+                <h4>SPECIAL CHARACTERS</h4>
+                <pre><code>sed 's/. */[&]/'           <span class="code-comment"># & = matched pattern</span>
+sed 's/\(word\)/[\1]/'    <span class="code-comment"># \1 = backreference</span>
+sed 's/. */\U&/'           <span class="code-comment"># Uppercase all</span>
+sed 's/. */\L&/'           <span class="code-comment"># Lowercase all</span>
+sed 's/./\u&/'            <span class="code-comment"># Capitalize first char</span></code></pre>
+            </div>
+
+            <div class="cheat-section">
+                <h4>COMMON PATTERNS</h4>
+                <pre><code>sed 's/[[: space:]]*$//'   <span class="code-comment"># Remove trailing whitespace</span>
+sed 's/^[[:space: ]]*//'   <span class="code-comment"># Remove leading whitespace</span>
+sed 'G'                   <span class="code-comment"># Double space file</span>
+sed '/^$/d'               <span class="code-comment"># Remove blank lines</span>
+sed 's/,/\t/g'            <span class="code-comment"># CSV to TSV</span>
+sed -n '1p'               <span class="code-comment"># Print first line (head -1)</span>
+sed -n '$p'               <span class="code-comment"># Print last line (tail -1)</span></code></pre>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- SECTION 11: TAKEAWAYS -->
+        <h2 id="takeaways">🎓 Key Takeaways</h2>
+
+        <div class="takeaways">
+            <h3>Remember These, Loki! </h3>
+            <ol>
+                <li><strong>SED = Stream Editor</strong> — processes text line by line without loading entire file</li>
+                <li><strong>Non-destructive by default</strong> — use <code>-i</code> for in-place editing (carefully! )</li>
+                <li><strong>Regex-powered</strong> — master regular expressions to master sed</li>
+                <li><strong>Perfect for: </strong> find/replace, line manipulation, text transformation</li>
+                <li><strong>Not ideal for:</strong> numeric operations, complex logic (use AWK instead)</li>
+                <li><strong>Always test first</strong> — run without <code>-i</code> before modifying files</li>
+                <li><strong>Pipeline friendly</strong> — combines with grep, awk, sort, etc.</li>
+                <li><strong>Delimiters are flexible</strong> — use <code>|</code> or <code>#</code> when dealing with paths</li>
+                <li><strong>Backup everything</strong> — use <code>-i.bak</code> when editing in place</li>
+                <li><strong>Practice daily</strong> — the more you use it, the more natural it becomes</li>
+            </ol>
+        </div>
+
+        <hr>
+
+        <!-- FURTHER LEARNING -->
+        <h2>📚 Further Learning</h2>
+        <ul>
+            <li><code>man sed</code> — The manual page</li>
+            <li><code>info sed</code> — GNU sed documentation</li>
+            <li><strong>Practice on: </strong> Log files, config files, CSV data</li>
+            <li><strong>Next steps:</strong> Learn AWK for column-based processing</li>
+            <li><strong>Advanced: </strong> Hold space operations for multi-line processing</li>
+        </ul>
+
+        <hr>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p><strong>📝 SED Complete Notes</strong></p>
+            <p>Created for <span class="highlight">Loki</span> by <span class="highlight">Shelly</span></p>
+            <p>Session: SED Mastery — The Stream Editor Deep Dive</p>
+            <p class="motto">"Master sed, and text files bend to your will." 🚀</p>
+        </div>
+
+    </div>
+</body>
+</html>

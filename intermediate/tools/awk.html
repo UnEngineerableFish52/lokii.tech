@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWK Mastery Notes — From Zero to Pro</title>
+    <style>
+        * {
+            margin:  0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0d1117;
+            color:  #e6edf3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 18px;
+            line-height: 1.7;
+            padding: 40px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #00ffff;
+            font-size: 2.8em;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom:  40px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        h2 {
+            color: #00ffff;
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        h3 {
+            color:  #ffa500;
+            font-size: 1.4em;
+            font-weight:  600;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #e6edf3;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        strong {
+            color:  #ffd700;
+            font-weight: 700;
+        }
+
+        code {
+            background-color: #161b22;
+            color: #7ee787;
+            padding:  3px 8px;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        pre {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 15px 0 25px 0;
+        }
+
+        pre code {
+            color: #7ee787;
+            padding: 0;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .comment {
+            color:  #8b949e;
+        }
+
+        table {
+            width:  100%;
+            border-collapse: collapse;
+            margin:  20px 0 30px 0;
+        }
+
+        th {
+            background-color: #1f2937;
+            color: #00ffff;
+            font-weight: 700;
+            text-align: left;
+            padding: 15px;
+            border:  1px solid #30363d;
+        }
+
+        td {
+            background-color: #161b22;
+            color: #e6edf3;
+            padding: 12px 15px;
+            border:  1px solid #30363d;
+        }
+
+        td:first-child {
+            color: #7ee787;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        tr:hover td {
+            background-color: #1f2937;
+        }
+
+        ul, ol {
+            margin:  15px 0 20px 30px;
+        }
+
+        li {
+            color: #e6edf3;
+            font-weight: 600;
+            margin-bottom:  10px;
+        }
+
+        .highlight {
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        .tip {
+            background-color: #1c3d5a;
+            border-left: 4px solid #58a6ff;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tip-title {
+            color: #58a6ff;
+            font-weight:  700;
+            margin-bottom: 8px;
+        }
+
+        .warning {
+            background-color: #5a3c1c;
+            border-left: 4px solid #ffa500;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius:  0 8px 8px 0;
+        }
+
+        .warning-title {
+            color:  #ffa500;
+            font-weight: 700;
+            margin-bottom:  8px;
+        }
+
+        .question {
+            background-color: #1a1a2e;
+            border:  1px solid #4a4a6a;
+            border-radius: 8px;
+            padding:  20px;
+            margin: 20px 0;
+        }
+
+        .question-title {
+            color: #ff79c6;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+        }
+
+        .divider {
+            border: 0;
+            height:  1px;
+            background:  linear-gradient(to right, transparent, #30363d, transparent);
+            margin: 40px 0;
+        }
+
+        .cheatsheet {
+            background-color: #0f1419;
+            border:  2px solid #00ffff;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .csv-data {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding:  15px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85em;
+            color: #aaa;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .section-number {
+            color:  #ff79c6;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AWK Mastery Notes — From Zero to Pro</h1>
+
+    <!-- Section 1 -->
+    <h2><span class="section-number">1.</span> What is AWK? </h2>
+    <p><strong>AWK</strong> = Pattern scanning and text processing language. </p>
+    <p><strong>Full Form:</strong> Named after creators — <strong>A</strong>ho, <strong>W</strong>einberger, <strong>K</strong>ernighan (1977, Bell Labs).</p>
+    <p><strong>One-liner definition:</strong><br>
+    AWK reads files line-by-line, splits each line into fields, and lets you process/filter/transform data using patterns and actions.</p>
+
+    <hr class="divider">
+
+    <!-- Section 2 -->
+    <h2><span class="section-number">2.</span> Why AWK? </h2>
+    <table>
+        <tr><th>Reason</th><th>Explanation</th></tr>
+        <tr><td>Text processing</td><td>Parse logs, configs, CSVs instantly</td></tr>
+        <tr><td>Data extraction</td><td>Pull specific columns without loading into Excel</td></tr>
+        <tr><td>Quick calculations</td><td>Sum, average, count — no Python script needed</td></tr>
+        <tr><td>One-liners</td><td>Do in 1 line what takes 20 lines in other languages</td></tr>
+        <tr><td>Universally available</td><td>Pre-installed on Linux, macOS, WSL</td></tr>
+    </table>
+
+    <hr class="divider">
+
+    <!-- Section 3 -->
+    <h2><span class="section-number">3.</span> When to Use AWK? </h2>
+    <ul>
+        <li>Parsing structured files (CSV, TSV, logs, <code>/etc/passwd</code>)</li>
+        <li>Extracting specific columns or fields</li>
+        <li>Filtering rows based on conditions</li>
+        <li>Quick stats (sum, count, avg, min, max)</li>
+        <li>Reformatting output</li>
+        <li>Preprocessing data before piping to other tools</li>
+    </ul>
+
+    <hr class="divider">
+
+    <!-- Section 4 -->
+    <h2><span class="section-number">4.</span> Who Needs AWK?</h2>
+    <table>
+        <tr><th>Role</th><th>Use Case</th></tr>
+        <tr><td>SysAdmins</td><td>Parse logs, monitor systems</td></tr>
+        <tr><td>DevOps</td><td>Process CI/CD outputs, configs</td></tr>
+        <tr><td>Security Analysts</td><td>Analyze access logs, extract IPs</td></tr>
+        <tr><td>Pentesters</td><td>Recon data parsing, wordlist manipulation</td></tr>
+        <tr><td>Data Engineers</td><td>Quick ETL, data cleaning</td></tr>
+        <tr><td>Developers</td><td>Debug logs, test output parsing</td></tr>
+    </table>
+
+    <hr class="divider">
+
+    <!-- Section 5 -->
+    <h2><span class="section-number">5.</span> AWK vs Others</h2>
+    <table>
+        <tr><th>Tool</th><th>Best For</th></tr>
+        <tr><td>grep</td><td>Finding/matching patterns</td></tr>
+        <tr><td>sed</td><td>Find and replace, line editing</td></tr>
+        <tr><td>awk</td><td>Column-based processing, calculations</td></tr>
+        <tr><td>cut</td><td>Simple column extraction (less powerful)</td></tr>
+    </table>
+
+    <div class="tip">
+        <div class="tip-title">Rule of Thumb</div>
+        <p>Search → <code>grep</code> | Replace → <code>sed</code> | Columns + Math → <code>awk</code></p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Section 6 -->
+    <h2><span class="section-number">6.</span> General Syntax</h2>
+    <pre><code>awk [OPTIONS] 'PATTERN {ACTION}' filename</code></pre>
+
+    <table>
+        <tr><th>Component</th><th>Meaning</th></tr>
+        <tr><td>OPTIONS</td><td>Flags like <code>-F</code> for delimiter</td></tr>
+        <tr><td>PATTERN</td><td>Condition to match (optional)</td></tr>
+        <tr><td>ACTION</td><td>What to do with matched lines</td></tr>
+        <tr><td>filename</td><td>Input file</td></tr>
+    </table>
+
+    <p><strong>If no PATTERN: </strong> Action runs on every line. </p>
+    <p><strong>If no ACTION:</strong> Prints entire matching line.</p>
+
+    <hr class="divider">
+
+    <!-- Section 7 -->
+    <h2><span class="section-number">7.</span> Key Options</h2>
+    <table>
+        <tr><th>Option</th><th>Meaning</th><th>Example</th></tr>
+        <tr><td>-F</td><td>Field separator</td><td><code>-F,</code> for CSV, <code>-F: </code> for /etc/passwd</td></tr>
+        <tr><td>-v</td><td>Define variable</td><td><code>-v threshold=50000</code></td></tr>
+        <tr><td>-f</td><td>Read awk script from file</td><td><code>awk -f script. awk data.txt</code></td></tr>
+    </table>
+
+    <hr class="divider">
+
+    <!-- Section 8 -->
+    <h2><span class="section-number">8.</span> Field Separator Deep Dive</h2>
+    <p><strong>Default separator:</strong> Whitespace (space/tab).</p>
+
+    <pre><code><span class="comment"># CSV (comma)</span>
+awk -F, '{print $1}' file.csv
+
+<span class="comment"># TSV (tab)</span>
+awk -F'\t' '{print $1}' file. tsv
+
+<span class="comment"># Colon (like /etc/passwd)</span>
+awk -F:  '{print $1}' /etc/passwd
+
+<span class="comment"># Pipe</span>
+awk -F'|' '{print $1}' file. psv
+
+<span class="comment"># Multiple separators (comma OR semicolon)</span>
+awk -F'[,;]' '{print $1}' file.txt</code></pre>
+
+    <hr class="divider">
+
+    <!-- Section 9 -->
+    <h2><span class="section-number">9.</span> Built-in Variables</h2>
+    <table>
+        <tr><th>Variable</th><th>Meaning</th><th>Example Value</th></tr>
+        <tr><td>$0</td><td>Entire current line</td><td><code>101,john,engineering,75000,newyork,active</code></td></tr>
+        <tr><td>$1, $2... </td><td>1st, 2nd...  field</td><td><code>$1</code>=101, <code>$2</code>=john</td></tr>
+        <tr><td>NR</td><td><strong>N</strong>umber of <strong>R</strong>ecord (line number)</td><td>1, 2, 3... </td></tr>
+        <tr><td>NF</td><td><strong>N</strong>umber of <strong>F</strong>ields in current line</td><td>6 (for 6-column CSV)</td></tr>
+        <tr><td>FS</td><td><strong>F</strong>ield <strong>S</strong>eparator (input)</td><td>,</td></tr>
+        <tr><td>OFS</td><td><strong>O</strong>utput <strong>F</strong>ield <strong>S</strong>eparator</td><td>Default: space</td></tr>
+        <tr><td>RS</td><td><strong>R</strong>ecord <strong>S</strong>eparator</td><td>Default: newline</td></tr>
+        <tr><td>ORS</td><td><strong>O</strong>utput <strong>R</strong>ecord <strong>S</strong>eparator</td><td>Default: newline</td></tr>
+        <tr><td>FILENAME</td><td>Current filename</td><td>emp.csv</td></tr>
+    </table>
+
+    <hr class="divider">
+
+    <!-- Section 10 -->
+    <h2><span class="section-number">10.</span> Special Blocks</h2>
+
+    <h3>BEGIN Block</h3>
+    <p>Runs <strong>before</strong> processing any lines.</p>
+    <pre><code>awk 'BEGIN {print "Starting..."} {print $0}' file.txt</code></pre>
+    <p><strong>Use cases:</strong> Print headers, initialize variables, set FS.</p>
+    <pre><code>awk 'BEGIN {FS=","; print "Name,Salary"} NR>1 {print $2,$4}' emp.csv</code></pre>
+
+    <h3>END Block</h3>
+    <p>Runs <strong>after</strong> all lines processed.</p>
+    <pre><code>awk '{sum+=$1} END {print "Total:", sum}' numbers.txt</code></pre>
+    <p><strong>Use cases:</strong> Print totals, averages, summaries.</p>
+
+    <hr class="divider">
+
+    <!-- Section 11 -->
+    <h2><span class="section-number">11.</span> Operators</h2>
+
+    <h3>Comparison</h3>
+    <table>
+        <tr><th>Operator</th><th>Meaning</th></tr>
+        <tr><td>==</td><td>Equal</td></tr>
+        <tr><td>!=</td><td>Not equal</td></tr>
+        <tr><td>></td><td>Greater than</td></tr>
+        <tr><td><</td><td>Less than</td></tr>
+        <tr><td>>=</td><td>Greater or equal</td></tr>
+        <tr><td><=</td><td>Less or equal</td></tr>
+    </table>
+
+    <h3>Logical</h3>
+    <table>
+        <tr><th>Operator</th><th>Meaning</th></tr>
+        <tr><td>&&</td><td>AND</td></tr>
+        <tr><td>||</td><td>OR</td></tr>
+        <tr><td>!</td><td>NOT</td></tr>
+    </table>
+
+    <h3>Regex Match</h3>
+    <table>
+        <tr><th>Operator</th><th>Meaning</th></tr>
+        <tr><td>~</td><td>Matches pattern</td></tr>
+        <tr><td>!~</td><td>Does not match</td></tr>
+    </table>
+
+    <pre><code><span class="comment"># Name contains "a"</span>
+awk -F, '$2 ~ /a/' emp.csv
+
+<span class="comment"># Department NOT marketing</span>
+awk -F, '$3 ! ~ /marketing/' emp.csv</code></pre>
+
+    <hr class="divider">
+
+    <!-- Section 12 -->
+    <h2><span class="section-number">12.</span> Associative Arrays</h2>
+    <p>Key-value storage — like Python dictionaries.</p>
+
+    <pre><code><span class="comment"># Count per department</span>
+awk -F, 'NR>1 {dept[$3]++} END {for(d in dept) print d, dept[d]}' emp.csv
+
+<span class="comment"># Sum salary per city</span>
+awk -F, 'NR>1 {city[$5]+=$4} END {for(c in city) print c, city[c]}' emp.csv</code></pre>
+
+    <p><strong>Syntax:</strong></p>
+    <pre><code>array[key] = value    <span class="comment"># assign</span>
+array[key]++          <span class="comment"># increment</span>
+for(var in array)     <span class="comment"># loop through keys</span></code></pre>
+
+    <hr class="divider">
+
+    <!-- Section 13 -->
+    <h2><span class="section-number">13.</span> Useful Functions</h2>
+
+    <h3>String Functions</h3>
+    <table>
+        <tr><th>Function</th><th>Meaning</th><th>Example</th></tr>
+        <tr><td>length(s)</td><td>String length</td><td><code>length($2)</code></td></tr>
+        <tr><td>toupper(s)</td><td>Uppercase</td><td><code>toupper($2)</code></td></tr>
+        <tr><td>tolower(s)</td><td>Lowercase</td><td><code>tolower($2)</code></td></tr>
+        <tr><td>substr(s,start,len)</td><td>Substring</td><td><code>substr($2,1,3)</code> → first 3 chars</td></tr>
+        <tr><td>gsub(regex,replace,target)</td><td>Global substitute</td><td><code>gsub(/old/,"new",$0)</code></td></tr>
+        <tr><td>sub(regex,replace,target)</td><td>Substitute first match</td><td><code>sub(/old/,"new",$0)</code></td></tr>
+        <tr><td>split(s,array,sep)</td><td>Split string into array</td><td><code>split($0,arr,",")</code></td></tr>
+        <tr><td>index(s,target)</td><td>Find position</td><td><code>index($2,"oh")</code></td></tr>
+    </table>
+
+    <h3>Math Functions</h3>
+    <table>
+        <tr><th>Function</th><th>Meaning</th></tr>
+        <tr><td>int(x)</td><td>Integer part</td></tr>
+        <tr><td>sqrt(x)</td><td>Square root</td></tr>
+        <tr><td>sin(x), cos(x)</td><td>Trigonometry</td></tr>
+        <tr><td>rand()</td><td>Random 0-1</td></tr>
+        <tr><td>srand()</td><td>Seed random</td></tr>
+    </table>
+
+    <hr class="divider">
+
+    <!-- Section 14 -->
+    <h2><span class="section-number">14.</span> Output Formatting</h2>
+
+    <h3>print (simple)</h3>
+    <pre><code>awk -F, '{print $2, $4}' emp.csv
+<span class="comment"># Output: john 75000</span></code></pre>
+
+    <h3>printf (formatted)</h3>
+    <pre><code>awk -F, '{printf "%-10s %d\n", $2, $4}' emp.csv
+<span class="comment"># Output: john       75000</span></code></pre>
+
+    <table>
+        <tr><th>Format</th><th>Meaning</th></tr>
+        <tr><td>%s</td><td>String</td></tr>
+        <tr><td>%d</td><td>Integer</td></tr>
+        <tr><td>%f</td><td>Float</td></tr>
+        <tr><td>%-10s</td><td>Left-align, 10 chars wide</td></tr>
+        <tr><td>%10s</td><td>Right-align, 10 chars wide</td></tr>
+        <tr><td>%. 2f</td><td>Float with 2 decimals</td></tr>
+        <tr><td>\n</td><td>Newline</td></tr>
+        <tr><td>\t</td><td>Tab</td></tr>
+    </table>
+
+    <hr class="divider">
+
+    <!-- Section 15 -->
+    <h2><span class="section-number">15.</span> Sample Data:  employees. csv</h2>
+    <div class="csv-data">id,name,department,salary,city,status
+101,john,engineering,75000,newyork,active
+102,sara,marketing,62000,chicago,active
+103,mike,engineering,81000,seattle,inactive
+104,emma,hr,55000,boston,active
+105,alex,marketing,59000,chicago,inactive
+106,lisa,engineering,92000,newyork,active
+107,david,finance,67000,seattle,active
+108,nina,hr,53000,boston,inactive
+109,chris,engineering,78000,newyork,active
+110,olivia,marketing,61000,chicago,active
+111,james,finance,71000,seattle,inactive
+112,sophia,hr,58000,boston,active
+113,liam,engineering,88000,newyork,active
+114,mia,marketing,64000,chicago,inactive
+115,noah,finance,69000,seattle,active
+116,ava,hr,52000,boston,active
+117,ethan,engineering,95000,newyork,inactive
+118,isabella,marketing,60000,chicago,active
+119,mason,finance,73000,seattle,active
+120,charlotte,hr,56000,boston,inactive
+121,logan,engineering,84000,newyork,active
+122,amelia,marketing,63000,chicago,active
+123,lucas,finance,70000,seattle,inactive
+124,harper,hr,54000,boston,active
+125,jack,engineering,91000,newyork,active
+126,ella,marketing,65000,chicago,inactive
+127,benjamin,finance,72000,seattle,active
+128,aria,hr,57000,boston,active
+129,henry,engineering,87000,newyork,inactive
+130,scarlett,marketing,66000,chicago,active
+131,sebastian,finance,74000,seattle,active
+132,grace,hr,51000,boston,inactive
+133,daniel,engineering,93000,newyork,active
+134,chloe,marketing,68000,chicago,active
+135,matthew,finance,76000,seattle,active</div>
+
+    <hr class="divider">
+
+    <!-- Section 16 -->
+    <h2><span class="section-number">16.</span> Practice Drills — Q&A</h2>
+
+    <h3>Basic Extraction</h3>
+
+    <div class="question">
+        <div class="question-title">Q1: Print only the `name` column.</div>
+        <pre><code>awk -F, '{print $2}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q2: Print `name` and `salary` columns.</div>
+        <pre><code>awk -F, '{print $2, $4}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q3: Print header row only.</div>
+        <pre><code>awk -F, 'NR==1' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q4: Print all rows except header.</div>
+        <pre><code>awk -F, 'NR>1' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q5: Print last field of each row.</div>
+        <pre><code>awk -F, '{print $NF}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q6: Print second-to-last field. </div>
+        <pre><code>awk -F, '{print $(NF-1)}' emp.csv</code></pre>
+    </div>
+
+    <h3>Filtering</h3>
+
+    <div class="question">
+        <div class="question-title">Q7: Print employees from engineering department.</div>
+        <pre><code>awk -F, '$3=="engineering"' emp. csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q8: Print names with salary > 70000.</div>
+        <pre><code>awk -F, 'NR>1 && $4>70000 {print $2}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q9: Print inactive employees.</div>
+        <pre><code>awk -F, '$6=="inactive"' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q10: Print employees from chicago OR boston.</div>
+        <pre><code>awk -F, '$5=="chicago" || $5=="boston"' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q11: Print finance employees with salary > 70000.</div>
+        <pre><code>awk -F, '$3=="finance" && $4>70000 {print $2}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q12: Print names containing "a".</div>
+        <pre><code>awk -F, '$2 ~ /a/ {print $2}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q13: Print employees NOT in marketing.</div>
+        <pre><code>awk -F, '$3 ! ~ /marketing/' emp.csv</code></pre>
+    </div>
+
+    <h3>Formatting Output</h3>
+
+    <div class="question">
+        <div class="question-title">Q14: Print name: salary format.</div>
+        <pre><code>awk -F, 'NR>1 {print $2":"$4}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q15: Print name (tab) department. </div>
+        <pre><code>awk -F, 'NR>1 {print $2"\t"$3}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q16: Print names in uppercase.</div>
+        <pre><code>awk -F, 'NR>1 {print toupper($2)}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q17: Print formatted table — name left-aligned 12 chars, salary right-aligned 8 chars.</div>
+        <pre><code>awk -F, 'NR>1 {printf "%-12s %8d\n", $2, $4}' emp.csv</code></pre>
+    </div>
+
+    <h3>Counting</h3>
+
+    <div class="question">
+        <div class="question-title">Q18: Count total employees (excluding header).</div>
+        <pre><code>awk -F, 'NR>1 {count++} END {print count}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q19: Count employees per department.</div>
+        <pre><code>awk -F, 'NR>1 {dept[$3]++} END {for(d in dept) print d, dept[d]}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q20: Count employees per city. </div>
+        <pre><code>awk -F, 'NR>1 {city[$5]++} END {for(c in city) print c, city[c]}' emp. csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q21: Count active vs inactive employees.</div>
+        <pre><code>awk -F, 'NR>1 {status[$6]++} END {for(s in status) print s, status[s]}' emp.csv</code></pre>
+    </div>
+
+    <h3>Math & Aggregation</h3>
+
+    <div class="question">
+        <div class="question-title">Q22: Calculate total salary sum.</div>
+        <pre><code>awk -F, 'NR>1 {sum+=$4} END {print sum}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q23: Calculate average salary. </div>
+        <pre><code>awk -F, 'NR>1 {sum+=$4; count++} END {print sum/count}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q24: Find highest salary.</div>
+        <pre><code>awk -F, 'NR>1 && $4>max {max=$4} END {print max}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q25: Find name of employee with highest salary.</div>
+        <pre><code>awk -F, 'NR>1 {if($4>max){max=$4; name=$2}} END {print name}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q26: Find lowest salary.</div>
+        <pre><code>awk -F, 'NR==2 {min=$4} NR>2 && $4<min {min=$4} END {print min}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q27: Calculate total salary per department.</div>
+        <pre><code>awk -F, 'NR>1 {dept[$3]+=$4} END {for(d in dept) print d, dept[d]}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q28: Calculate average salary per city.</div>
+        <pre><code>awk -F, 'NR>1 {sum[$5]+=$4; count[$5]++} END {for(c in sum) print c, sum[c]/count[c]}' emp.csv</code></pre>
+    </div>
+
+    <h3>Advanced</h3>
+
+    <div class="question">
+        <div class="question-title">Q29: Print employees with salary above average.</div>
+        <pre><code>awk -F, 'NR>1 {sal[NR]=$4; name[NR]=$2; sum+=$4; count++} END {avg=sum/count; for(i in sal) if(sal[i]>avg) print name[i], sal[i]}' emp. csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q30: Print top 3 highest paid employees.</div>
+        <pre><code>awk -F, 'NR>1 {print $4, $2}' emp.csv | sort -rn | head -3</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q31: Print department with highest total salary.</div>
+        <pre><code>awk -F, 'NR>1 {dept[$3]+=$4} END {for(d in dept) if(dept[d]>max){max=dept[d]; top=d} print top, max}' emp. csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q32: Add row numbers to output.</div>
+        <pre><code>awk -F, 'NR>1 {print NR-1, $2, $4}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q33: Print only unique departments.</div>
+        <pre><code>awk -F, 'NR>1 && ! seen[$3]++ {print $3}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q34: Print employees and label salary as HIGH (>75000) or LOW. </div>
+        <pre><code>awk -F, 'NR>1 {print $2, ($4>75000 ? "HIGH" :  "LOW")}' emp.csv</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-title">Q35: Swap name and department columns in output.</div>
+        <pre><code>awk -F, 'NR>1 {print $3, $2}' emp.csv</code></pre>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Section 17 -->
+    <h2><span class="section-number">17.</span> Quick Reference Cheatsheet</h2>
+
+    <div class="cheatsheet">
+        <table>
+            <tr><th>Task</th><th>Command</th></tr>
+            <tr><td>Print column 2</td><td><code>awk -F, '{print $2}' file</code></td></tr>
+            <tr><td>Print multiple columns</td><td><code>awk -F, '{print $1, $3}' file</code></td></tr>
+            <tr><td>Skip header</td><td><code>awk -F, 'NR>1' file</code></td></tr>
+            <tr><td>Filter by value</td><td><code>awk -F, '$3=="value"' file</code></td></tr>
+            <tr><td>Filter by number</td><td><code>awk -F, '$4>1000' file</code></td></tr>
+            <tr><td>Regex match</td><td><code>awk -F, '$2 ~ /pattern/' file</code></td></tr>
+            <tr><td>Count rows</td><td><code>awk 'END {print NR}' file</code></td></tr>
+            <tr><td>Sum column</td><td><code>awk -F, '{sum+=$4} END {print sum}' file</code></td></tr>
+            <tr><td>Average</td><td><code>awk -F, '{sum+=$4} END {print sum/NR}' file</code></td></tr>
+            <tr><td>Group count</td><td><code>awk -F, '{arr[$3]++} END {for(k in arr) print k, arr[k]}' file</code></td></tr>
+            <tr><td>Group sum</td><td><code>awk -F, '{arr[$3]+=$4} END {for(k in arr) print k, arr[k]}' file</code></td></tr>
+            <tr><td>Find max</td><td><code>awk -F, '$4>max {max=$4} END {print max}' file</code></td></tr>
+            <tr><td>Unique values</td><td><code>awk -F, '! seen[$3]++ {print $3}' file</code></td></tr>
+            <tr><td>Format output</td><td><code>awk -F, '{printf "%-10s %d\n", $2, $4}' file</code></td></tr>
+        </table>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Section 18 -->
+    <h2><span class="section-number">18.</span> Common Mistakes to Avoid</h2>
+
+    <div class="warning">
+        <div class="warning-title">Watch Out!</div>
+        <table>
+            <tr><th>Mistake</th><th>Fix</th></tr>
+            <tr><td>Forgetting -F, for CSV</td><td>Always specify delimiter</td></tr>
+            <tr><td>Using = instead of ==</td><td><code>=</code> assigns, <code>==</code> compares</td></tr>
+            <tr><td>Spaces around -F</td><td><code>-F,</code> not <code>-F ,</code></td></tr>
+            <tr><td>Wrong quotes</td><td>Use single quotes <code>'.. .'</code> around awk program</td></tr>
+            <tr><td>Forgetting $ for fields</td><td><code>$3</code> not <code>3</code></td></tr>
+            <tr><td>Multiple END blocks</td><td>Only one <code>END {}</code> allowed</td></tr>
+        </table>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Section 19 -->
+    <h2><span class="section-number">19.</span> Real-World Use Cases</h2>
+
+    <h3>Parse /etc/passwd</h3>
+    <pre><code><span class="comment"># List all usernames</span>
+awk -F:  '{print $1}' /etc/passwd
+
+<span class="comment"># Find users with bash shell</span>
+awk -F: '$7 ~ /bash/ {print $1}' /etc/passwd</code></pre>
+
+    <h3>Analyze Access Logs</h3>
+    <pre><code><span class="comment"># Count requests per IP</span>
+awk '{ip[$1]++} END {for(i in ip) print ip[i], i}' access.log | sort -rn | head -10
+
+<span class="comment"># Find 404 errors</span>
+awk '$9==404 {print $7}' access.log</code></pre>
+
+    <h3>Process CSV Reports</h3>
+    <pre><code><span class="comment"># Sum sales column</span>
+awk -F, 'NR>1 {sum+=$5} END {print "Total Sales:", sum}' sales.csv
+
+<span class="comment"># Find above-average performers</span>
+awk -F, 'NR>1 {sum+=$5; count++; data[NR]=$0} END {avg=sum/count; for(i in data) {split(data[i],a,","); if(a[5]>avg) print a[1], a[5]}}' sales.csv</code></pre>
+
+    <hr class="divider">
+
+    <!-- Section 20 -->
+    <h2><span class="section-number">20.</span> Next Steps</h2>
+    <ol>
+        <li>Practice all 35 drills until muscle memory</li>
+        <li>Create your own sample files and queries</li>
+        <li>Combine with <code>grep</code> and <code>sed</code> in pipelines</li>
+        <li>Apply to real logs on your Kali VM</li>
+        <li>Move to <code>sed</code> mastery next</li>
+    </ol>
+
+    <hr class="divider">
+
+    <p style="text-align:  center; color: #8b949e; margin-top: 40px;">
+        <strong>End of AWK Mastery Notes</strong><br>
+        Built for Loki by Shelly 🔥
+    </p>
+
+</body>
+</html>
