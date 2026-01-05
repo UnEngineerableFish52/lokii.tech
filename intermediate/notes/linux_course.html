@@ -17,16 +17,67 @@
     
     <!-- Highlight.js for syntax coloring (Can be customized in style.css or kept separate) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/tomorrow-night.min.css">
+    <style>
+        /* Site Header - Homepage Style */
+        .site-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #262626;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .site-header .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .branding {
+            text-decoration: none;
+        }
+
+        .branding .logo {
+            color: #00bcd4;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .site-nav {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .site-nav .nav-link {
+            color: #A1A1AA;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .site-nav .nav-link:hover {
+            color: #00bcd4;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Persistent Navigation -->
+    <!-- Site Header -->
     <header class="site-header">
-        <div class="nav-container">
-            <a href="index.html" class="branding">
-                🐧 Linux Mastery
+        <div class="header-content">
+            <a href="../../index.html" class="branding">
+                <span class="logo">lokii.tech</span>
             </a>
-            <a href="index.html" class="home-link">← Back to Hub</a>
+            <nav class="site-nav">
+                <a href="../../index.html#about" class="nav-link">About</a>
+                <a href="../../index.html#resources" class="nav-link">Resources</a>
+                <a href="https://github.com/UnEliteFish52" target="_blank" class="nav-link">GitHub</a>
+            </nav>
         </div>
     </header>
 
