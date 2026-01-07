@@ -1,0 +1,10 @@
+This file shall contain the description about the status of the project.
+
+Current Status:
+- Nice landing page
+- PWA working
+- homepage dark themed awesome looking
+- about page looks dark and generic but okay
+- resources NOT MODULARIZED, needs to be fixed
+- the rest (mission and footer) are dark themed and generic fine looking no need to worry about this 
+- LICENSE GNU General Public License v3.0
