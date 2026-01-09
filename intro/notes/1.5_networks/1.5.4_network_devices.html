@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.5.4 Network Devices | Networking | Cybersecurity Course</title>
+    <meta name="description" content="Master network devices for cybersecurity. Learn about hubs, switches, routers, firewalls, IDS/IPS, and security implications of each device.">
+    <meta name="author" content="lokii (UnExplainableFish52)">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="icon" href="/favicon.ico">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6e6e6; font-family: system-ui, 'Segoe UI', sans-serif; line-height: 1.7; min-height: 100vh; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        
+        .site-header { padding: 15px 20px; border-bottom: 1px solid #30363d; background: rgba(13,17,23,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .branding { text-decoration: none; }
+        .branding .logo { color: #00ffff; font-size: 1.5rem; font-weight: 800; }
+        .site-nav { display: flex; gap: 25px; }
+        .site-nav .nav-link { color: #8b949e; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .site-nav .nav-link:hover { color: #00ffff; }
+        
+        header.page-header { text-align: center; padding: 50px 20px; margin-bottom: 40px; }
+        h1 { font-size: 2.5em; color: #00ffff; font-weight: bold; margin-bottom: 15px; }
+        h2 { font-size: 1.8em; color: #00ffff; font-weight: bold; margin: 50px 0 25px; padding-bottom: 10px; border-bottom: 2px solid #30363d; }
+        h3 { font-size: 1.4em; color: #00ffff; font-weight: bold; margin: 30px 0 15px; }
+        h4 { font-size: 1.2em; color: #fff; font-weight: bold; margin: 25px 0 12px; }
+        .subtitle { color: #8b949e; font-size: 1.2em; }
+        
+        .section { background: rgba(22,27,34,0.5); border: 1px solid #30363d; border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+        p { margin-bottom: 15px; font-weight: 500; }
+        .highlight { color: #ffd700; font-weight: bold; }
+        .code-text { color: #00ff88; font-family: 'Consolas', monospace; background: rgba(0,255,136,0.1); padding: 2px 6px; border-radius: 4px; }
+        a { color: #58a6ff; text-decoration: none; transition: all 0.3s; }
+        a:hover { color: #79c0ff; text-decoration: underline; }
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin-bottom: 10px; }
+        
+        .info-box { background: rgba(0,255,255,0.1); border-left: 4px solid #00ffff; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .security-box { background: rgba(255,0,85,0.1); border-left: 4px solid #ff0055; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .tip-box { background: rgba(0,255,136,0.1); border-left: 4px solid #00ff88; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .warning-box { background: rgba(255,107,107,0.1); border-left: 4px solid #ff6b6b; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        
+        /* Layer color coding */
+        .layer-1 { border-left: 4px solid #fd79a8; background: rgba(253,121,168,0.1); }
+        .layer-2 { border-left: 4px solid #a29bfe; background: rgba(162,155,254,0.1); }
+        .layer-3 { border-left: 4px solid #74b9ff; background: rgba(116,185,255,0.1); }
+        .layer-sec { border-left: 4px solid #ff6b6b; background: rgba(255,107,107,0.1); }
+        .layer-wireless { border-left: 4px solid #55efc4; background: rgba(85,239,196,0.1); }
+        
+        .device-card { padding: 20px; margin: 20px 0; border-radius: 0 10px 10px 0; }
+        .device-card h4 { margin-top: 0; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.9em; }
+        th { background: rgba(0,255,255,0.2); color: #00ffff; padding: 12px 10px; text-align: left; border-bottom: 2px solid #00ffff; font-weight: bold; }
+        td { padding: 12px 10px; border-bottom: 1px solid #30363d; }
+        tr:nth-child(even) { background: rgba(22,27,34,0.5); }
+        tr:hover { background: rgba(0,255,255,0.05); }
+        
+        .code-block { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin: 20px 0; overflow-x: auto; }
+        .code-block code { color: #00ff88; font-family: 'Consolas', monospace; font-size: 0.95em; line-height: 1.6; }
+        .code-header { background: rgba(0,255,136,0.15); color: #00ff88; padding: 8px 15px; border-radius: 8px 8px 0 0; margin: 20px 0 0 0; font-family: monospace; font-size: 0.85em; font-weight: bold; }
+        .code-header + .code-block { margin-top: 0; border-radius: 0 0 8px 8px; }
+        .comment { color: #8b949e; }
+        
+        .diagram { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 25px; margin: 20px 0; text-align: center; font-family: monospace; color: #00ffff; overflow-x: auto; }
+        .diagram pre { margin: 0; display: inline-block; text-align: left; line-height: 1.4; }
+        
+        .checklist { list-style: none; padding-left: 0; }
+        .checklist li { padding: 10px 15px; margin: 8px 0; background: rgba(22,27,34,0.5); border-radius: 8px; border-left: 3px solid #30363d; }
+        .checklist li::before { content: "☐ "; color: #ffd700; font-weight: bold; }
+        
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 20px 0; }
+        .compare-card { padding: 20px; border-radius: 10px; background: rgba(22,27,34,0.5); border: 1px solid #30363d; }
+        .compare-card h4 { color: #00ffff; margin-top: 0; }
+        
+        .quiz-question { background: rgba(22,27,34,0.8); border: 1px solid #30363d; border-radius: 10px; padding: 20px; margin: 15px 0; }
+        .quiz-question strong { color: #ffd700; }
+        .quiz-options { margin: 15px 0 0 20px; }
+        .quiz-options label { display: block; padding: 8px 0; cursor: pointer; }
+        
+        .answers-toggle { background: rgba(0,255,136,0.15); color: #00ff88; border: 2px solid #00ff88; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; transition: all 0.3s; }
+        .answers-toggle:hover { background: rgba(0,255,136,0.25); }
+        .answers-content { display: none; background: rgba(22,27,34,0.8); border: 1px solid #30363d; border-radius: 10px; padding: 25px; margin-top: 15px; }
+        .answers-content.show { display: block; }
+        .answer-item { padding: 10px 0; border-bottom: 1px solid #30363d; }
+        .answer-item:last-child { border-bottom: none; }
+        .answer-correct { color: #00ff88; font-weight: bold; }
+        
+        .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 60px; padding-top: 30px; border-top: 2px solid #30363d; flex-wrap: wrap; gap: 10px; }
+        .page-nav a { display: flex; align-items: center; gap: 10px; color: #00ffff; text-decoration: none; padding: 15px 25px; border: 2px solid #30363d; border-radius: 10px; transition: all 0.3s; font-weight: 600; }
+        .page-nav a:hover { border-color: #00ffff; background: rgba(0,255,255,0.1); text-decoration: none; }
+        
+        footer { text-align: center; padding: 40px 20px; margin-top: 60px; border-top: 1px solid #30363d; color: #8b949e; }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            table { font-size: 0.75em; }
+            th, td { padding: 8px 5px; }
+            .page-nav { flex-direction: column; }
+            .page-nav a { width: 100%; justify-content: center; }
+            .header-content { flex-direction: column; gap: 15px; }
+            .comparison-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <a href="../../../index.html" class="branding"><span class="logo">lokii.tech</span></a>
+            <nav class="site-nav">
+                <a href="../../../index.html#about" class="nav-link">About</a>
+                <a href="../../../index.html#resources" class="nav-link">Resources</a>
+                <a href="https://github.com/UnExplainableFish52" target="_blank" class="nav-link">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>🔧 1.5.4 Network Devices</h1>
+            <p class="subtitle">Understanding the hardware that builds and secures networks</p>
+        </header>
+
+        <!-- Section 1: Overview -->
+        <h2>📋 1. Overview</h2>
+        <div class="section">
+            <h3>Why Understanding Devices Matters for Security</h3>
+            <ul>
+                <li><span class="highlight">Attack Surface:</span> Each device is a potential entry point for attackers</li>
+                <li><span class="highlight">Traffic Control:</span> Devices determine what can communicate with what</li>
+                <li><span class="highlight">Visibility:</span> Know where to place monitoring and defenses</li>
+                <li><span class="highlight">Vulnerabilities:</span> Different devices have different weaknesses</li>
+            </ul>
+
+            <h3>Device Placement in Network Architecture</h3>
+            <div class="info-box">
+                <p>Network devices are organized by <span class="highlight">OSI layers</span> — understanding which layer a device operates at tells you what it can "see" and control:</p>
+                <ul>
+                    <li><strong>Layer 1 (Physical):</strong> Deals with electrical signals and cables</li>
+                    <li><strong>Layer 2 (Data Link):</strong> Works with MAC addresses</li>
+                    <li><strong>Layer 3 (Network):</strong> Routes by IP addresses</li>
+                    <li><strong>Layer 7 (Application):</strong> Understands protocols like HTTP</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 2: Layer 1 Devices -->
+        <h2 style="color: #fd79a8;">🔌 2. Layer 1 Devices (Physical)</h2>
+        <div class="section">
+            <div class="device-card layer-1">
+                <h4>2.1 Hub</h4>
+                <p><span class="highlight">What it does:</span> A "dumb" device that receives data on one port and broadcasts it to ALL other ports.</p>
+                
+                <h4>How It Works</h4>
+                <div class="diagram">
+<pre>
+       ┌─────────────────┐
+       │      HUB        │
+       │  ┌───┬───┬───┐  │
+       │  │ 1 │ 2 │ 3 │  │
+       └──┴─┬─┴─┬─┴─┬─┴──┘
+            │   │   │
+           PC1 PC2 PC3
+           
+Data sent to PC2 goes to ALL ports (PC1, PC3, etc.)
+</pre>
+                </div>
+
+                <h4>Problems</h4>
+                <ul>
+                    <li><span class="highlight">Single Collision Domain:</span> All devices compete for bandwidth</li>
+                    <li><span class="highlight">Half-duplex:</span> Can't send and receive simultaneously</li>
+                    <li><span class="highlight">Performance degrades</span> as devices increase</li>
+                </ul>
+
+                <div class="security-box">
+                    <strong>🔴 Security Risk:</strong> ALL traffic is visible to ALL connected devices. Attackers can easily sniff all network traffic without any special configuration!
+                </div>
+
+                <p><span class="highlight">Status:</span> <strong>Obsolete</strong> — replaced by switches in all modern networks.</p>
+            </div>
+
+            <div class="device-card layer-1">
+                <h4>2.2 Repeater</h4>
+                <p><span class="highlight">What it does:</span> Amplifies and regenerates signals to extend network range.</p>
+                <ul>
+                    <li>Works at the physical layer — just boosts electrical signals</li>
+                    <li>Used to overcome cable distance limitations</li>
+                    <li>No intelligence — doesn't filter or route</li>
+                </ul>
+            </div>
+
+            <div class="device-card layer-1">
+                <h4>2.3 Modem</h4>
+                <p><span class="highlight">MOdulator-DEModulator:</span> Converts digital signals ↔ analog signals for transmission over phone/cable lines.</p>
+                
+                <table>
+                    <thead><tr><th>Type</th><th>Medium</th><th>Speed</th></tr></thead>
+                    <tbody>
+                        <tr><td>DSL</td><td>Phone line</td><td>Up to 100 Mbps</td></tr>
+                        <tr><td>Cable</td><td>Coaxial cable</td><td>Up to 1 Gbps</td></tr>
+                        <tr><td>Fiber</td><td>Fiber optic</td><td>Up to 10 Gbps+</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 3: Layer 2 Devices -->
+        <h2 style="color: #a29bfe;">🔀 3. Layer 2 Devices (Data Link)</h2>
+        <div class="section">
+            <div class="device-card layer-2">
+                <h4>3.1 Switch</h4>
+                <p><span class="highlight">What it does:</span> Intelligently forwards frames based on MAC addresses. Each port is its own collision domain.</p>
+                
+                <h4>How a Switch Learns</h4>
+                <ol>
+                    <li><span class="highlight">Flooding:</span> Initially, switch doesn't know where devices are — broadcasts to all ports</li>
+                    <li><span class="highlight">Learning:</span> Records source MAC address + port in MAC address table</li>
+                    <li><span class="highlight">Forwarding:</span> Once learned, sends frames only to the correct port (unicast)</li>
+                </ol>
+
+                <div class="diagram">
+<pre>
+MAC Address Table:
+┌─────────────────────────────────────┐
+│  MAC Address        │  Port         │
+├─────────────────────┼───────────────┤
+│  AA:BB:CC:DD:EE:01  │  Port 1       │
+│  AA:BB:CC:DD:EE:02  │  Port 2       │
+│  AA:BB:CC:DD:EE:03  │  Port 5       │
+└─────────────────────┴───────────────┘
+</pre>
+                </div>
+
+                <h4>Managed vs Unmanaged Switches</h4>
+                <table>
+                    <thead><tr><th>Feature</th><th>Unmanaged</th><th>Managed</th></tr></thead>
+                    <tbody>
+                        <tr><td>Configuration</td><td>Plug and play</td><td>Full configuration via CLI/GUI</td></tr>
+                        <tr><td>VLANs</td><td>No</td><td>Yes</td></tr>
+                        <tr><td>Port Security</td><td>No</td><td>Yes</td></tr>
+                        <tr><td>Monitoring</td><td>Limited</td><td>SNMP, port mirroring</td></tr>
+                        <tr><td>Cost</td><td>Cheaper</td><td>More expensive</td></tr>
+                        <tr><td>Use Case</td><td>Home/Small office</td><td>Enterprise</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>VLANs (Virtual LANs) - Intro</h4>
+                <p>Logically segment a physical switch into multiple broadcast domains:</p>
+                <ul>
+                    <li>VLAN 10: Accounting (ports 1-5)</li>
+                    <li>VLAN 20: Engineering (ports 6-10)</li>
+                    <li>Devices on different VLANs can't communicate without a router</li>
+                </ul>
+
+                <div class="security-box">
+                    <strong>🔴 Switch Security Attacks:</strong>
+                    <ul>
+                        <li><span class="highlight">MAC Flooding:</span> Overflow MAC table → switch acts like hub</li>
+                        <li><span class="highlight">VLAN Hopping:</span> Access traffic from other VLANs</li>
+                        <li><span class="highlight">ARP Spoofing:</span> Not stopped by switches</li>
+                    </ul>
+                    <strong>Defenses:</strong> Port security, DHCP snooping, Dynamic ARP Inspection
+                </div>
+
+                <div class="code-header">Cisco Switch Commands</div>
+                <div class="code-block">
+<code><span class="comment"># View MAC address table</span>
+show mac address-table
+
+<span class="comment"># Configure port security</span>
+interface FastEthernet0/1
+switchport port-security
+switchport port-security maximum 2
+switchport port-security violation shutdown</code>
+                </div>
+            </div>
+
+            <div class="device-card layer-2">
+                <h4>3.2 Bridge</h4>
+                <p><span class="highlight">What it does:</span> Connects two network segments, filtering traffic by MAC address.</p>
+                <ul>
+                    <li>Mostly obsolete — replaced by switches</li>
+                    <li>Software bridges still used (Linux bridge for VMs)</li>
+                </ul>
+            </div>
+
+            <div class="device-card layer-2">
+                <h4>3.3 NIC (Network Interface Card)</h4>
+                <p><span class="highlight">What it does:</span> Hardware interface between computer and network.</p>
+                <ul>
+                    <li>Has unique <span class="highlight">MAC address</span> burned in (OUI + Device ID)</li>
+                    <li><span class="highlight">Promiscuous Mode:</span> Captures ALL traffic, not just addressed to it — used for packet sniffing</li>
+                </ul>
+
+                <div class="code-header">Enable Promiscuous Mode (Linux)</div>
+                <div class="code-block">
+<code><span class="comment"># Enable promiscuous mode</span>
+sudo ip link set eth0 promisc on
+
+<span class="comment"># Verify</span>
+ip link show eth0
+
+<span class="comment"># Disable</span>
+sudo ip link set eth0 promisc off</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Layer 3 Devices -->
+        <h2 style="color: #74b9ff;">🌐 4. Layer 3 Devices (Network)</h2>
+        <div class="section">
+            <div class="device-card layer-3">
+                <h4>4.1 Router</h4>
+                <p><span class="highlight">What it does:</span> Routes packets between different networks using IP addresses. Creates separate broadcast domains.</p>
+                
+                <h4>Key Concepts</h4>
+                <ul>
+                    <li><span class="highlight">Routing Table:</span> Maps destination networks to next-hop addresses</li>
+                    <li><span class="highlight">Default Gateway:</span> Where packets go when no specific route matches</li>
+                    <li><span class="highlight">Each Interface:</span> Different IP network (e.g., 192.168.1.x and 10.0.0.x)</li>
+                </ul>
+
+                <h4>Static vs Dynamic Routing</h4>
+                <table>
+                    <thead><tr><th>Type</th><th>Description</th><th>Pros</th><th>Cons</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="highlight">Static</span></td>
+                            <td>Manually configured routes</td>
+                            <td>Simple, predictable, secure</td>
+                            <td>Doesn't adapt to changes</td>
+                        </tr>
+                        <tr>
+                            <td><span class="highlight">Dynamic</span></td>
+                            <td>Routers learn routes automatically</td>
+                            <td>Adapts to network changes</td>
+                            <td>More complex, CPU overhead</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Common Routing Protocols</h4>
+                <table>
+                    <thead><tr><th>Protocol</th><th>Type</th><th>Metric</th><th>Use Case</th></tr></thead>
+                    <tbody>
+                        <tr><td>RIP</td><td>Distance Vector</td><td>Hop count (max 15)</td><td>Small networks</td></tr>
+                        <tr><td>OSPF</td><td>Link State</td><td>Cost (bandwidth)</td><td>Enterprise</td></tr>
+                        <tr><td>EIGRP</td><td>Hybrid</td><td>Composite</td><td>Cisco networks</td></tr>
+                        <tr><td>BGP</td><td>Path Vector</td><td>AS path</td><td>Internet backbone</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>NAT (Network Address Translation)</h4>
+                <p>Translates private IPs to public IPs, allowing multiple devices to share one public IP:</p>
+                <div class="diagram">
+<pre>
+Internal Network          Router (NAT)           Internet
+┌──────────────┐         ┌──────────┐          ┌──────────┐
+│ 192.168.1.10 │─────────│          │          │          │
+│ 192.168.1.11 │─────────│ NAT      │──────────│  Web     │
+│ 192.168.1.12 │─────────│ 203.0.113.5         │  Server  │
+└──────────────┘         └──────────┘          └──────────┘
+    Private IPs       Public IP appears        Destination
+                      as source
+</pre>
+                </div>
+
+                <div class="security-box">
+                    <strong>🔴 Router Security:</strong>
+                    <ul>
+                        <li><span class="highlight">Default Credentials:</span> Always change admin/admin!</li>
+                        <li><span class="highlight">ACLs:</span> Access Control Lists filter traffic by IP/port</li>
+                        <li><span class="highlight">Misconfigurations:</span> Open admin interfaces, weak passwords</li>
+                        <li><span class="highlight">Firmware:</span> Keep updated for security patches</li>
+                    </ul>
+                </div>
+
+                <div class="code-header">View Routing Table</div>
+                <div class="code-block">
+<code><span class="comment"># Linux</span>
+ip route
+route -n
+netstat -rn
+
+<span class="comment"># Windows</span>
+route print
+netstat -rn
+
+<span class="comment"># Find default gateway</span>
+ip route | grep default          <span class="comment"># Linux</span>
+ipconfig | findstr Gateway       <span class="comment"># Windows</span></code>
+                </div>
+            </div>
+
+            <div class="device-card layer-3">
+                <h4>4.2 Layer 3 Switch (Multilayer Switch)</h4>
+                <p><span class="highlight">What it does:</span> A switch with built-in routing capability. Routes between VLANs at wire speed.</p>
+                <ul>
+                    <li>Faster than separate router for inter-VLAN routing</li>
+                    <li>Use when: High-speed routing needed within campus network</li>
+                    <li>Common in enterprise data centers</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 5: Security Devices -->
+        <h2 style="color: #ff6b6b;">🛡️ 5. Security Devices</h2>
+        <div class="section">
+            <div class="device-card layer-sec">
+                <h4>5.1 Firewall</h4>
+                <p><span class="highlight">What it does:</span> Controls incoming and outgoing network traffic based on security rules.</p>
+                
+                <h4>Firewall Types</h4>
+                <table>
+                    <thead><tr><th>Type</th><th>OSI Layer</th><th>How it Works</th><th>Pros/Cons</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="highlight">Packet Filtering</span></td>
+                            <td>3-4</td>
+                            <td>Filters by IP/port (stateless)</td>
+                            <td>Fast, but no context</td>
+                        </tr>
+                        <tr>
+                            <td><span class="highlight">Stateful Inspection</span></td>
+                            <td>3-4</td>
+                            <td>Tracks connection state</td>
+                            <td>Smarter, more secure</td>
+                        </tr>
+                        <tr>
+                            <td><span class="highlight">Application/Proxy</span></td>
+                            <td>7</td>
+                            <td>Inspects application data</td>
+                            <td>Deep inspection, slower</td>
+                        </tr>
+                        <tr>
+                            <td><span class="highlight">NGFW (Next-Gen)</span></td>
+                            <td>3-7</td>
+                            <td>All above + IPS, app awareness</td>
+                            <td>Best protection, expensive</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Firewall Rule Structure</h4>
+                <div class="diagram">
+<pre>
+┌──────────────────────────────────────────────────────────────────┐
+│  Source IP  │  Dest IP  │  Protocol  │  Port  │  Action         │
+├─────────────┼───────────┼────────────┼────────┼─────────────────┤
+│  any        │  10.0.0.5 │  TCP       │  22    │  ALLOW          │
+│  any        │  any      │  TCP       │  23    │  DENY (Telnet)  │
+│  192.168.x  │  any      │  any       │  any   │  ALLOW          │
+│  any        │  any      │  any       │  any   │  DENY (default) │
+└──────────────────────────────────────────────────────────────────┘
+Rules processed top-to-bottom, first match wins!
+</pre>
+                </div>
+
+                <h4>DMZ (Demilitarized Zone)</h4>
+                <p>Network segment between external and internal networks for public-facing servers:</p>
+                <div class="diagram">
+<pre>
+Internet ──▶ [Firewall] ──▶ DMZ (Web/Mail Servers) ──▶ [Firewall] ──▶ Internal Network
+                │                                                          │
+                └──────────── Attackers blocked here ──────────────────────┘
+</pre>
+                </div>
+
+                <h4>Common Firewalls</h4>
+                <ul>
+                    <li><span class="highlight">pfSense:</span> Open-source, BSD-based</li>
+                    <li><span class="highlight">iptables/nftables:</span> Linux built-in</li>
+                    <li><span class="highlight">Windows Firewall:</span> Built into Windows</li>
+                    <li><span class="highlight">Cisco ASA:</span> Enterprise hardware</li>
+                    <li><span class="highlight">Palo Alto:</span> NGFW leader</li>
+                </ul>
+
+                <div class="code-header">Firewall Commands</div>
+                <div class="code-block">
+<code><span class="comment"># Linux iptables</span>
+iptables -L -n -v                              <span class="comment"># List rules</span>
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT  <span class="comment"># Allow SSH</span>
+iptables -A INPUT -p tcp --dport 23 -j DROP    <span class="comment"># Block Telnet</span>
+iptables -P INPUT DROP                         <span class="comment"># Default deny</span>
+
+<span class="comment"># Windows Firewall</span>
+netsh advfirewall show allprofiles
+netsh advfirewall firewall add rule name="Block Telnet" dir=in action=block protocol=tcp localport=23</code>
+                </div>
+            </div>
+
+            <div class="device-card layer-sec">
+                <h4>5.2 IDS (Intrusion Detection System)</h4>
+                <p><span class="highlight">What it does:</span> Monitors network traffic and <strong>alerts</strong> on suspicious activity. Does NOT block — passive monitoring.</p>
+                
+                <h4>Detection Methods</h4>
+                <ul>
+                    <li><span class="highlight">Signature-based:</span> Matches known attack patterns (like antivirus)</li>
+                    <li><span class="highlight">Anomaly-based:</span> Detects deviations from normal behavior</li>
+                </ul>
+
+                <h4>Types</h4>
+                <ul>
+                    <li><span class="highlight">NIDS:</span> Network-based IDS (monitors network traffic)</li>
+                    <li><span class="highlight">HIDS:</span> Host-based IDS (monitors individual host)</li>
+                </ul>
+
+                <p><strong>Examples:</strong> Snort, Suricata, OSSEC, Zeek (Bro)</p>
+            </div>
+
+            <div class="device-card layer-sec">
+                <h4>5.3 IPS (Intrusion Prevention System)</h4>
+                <p><span class="highlight">What it does:</span> Monitors AND <strong>blocks</strong> malicious traffic. Deployed inline (traffic passes through it).</p>
+                
+                <h4>IDS vs IPS Comparison</h4>
+                <table>
+                    <thead><tr><th>Aspect</th><th>IDS</th><th>IPS</th></tr></thead>
+                    <tbody>
+                        <tr><td>Action</td><td>Detect & Alert</td><td>Detect & Block</td></tr>
+                        <tr><td>Deployment</td><td>Passive (span/tap)</td><td>Inline (traffic flows through)</td></tr>
+                        <tr><td>Latency</td><td>None</td><td>Slight increase</td></tr>
+                        <tr><td>Risk</td><td>Can miss attacks</td><td>False positives block legit traffic</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="device-card layer-sec">
+                <h4>5.4 WAF (Web Application Firewall)</h4>
+                <p><span class="highlight">What it does:</span> Layer 7 firewall specifically for web applications. Inspects HTTP/HTTPS traffic.</p>
+                
+                <h4>Protects Against</h4>
+                <ul>
+                    <li><span class="highlight">SQL Injection</span></li>
+                    <li><span class="highlight">Cross-Site Scripting (XSS)</span></li>
+                    <li><span class="highlight">CSRF Attacks</span></li>
+                    <li><span class="highlight">File Inclusion</span></li>
+                    <li><span class="highlight">OWASP Top 10</span></li>
+                </ul>
+
+                <p><strong>Examples:</strong> ModSecurity, Cloudflare WAF, AWS WAF, Imperva</p>
+            </div>
+
+            <div class="device-card layer-sec">
+                <h4>5.5 Proxy Server</h4>
+                <p><span class="highlight">What it does:</span> Intermediary between clients and servers. Can filter, cache, and anonymize traffic.</p>
+                
+                <h4>Forward Proxy vs Reverse Proxy</h4>
+                <div class="comparison-grid">
+                    <div class="compare-card">
+                        <h4>Forward Proxy</h4>
+                        <p>Sits between <strong>internal users</strong> and internet</p>
+                        <ul>
+                            <li>Content filtering</li>
+                            <li>Caching for performance</li>
+                            <li>Anonymity for users</li>
+                            <li>Access control</li>
+                        </ul>
+                    </div>
+                    <div class="compare-card">
+                        <h4>Reverse Proxy</h4>
+                        <p>Sits between <strong>internet</strong> and internal servers</p>
+                        <ul>
+                            <li>Load balancing</li>
+                            <li>SSL termination</li>
+                            <li>Hides server details</li>
+                            <li>DDoS protection</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p><strong>Examples:</strong> Squid, NGINX, HAProxy, Burp Suite (pentesting)</p>
+            </div>
+        </div>
+
+        <!-- Section 6: Wireless Devices -->
+        <h2 style="color: #55efc4;">📶 6. Wireless Devices</h2>
+        <div class="section">
+            <div class="device-card layer-wireless">
+                <h4>6.1 Access Point (AP)</h4>
+                <p><span class="highlight">What it does:</span> Connects wireless devices to wired network. Acts as a bridge between WiFi and Ethernet.</p>
+                
+                <h4>Key Concepts</h4>
+                <ul>
+                    <li><span class="highlight">SSID:</span> Network name (Service Set Identifier)</li>
+                    <li><span class="highlight">Channels:</span> Frequency ranges (1-11 for 2.4GHz)</li>
+                    <li><span class="highlight">Bands:</span> 2.4GHz (range) vs 5GHz (speed) vs 6GHz (WiFi 6E)</li>
+                </ul>
+
+                <div class="tip-box">
+                    <strong>💡 Security Note:</strong> AP security (WPA2/WPA3, MAC filtering) covered in detail in 1.5.5 WiFi Explained!
+                </div>
+            </div>
+
+            <div class="device-card layer-wireless">
+                <h4>6.2 Wireless Controller</h4>
+                <p><span class="highlight">What it does:</span> Centrally manages multiple access points in enterprise deployments.</p>
+                <ul>
+                    <li>Unified configuration across all APs</li>
+                    <li>Seamless roaming between APs</li>
+                    <li>Central logging and monitoring</li>
+                    <li>Examples: Cisco WLC, Aruba, Ubiquiti</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 7: Other Devices -->
+        <h2>🔧 7. Other Important Devices</h2>
+        <div class="section">
+            <h4>7.1 Gateway</h4>
+            <p><span class="highlight">What it does:</span> Connects networks using different protocols. Performs protocol translation.</p>
+            <ul>
+                <li>Often used interchangeably with "default gateway" (router)</li>
+                <li>True gateways convert between different network types</li>
+            </ul>
+
+            <h4>7.2 Load Balancer</h4>
+            <p><span class="highlight">What it does:</span> Distributes incoming traffic across multiple servers for performance and availability.</p>
+            <ul>
+                <li><span class="highlight">Algorithms:</span> Round Robin, Least Connections, IP Hash</li>
+                <li><span class="highlight">Health Checks:</span> Removes failed servers from pool</li>
+                <li><span class="highlight">Examples:</span> HAProxy, F5, AWS ELB, NGINX</li>
+            </ul>
+            <div class="diagram">
+<pre>
+                    ┌─────────────────┐
+                    │  Load Balancer  │
+                    └────────┬────────┘
+                             │
+          ┌──────────────────┼──────────────────┐
+          ▼                  ▼                  ▼
+    ┌──────────┐       ┌──────────┐       ┌──────────┐
+    │ Server 1 │       │ Server 2 │       │ Server 3 │
+    └──────────┘       └──────────┘       └──────────┘
+</pre>
+            </div>
+
+            <h4>7.3 VPN Concentrator</h4>
+            <p><span class="highlight">What it does:</span> Handles multiple VPN connections, terminating encrypted tunnels.</p>
+            <ul>
+                <li>Central point for remote access VPNs</li>
+                <li>Encrypts/decrypts traffic at scale</li>
+                <li>Often built into firewalls/routers today</li>
+            </ul>
+        </div>
+
+        <!-- Section 8: Network Placement Diagram -->
+        <h2>🗺️ 8. Network Device Placement</h2>
+        <div class="section">
+            <p>Typical enterprise network architecture showing device placement:</p>
+            
+            <div class="diagram">
+<pre>
+                              ┌──────────────┐
+                              │   INTERNET   │
+                              └──────┬───────┘
+                                     │
+                              ┌──────┴───────┐
+                              │    ROUTER    │ ◄── Border Router (BGP)
+                              └──────┬───────┘
+                                     │
+                              ┌──────┴───────┐
+                              │   FIREWALL   │ ◄── Perimeter Defense
+                              └──────┬───────┘
+                     ┌───────────────┼───────────────┐
+                     │               │               │
+              ┌──────┴───────┐ ┌─────┴──────┐ ┌──────┴───────┐
+              │     DMZ      │ │   IDS/IPS  │ │   Internal   │
+              │ (Web/Email)  │ │  (Inline)  │ │   Network    │
+              └──────────────┘ └────────────┘ └──────┬───────┘
+                                                     │
+                                              ┌──────┴───────┐
+                                              │ Core Switch  │ ◄── Layer 3 Switch
+                                              │   (L3)       │
+                                              └──────┬───────┘
+                              ┌───────────────────────┼───────────────────────┐
+                              │                       │                       │
+                       ┌──────┴───────┐        ┌──────┴───────┐        ┌──────┴───────┐
+                       │ Access Switch│        │ Access Switch│        │ Access Switch│
+                       │   VLAN 10    │        │   VLAN 20    │        │   VLAN 30    │
+                       └──────┬───────┘        └──────┬───────┘        └──────┬───────┘
+                              │                       │                       │
+                         Workstations              Servers              WiFi APs
+</pre>
+            </div>
+
+            <div class="info-box">
+                <strong>Key Placement Principles:</strong>
+                <ul>
+                    <li><span class="highlight">Defense in Depth:</span> Multiple layers of security</li>
+                    <li><span class="highlight">DMZ Concept:</span> Public servers isolated from internal</li>
+                    <li><span class="highlight">Segmentation:</span> VLANs separate different departments/functions</li>
+                    <li><span class="highlight">Monitoring Points:</span> IDS/IPS at network boundaries</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 9: Device Comparison Table -->
+        <h2>📊 9. Device Comparison Table</h2>
+        <div class="section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Device</th>
+                        <th>OSI Layer</th>
+                        <th>Forwards By</th>
+                        <th>Collision Domain</th>
+                        <th>Broadcast Domain</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="highlight">Hub</span></td>
+                        <td>1</td>
+                        <td>— (broadcasts all)</td>
+                        <td>Single (shared)</td>
+                        <td>Single</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Repeater</span></td>
+                        <td>1</td>
+                        <td>— (regenerates)</td>
+                        <td>Extends</td>
+                        <td>Single</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Bridge</span></td>
+                        <td>2</td>
+                        <td>MAC Address</td>
+                        <td>Per segment</td>
+                        <td>Single</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Switch</span></td>
+                        <td>2</td>
+                        <td>MAC Address</td>
+                        <td>Per port</td>
+                        <td>Single (or per VLAN)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Router</span></td>
+                        <td>3</td>
+                        <td>IP Address</td>
+                        <td>Per interface</td>
+                        <td>Per interface</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">L3 Switch</span></td>
+                        <td>2-3</td>
+                        <td>MAC/IP</td>
+                        <td>Per port</td>
+                        <td>Per VLAN</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Firewall</span></td>
+                        <td>3-7</td>
+                        <td>Rules-based</td>
+                        <td>Per interface</td>
+                        <td>Per zone</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 10: Security Hardening Checklist -->
+        <h2>🔐 10. Security Hardening Checklist</h2>
+        <div class="section">
+            <p>Apply these to ALL network devices:</p>
+            
+            <ul class="checklist">
+                <li>Change default credentials (admin/admin, cisco/cisco)</li>
+                <li>Disable unused ports and services</li>
+                <li>Update firmware regularly for security patches</li>
+                <li>Enable logging and send to central SIEM</li>
+                <li>Implement ACLs to restrict traffic</li>
+                <li>Configure VLANs for network segmentation</li>
+                <li>Use SSH instead of Telnet for management</li>
+                <li>Enable HTTPS for web interfaces</li>
+                <li>Physical security — lock server rooms</li>
+                <li>Backup configurations regularly</li>
+                <li>Disable CDP/LLDP or limit scope</li>
+                <li>Set login banners with legal warnings</li>
+            </ul>
+        </div>
+
+        <!-- Section 11: Code Examples -->
+        <h2>💻 11. Device Interaction Commands</h2>
+        <div class="section">
+            <div class="code-header">Find Network Devices</div>
+            <div class="code-block">
+<code><span class="comment"># Find default gateway</span>
+ip route | grep default               <span class="comment"># Linux</span>
+ipconfig | findstr Gateway            <span class="comment"># Windows</span>
+
+<span class="comment"># ARP table - find devices on local network</span>
+arp -a
+
+<span class="comment"># Trace path through routers</span>
+traceroute 8.8.8.8                    <span class="comment"># Linux</span>
+tracert 8.8.8.8                       <span class="comment"># Windows</span>
+
+<span class="comment"># Discover network topology</span>
+nmap -sn 192.168.1.0/24              <span class="comment"># Ping sweep</span></code>
+            </div>
+
+            <div class="code-header">Device-Specific Commands</div>
+            <div class="code-block">
+<code><span class="comment"># Linux - View interfaces</span>
+ip addr show
+ip link show
+
+<span class="comment"># Check NIC info (including MAC)</span>
+ip link show eth0
+ipconfig /all                         <span class="comment"># Windows</span>
+
+<span class="comment"># Flush routing cache</span>
+ip route flush cache                  <span class="comment"># Linux</span>
+
+<span class="comment"># Release/renew DHCP</span>
+sudo dhclient -r && sudo dhclient     <span class="comment"># Linux</span>
+ipconfig /release && ipconfig /renew  <span class="comment"># Windows</span></code>
+            </div>
+        </div>
+
+        <!-- Section 12: Quiz -->
+        <h2>📝 12. Knowledge Check Quiz</h2>
+        <div class="section">
+            <div class="quiz-question">
+                <strong>Q1:</strong> Which device operates at Layer 1 and broadcasts to all ports?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1"> Switch</label>
+                    <label><input type="radio" name="q1"> Hub</label>
+                    <label><input type="radio" name="q1"> Router</label>
+                    <label><input type="radio" name="q1"> Firewall</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q2:</strong> A switch forwards traffic based on:
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2"> IP Address</label>
+                    <label><input type="radio" name="q2"> MAC Address</label>
+                    <label><input type="radio" name="q2"> Port Number</label>
+                    <label><input type="radio" name="q2"> Domain Name</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q3:</strong> Which security device monitors AND blocks malicious traffic?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3"> IDS</label>
+                    <label><input type="radio" name="q3"> IPS</label>
+                    <label><input type="radio" name="q3"> Hub</label>
+                    <label><input type="radio" name="q3"> Switch</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q4:</strong> What is the purpose of a DMZ?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4"> Speed up network traffic</label>
+                    <label><input type="radio" name="q4"> Isolate public-facing servers from internal network</label>
+                    <label><input type="radio" name="q4"> Store backup data</label>
+                    <label><input type="radio" name="q4"> Manage wireless connections</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q5:</strong> A router creates separate:
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5"> Collision domains only</label>
+                    <label><input type="radio" name="q5"> Broadcast domains only</label>
+                    <label><input type="radio" name="q5"> Both collision and broadcast domains</label>
+                    <label><input type="radio" name="q5"> Neither</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q6:</strong> Which attack targets a switch's MAC address table?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6"> SQL Injection</label>
+                    <label><input type="radio" name="q6"> MAC Flooding</label>
+                    <label><input type="radio" name="q6"> DNS Poisoning</label>
+                    <label><input type="radio" name="q6"> Phishing</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q7:</strong> A WAF protects against:
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7"> Physical intrusion</label>
+                    <label><input type="radio" name="q7"> SQL Injection and XSS</label>
+                    <label><input type="radio" name="q7"> Power outages</label>
+                    <label><input type="radio" name="q7"> Cable damage</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q8:</strong> What does NAT stand for?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8"> Network Access Token</label>
+                    <label><input type="radio" name="q8"> Network Address Translation</label>
+                    <label><input type="radio" name="q8"> Node Authentication Table</label>
+                    <label><input type="radio" name="q8"> Next-gen Access Technology</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q9:</strong> Which routing protocol is used for the internet backbone?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q9"> RIP</label>
+                    <label><input type="radio" name="q9"> OSPF</label>
+                    <label><input type="radio" name="q9"> BGP</label>
+                    <label><input type="radio" name="q9"> EIGRP</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q10:</strong> A forward proxy sits between:
+                <div class="quiz-options">
+                    <label><input type="radio" name="q10"> Internet and internal servers</label>
+                    <label><input type="radio" name="q10"> Internal users and internet</label>
+                    <label><input type="radio" name="q10"> Two internal networks</label>
+                    <label><input type="radio" name="q10"> Router and switch</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q11:</strong> Which firewall type inspects at Layer 7?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q11"> Packet Filtering</label>
+                    <label><input type="radio" name="q11"> Stateful</label>
+                    <label><input type="radio" name="q11"> Application/Proxy Firewall</label>
+                    <label><input type="radio" name="q11"> Static Firewall</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q12:</strong> Why are hubs a security risk?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q12"> They're too fast</label>
+                    <label><input type="radio" name="q12"> All traffic is visible to all ports</label>
+                    <label><input type="radio" name="q12"> They don't support encryption</label>
+                    <label><input type="radio" name="q12"> They use too much power</label>
+                </div>
+            </div>
+
+            <div class="answers-section">
+                <button class="answers-toggle" onclick="toggleAnswers()">Show Answers</button>
+                <div class="answers-content" id="answersContent">
+                    <div class="answer-item"><strong>Q1:</strong> <span class="answer-correct">Hub</span></div>
+                    <div class="answer-item"><strong>Q2:</strong> <span class="answer-correct">MAC Address</span></div>
+                    <div class="answer-item"><strong>Q3:</strong> <span class="answer-correct">IPS</span> (Intrusion Prevention System)</div>
+                    <div class="answer-item"><strong>Q4:</strong> <span class="answer-correct">Isolate public-facing servers from internal network</span></div>
+                    <div class="answer-item"><strong>Q5:</strong> <span class="answer-correct">Both collision and broadcast domains</span></div>
+                    <div class="answer-item"><strong>Q6:</strong> <span class="answer-correct">MAC Flooding</span></div>
+                    <div class="answer-item"><strong>Q7:</strong> <span class="answer-correct">SQL Injection and XSS</span></div>
+                    <div class="answer-item"><strong>Q8:</strong> <span class="answer-correct">Network Address Translation</span></div>
+                    <div class="answer-item"><strong>Q9:</strong> <span class="answer-correct">BGP</span> (Border Gateway Protocol)</div>
+                    <div class="answer-item"><strong>Q10:</strong> <span class="answer-correct">Internal users and internet</span></div>
+                    <div class="answer-item"><strong>Q11:</strong> <span class="answer-correct">Application/Proxy Firewall</span></div>
+                    <div class="answer-item"><strong>Q12:</strong> <span class="answer-correct">All traffic is visible to all ports</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="page-nav">
+            <a href="1.5.3_protocols_and_ports.html"><span>←</span><span>Previous: Protocols & Ports</span></a>
+            <a href="../1.5_networks.html"><span>↑</span><span>Networking Hub</span></a>
+            <a href="1.5.5_wifi_explained.html"><span>Next: WiFi Explained</span><span>→</span></a>
+        </nav>
+
+        <footer>
+            <p>Module 1.5.4: Network Devices</p>
+            <p>Part of the Cybersecurity Beginner Course at <a href="../../../index.html">lokii.tech</a></p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswers() {
+            const content = document.getElementById('answersContent');
+            const button = document.querySelector('.answers-toggle');
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                button.textContent = 'Show Answers';
+            } else {
+                content.classList.add('show');
+                button.textContent = 'Hide Answers';
+            }
+        }
+    </script>
+</body>
+</html>

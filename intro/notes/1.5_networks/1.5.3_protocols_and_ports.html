@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.5.3 Protocols & Ports | Networking | Cybersecurity Course</title>
+    <meta name="description" content="Master network protocols and ports for cybersecurity. Learn TCP vs UDP, vulnerable ports, service enumeration, and pentesting techniques.">
+    <meta name="author" content="lokii (UnExplainableFish52)">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="icon" href="/favicon.ico">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6e6e6; font-family: system-ui, 'Segoe UI', sans-serif; line-height: 1.7; min-height: 100vh; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        
+        .site-header { padding: 15px 20px; border-bottom: 1px solid #30363d; background: rgba(13,17,23,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .branding { text-decoration: none; }
+        .branding .logo { color: #00ffff; font-size: 1.5rem; font-weight: 800; }
+        .site-nav { display: flex; gap: 25px; }
+        .site-nav .nav-link { color: #8b949e; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .site-nav .nav-link:hover { color: #00ffff; }
+        
+        header.page-header { text-align: center; padding: 50px 20px; margin-bottom: 40px; }
+        h1 { font-size: 2.5em; color: #00ffff; font-weight: bold; margin-bottom: 15px; }
+        h2 { font-size: 1.8em; color: #00ffff; font-weight: bold; margin: 50px 0 25px; padding-bottom: 10px; border-bottom: 2px solid #30363d; }
+        h3 { font-size: 1.4em; color: #00ffff; font-weight: bold; margin: 30px 0 15px; }
+        h4 { font-size: 1.2em; color: #fff; font-weight: bold; margin: 25px 0 12px; }
+        .subtitle { color: #8b949e; font-size: 1.2em; }
+        
+        .section { background: rgba(22,27,34,0.5); border: 1px solid #30363d; border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+        p { margin-bottom: 15px; font-weight: 500; }
+        .highlight { color: #ffd700; font-weight: bold; }
+        .code-text { color: #00ff88; font-family: 'Consolas', monospace; background: rgba(0,255,136,0.1); padding: 2px 6px; border-radius: 4px; }
+        .danger { color: #ff6b6b; font-weight: bold; }
+        a { color: #58a6ff; text-decoration: none; transition: all 0.3s; }
+        a:hover { color: #79c0ff; text-decoration: underline; }
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin-bottom: 10px; }
+        
+        .info-box { background: rgba(0,255,255,0.1); border-left: 4px solid #00ffff; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .security-box { background: rgba(255,0,85,0.1); border-left: 4px solid #ff0055; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .tip-box { background: rgba(0,255,136,0.1); border-left: 4px solid #00ff88; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .warning-box { background: rgba(255,107,107,0.1); border-left: 4px solid #ff6b6b; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.9em; }
+        th { background: rgba(0,255,255,0.2); color: #00ffff; padding: 12px 10px; text-align: left; border-bottom: 2px solid #00ffff; font-weight: bold; cursor: pointer; }
+        th:hover { background: rgba(0,255,255,0.3); }
+        td { padding: 12px 10px; border-bottom: 1px solid #30363d; }
+        tr:nth-child(even) { background: rgba(22,27,34,0.5); }
+        tr:hover { background: rgba(0,255,255,0.05); }
+        .vuln-high { background: rgba(255,107,107,0.2) !important; }
+        .vuln-high td { color: #ff6b6b; }
+        
+        .code-block { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin: 20px 0; overflow-x: auto; }
+        .code-block code { color: #00ff88; font-family: 'Consolas', monospace; font-size: 0.95em; line-height: 1.6; }
+        .code-header { background: rgba(0,255,136,0.15); color: #00ff88; padding: 8px 15px; border-radius: 8px 8px 0 0; margin: 20px 0 0 0; font-family: monospace; font-size: 0.85em; font-weight: bold; }
+        .code-header + .code-block { margin-top: 0; border-radius: 0 0 8px 8px; }
+        .comment { color: #8b949e; }
+        
+        .diagram { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 25px; margin: 20px 0; text-align: center; font-family: monospace; color: #00ffff; overflow-x: auto; }
+        .diagram pre { margin: 0; display: inline-block; text-align: left; }
+        
+        .risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 20px 0; }
+        .risk-card { padding: 20px; border-radius: 10px; }
+        .risk-critical { background: rgba(255,0,0,0.15); border: 2px solid #ff4444; }
+        .risk-high { background: rgba(255,107,107,0.15); border: 2px solid #ff6b6b; }
+        .risk-medium { background: rgba(255,193,7,0.15); border: 2px solid #ffc107; }
+        
+        .quiz-question { background: rgba(22,27,34,0.8); border: 1px solid #30363d; border-radius: 10px; padding: 20px; margin: 15px 0; }
+        .quiz-question strong { color: #ffd700; }
+        .quiz-options { margin: 15px 0 0 20px; }
+        .quiz-options label { display: block; padding: 8px 0; cursor: pointer; }
+        
+        .answers-toggle { background: rgba(0,255,136,0.15); color: #00ff88; border: 2px solid #00ff88; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; transition: all 0.3s; }
+        .answers-toggle:hover { background: rgba(0,255,136,0.25); }
+        .answers-content { display: none; background: rgba(22,27,34,0.8); border: 1px solid #30363d; border-radius: 10px; padding: 25px; margin-top: 15px; }
+        .answers-content.show { display: block; }
+        .answer-item { padding: 10px 0; border-bottom: 1px solid #30363d; }
+        .answer-item:last-child { border-bottom: none; }
+        .answer-correct { color: #00ff88; font-weight: bold; }
+        
+        .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 60px; padding-top: 30px; border-top: 2px solid #30363d; flex-wrap: wrap; gap: 10px; }
+        .page-nav a { display: flex; align-items: center; gap: 10px; color: #00ffff; text-decoration: none; padding: 15px 25px; border: 2px solid #30363d; border-radius: 10px; transition: all 0.3s; font-weight: 600; }
+        .page-nav a:hover { border-color: #00ffff; background: rgba(0,255,255,0.1); text-decoration: none; }
+        
+        footer { text-align: center; padding: 40px 20px; margin-top: 60px; border-top: 1px solid #30363d; color: #8b949e; }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            table { font-size: 0.75em; }
+            th, td { padding: 8px 5px; }
+            .page-nav { flex-direction: column; }
+            .page-nav a { width: 100%; justify-content: center; }
+            .header-content { flex-direction: column; gap: 15px; }
+            .risk-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <a href="../../../index.html" class="branding"><span class="logo">lokii.tech</span></a>
+            <nav class="site-nav">
+                <a href="../../../index.html#about" class="nav-link">About</a>
+                <a href="../../../index.html#resources" class="nav-link">Resources</a>
+                <a href="https://github.com/UnExplainableFish52" target="_blank" class="nav-link">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>🔌 1.5.3 Protocols & Ports</h1>
+            <p class="subtitle">The language of network communication & entry points for attackers</p>
+        </header>
+
+        <!-- Section 1: What are Protocols -->
+        <h2>📡 1. What are Protocols?</h2>
+        <div class="section">
+            <p><span class="highlight">Definition:</span> A protocol is a set of rules and standards that define how data is transmitted and received across a network.</p>
+            
+            <h3>Why Standardization Matters</h3>
+            <ul>
+                <li><span class="highlight">Interoperability:</span> Devices from different vendors can communicate</li>
+                <li><span class="highlight">Reliability:</span> Predictable behavior across all implementations</li>
+                <li><span class="highlight">Security:</span> Known standards can be analyzed and secured</li>
+                <li><span class="highlight">Scalability:</span> Networks can grow without compatibility issues</li>
+            </ul>
+
+            <h3>Protocol Stack Concept</h3>
+            <p>Protocols work in <span class="highlight">layers</span> — each layer handles specific tasks and passes data to the next:</p>
+            <div class="diagram">
+<pre>
+┌─────────────────────────────┐
+│  Application (HTTP, FTP)    │ ← User sees this
+├─────────────────────────────┤
+│  Transport (TCP, UDP)       │ ← Ports, reliability
+├─────────────────────────────┤
+│  Network (IP)               │ ← Routing, addressing
+├─────────────────────────────┤
+│  Data Link (Ethernet)       │ ← Local delivery
+├─────────────────────────────┤
+│  Physical (Cables, WiFi)    │ ← Actual transmission
+└─────────────────────────────┘
+</pre>
+            </div>
+        </div>
+
+        <!-- Section 2: What are Ports -->
+        <h2>🚪 2. What are Ports?</h2>
+        <div class="section">
+            <p>A <span class="highlight">port</span> is a logical endpoint for network communication. Think of IP as the building address and port as the apartment number.</p>
+            
+            <div class="info-box">
+                <strong>Socket = IP Address + Port Number</strong><br>
+                Example: <span class="code-text">192.168.1.100:443</span> = IP 192.168.1.100, Port 443 (HTTPS)
+            </div>
+
+            <h3>Port Number Ranges</h3>
+            <table>
+                <thead><tr><th>Range</th><th>Name</th><th>Description</th><th>Examples</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="code-text">0-1023</span></td><td><span class="highlight">Well-Known</span></td><td>Reserved for common services, requires root/admin</td><td>80 (HTTP), 443 (HTTPS), 22 (SSH)</td></tr>
+                    <tr><td><span class="code-text">1024-49151</span></td><td><span class="highlight">Registered</span></td><td>Registered with IANA for specific apps</td><td>3306 (MySQL), 8080 (HTTP-Alt)</td></tr>
+                    <tr><td><span class="code-text">49152-65535</span></td><td><span class="highlight">Dynamic/Private</span></td><td>Ephemeral ports for client connections</td><td>Random client source ports</td></tr>
+                </tbody>
+            </table>
+
+            <div class="tip-box">
+                <strong>💡 Total Ports:</strong> 65,536 (0-65535) — that's 2^16 possibilities per IP address!
+            </div>
+        </div>
+
+        <!-- Section 3: TCP vs UDP -->
+        <h2>⚔️ 3. TCP vs UDP</h2>
+        <div class="section">
+            <table>
+                <thead><tr><th>Aspect</th><th>TCP</th><th>UDP</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="highlight">Connection</span></td><td>Connection-oriented</td><td>Connectionless</td></tr>
+                    <tr><td><span class="highlight">Reliability</span></td><td>Guaranteed delivery, ordering</td><td>Best effort, no guarantees</td></tr>
+                    <tr><td><span class="highlight">Speed</span></td><td>Slower (overhead)</td><td>Faster (minimal overhead)</td></tr>
+                    <tr><td><span class="highlight">Header Size</span></td><td>20 bytes minimum</td><td>8 bytes</td></tr>
+                    <tr><td><span class="highlight">Use Cases</span></td><td>HTTP, FTP, SSH, Email</td><td>DNS, VoIP, Gaming, Streaming</td></tr>
+                    <tr><td><span class="highlight">Error Checking</span></td><td>Full error recovery</td><td>Checksum only</td></tr>
+                    <tr><td><span class="highlight">Flow Control</span></td><td>Yes (windowing)</td><td>No</td></tr>
+                </tbody>
+            </table>
+
+            <h3>TCP 3-Way Handshake</h3>
+            <div class="diagram">
+<pre>
+    Client                    Server
+       │                         │
+       │──── SYN (seq=100) ────▶│  1. Client initiates
+       │                         │
+       │◀─ SYN-ACK (seq=300, ──│  2. Server acknowledges
+       │    ack=101)             │
+       │                         │
+       │──── ACK (ack=301) ────▶│  3. Connection established
+       │                         │
+       │◀════ DATA TRANSFER ═══▶│
+</pre>
+            </div>
+
+            <h3>TCP 4-Way Termination</h3>
+            <div class="diagram">
+<pre>
+    Client                    Server
+       │                         │
+       │──── FIN ──────────────▶│  1. Client wants to close
+       │◀─── ACK ───────────────│  2. Server acknowledges
+       │                         │
+       │◀─── FIN ───────────────│  3. Server ready to close
+       │──── ACK ──────────────▶│  4. Connection closed
+</pre>
+            </div>
+
+            <h3>When to Use Which?</h3>
+            <ul>
+                <li><span class="highlight">TCP:</span> When data integrity matters — web pages, file transfers, emails</li>
+                <li><span class="highlight">UDP:</span> When speed matters over reliability — live streams, games, DNS queries</li>
+            </ul>
+        </div>
+
+        <!-- Section 4: Master Protocol Table -->
+        <h2>⭐ 4. Master Protocol & Port Table</h2>
+        <div class="section">
+            <div class="warning-box">
+                <strong>🔴 Security Note:</strong> Ports marked with ⚠️ HIGH are commonly targeted in attacks. Always secure or disable if not needed!
+            </div>
+
+            <table id="protocolTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Protocol</th>
+                        <th onclick="sortTable(1)">Port</th>
+                        <th onclick="sortTable(2)">TCP/UDP</th>
+                        <th onclick="sortTable(3)">Purpose</th>
+                        <th onclick="sortTable(4)">Risk</th>
+                        <th>Security Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="vuln-high"><td>FTP</td><td>20, 21</td><td>TCP</td><td>File Transfer</td><td>⚠️ HIGH</td><td>Cleartext creds, use SFTP/FTPS</td></tr>
+                    <tr><td>SSH</td><td>22</td><td>TCP</td><td>Secure Shell</td><td>Medium</td><td>Brute-forceable, use keys + fail2ban</td></tr>
+                    <tr class="vuln-high"><td>Telnet</td><td>23</td><td>TCP</td><td>Remote Access</td><td>⚠️ HIGH</td><td>Cleartext everything, NEVER use</td></tr>
+                    <tr class="vuln-high"><td>SMTP</td><td>25</td><td>TCP</td><td>Email Sending</td><td>⚠️ HIGH</td><td>Open relay abuse, spam source</td></tr>
+                    <tr><td>DNS</td><td>53</td><td>UDP/TCP</td><td>Domain Resolution</td><td>Medium</td><td>Poisoning, amplification DDoS</td></tr>
+                    <tr><td>DHCP</td><td>67, 68</td><td>UDP</td><td>IP Assignment</td><td>Medium</td><td>Rogue DHCP, starvation attacks</td></tr>
+                    <tr class="vuln-high"><td>TFTP</td><td>69</td><td>UDP</td><td>Simple File Transfer</td><td>⚠️ HIGH</td><td>No authentication at all</td></tr>
+                    <tr class="vuln-high"><td>HTTP</td><td>80</td><td>TCP</td><td>Web Traffic</td><td>⚠️ HIGH</td><td>Cleartext, MITM, use HTTPS</td></tr>
+                    <tr><td>Kerberos</td><td>88</td><td>TCP/UDP</td><td>Authentication</td><td>Medium</td><td>Pass-the-ticket, golden ticket</td></tr>
+                    <tr class="vuln-high"><td>POP3</td><td>110</td><td>TCP</td><td>Email Retrieval</td><td>⚠️ HIGH</td><td>Cleartext, use POP3S</td></tr>
+                    <tr class="vuln-high"><td>IMAP</td><td>143</td><td>TCP</td><td>Email Retrieval</td><td>⚠️ HIGH</td><td>Cleartext, use IMAPS</td></tr>
+                    <tr class="vuln-high"><td>SNMP</td><td>161, 162</td><td>UDP</td><td>Network Management</td><td>⚠️ HIGH</td><td>Default "public" community string</td></tr>
+                    <tr><td>LDAP</td><td>389</td><td>TCP/UDP</td><td>Directory Services</td><td>Medium</td><td>LDAP injection attacks</td></tr>
+                    <tr><td>HTTPS</td><td>443</td><td>TCP</td><td>Secure Web</td><td>Low</td><td>Verify cert validity</td></tr>
+                    <tr class="vuln-high"><td>SMB</td><td>445</td><td>TCP</td><td>File Sharing</td><td>⚠️ HIGH</td><td>EternalBlue, WannaCry, ransomware</td></tr>
+                    <tr><td>SMTPS</td><td>465</td><td>TCP</td><td>Secure Email</td><td>Low</td><td>Encrypted SMTP</td></tr>
+                    <tr><td>LDAPS</td><td>636</td><td>TCP</td><td>Secure LDAP</td><td>Low</td><td>Encrypted directory access</td></tr>
+                    <tr><td>IMAPS</td><td>993</td><td>TCP</td><td>Secure IMAP</td><td>Low</td><td>Encrypted email retrieval</td></tr>
+                    <tr><td>POP3S</td><td>995</td><td>TCP</td><td>Secure POP3</td><td>Low</td><td>Encrypted email retrieval</td></tr>
+                    <tr class="vuln-high"><td>MSSQL</td><td>1433</td><td>TCP</td><td>SQL Server</td><td>⚠️ HIGH</td><td>SQLi, weak sa credentials</td></tr>
+                    <tr><td>Oracle</td><td>1521</td><td>TCP</td><td>Oracle DB</td><td>Medium</td><td>TNS listener exploits</td></tr>
+                    <tr class="vuln-high"><td>MySQL</td><td>3306</td><td>TCP</td><td>MySQL Database</td><td>⚠️ HIGH</td><td>Default creds, SQLi, UDF exploits</td></tr>
+                    <tr class="vuln-high"><td>RDP</td><td>3389</td><td>TCP</td><td>Remote Desktop</td><td>⚠️ HIGH</td><td>BlueKeep, brute force, NLA bypass</td></tr>
+                    <tr><td>PostgreSQL</td><td>5432</td><td>TCP</td><td>PostgreSQL DB</td><td>Medium</td><td>Weak trust authentication</td></tr>
+                    <tr class="vuln-high"><td>VNC</td><td>5900</td><td>TCP</td><td>Remote Desktop</td><td>⚠️ HIGH</td><td>Weak/no authentication</td></tr>
+                    <tr><td>WinRM</td><td>5985, 5986</td><td>TCP</td><td>Windows Remote Mgmt</td><td>Medium</td><td>Lateral movement pivot</td></tr>
+                    <tr class="vuln-high"><td>Redis</td><td>6379</td><td>TCP</td><td>Cache/Database</td><td>⚠️ HIGH</td><td>Often NO auth, RCE possible</td></tr>
+                    <tr><td>HTTP Proxy</td><td>8080</td><td>TCP</td><td>Proxy Server</td><td>Medium</td><td>Misconfigured open proxies</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 5: Commonly Exploited Ports -->
+        <h2>🎯 5. Commonly Exploited Ports</h2>
+        <div class="section">
+            <div class="risk-grid">
+                <div class="risk-card risk-critical">
+                    <h4 style="color:#ff4444;">🔴 Critical Risk</h4>
+                    <p><span class="code-text">21, 23, 25, 445, 3389</span></p>
+                    <ul>
+                        <li><strong>21 (FTP):</strong> Anonymous access, cleartext</li>
+                        <li><strong>23 (Telnet):</strong> No encryption ever</li>
+                        <li><strong>25 (SMTP):</strong> Open relays, spam</li>
+                        <li><strong>445 (SMB):</strong> EternalBlue, WannaCry</li>
+                        <li><strong>3389 (RDP):</strong> BlueKeep CVE-2019-0708</li>
+                    </ul>
+                </div>
+                <div class="risk-card risk-high">
+                    <h4 style="color:#ff6b6b;">🟠 High Risk</h4>
+                    <p><span class="code-text">80, 110, 143, 161, 1433, 3306, 6379</span></p>
+                    <ul>
+                        <li><strong>80 (HTTP):</strong> MITM, injection attacks</li>
+                        <li><strong>110/143:</strong> Email credential theft</li>
+                        <li><strong>161 (SNMP):</strong> Info disclosure</li>
+                        <li><strong>1433/3306:</strong> Database attacks</li>
+                        <li><strong>6379 (Redis):</strong> Unauthorized access</li>
+                    </ul>
+                </div>
+                <div class="risk-card risk-medium">
+                    <h4 style="color:#ffc107;">🟡 Medium Risk</h4>
+                    <p><span class="code-text">22, 53, 88, 389, 5432</span></p>
+                    <ul>
+                        <li><strong>22 (SSH):</strong> Brute force targets</li>
+                        <li><strong>53 (DNS):</strong> Poisoning, tunneling</li>
+                        <li><strong>88 (Kerberos):</strong> Ticket attacks</li>
+                        <li><strong>389 (LDAP):</strong> Injection, enumeration</li>
+                        <li><strong>5432 (Postgres):</strong> Trust auth bypass</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Critical Port Deep Dive</h3>
+            
+            <h4>Port 445 (SMB) — The Crown Jewel</h4>
+            <div class="security-box">
+                <p><strong>Why Dangerous:</strong> SMB is deeply integrated into Windows. One vulnerability = full system compromise.</p>
+                <p><strong>Famous Exploits:</strong></p>
+                <ul>
+                    <li><span class="danger">EternalBlue (MS17-010)</span> — WannaCry, NotPetya ransomware</li>
+                    <li>SMBGhost (CVE-2020-0796) — SMBv3 compression bug</li>
+                </ul>
+                <p><strong>How to Secure:</strong> Disable SMBv1, block port 445 at firewall, disable if not needed</p>
+            </div>
+
+            <h4>Port 3389 (RDP) — Remote Access Goldmine</h4>
+            <div class="security-box">
+                <p><strong>Why Dangerous:</strong> Direct GUI access to Windows machines. Constantly brute-forced.</p>
+                <p><strong>Famous Exploits:</strong></p>
+                <ul>
+                    <li><span class="danger">BlueKeep (CVE-2019-0708)</span> — Pre-auth RCE, wormable</li>
+                    <li>Credential stuffing and brute force attacks</li>
+                </ul>
+                <p><strong>How to Secure:</strong> VPN required, NLA enabled, account lockout, change default port</p>
+            </div>
+        </div>
+
+        <!-- Section 6: Default Open Ports -->
+        <h2>🖥️ 6. Default Open Ports</h2>
+        <div class="section">
+            <h3>Windows Default Services</h3>
+            <table>
+                <thead><tr><th>Port</th><th>Service</th><th>Recommendation</th></tr></thead>
+                <tbody>
+                    <tr><td>135</td><td>RPC Endpoint Mapper</td><td>Block externally</td></tr>
+                    <tr><td>139</td><td>NetBIOS Session</td><td>Disable if not needed</td></tr>
+                    <tr class="vuln-high"><td>445</td><td>SMB</td><td>Block externally, disable SMBv1</td></tr>
+                    <tr><td>3389</td><td>RDP</td><td>VPN only, or disable</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Linux Default Services</h3>
+            <table>
+                <thead><tr><th>Port</th><th>Service</th><th>Recommendation</th></tr></thead>
+                <tbody>
+                    <tr><td>22</td><td>SSH</td><td>Key auth only, fail2ban</td></tr>
+                    <tr><td>111</td><td>RPCbind</td><td>Block if not using NFS</td></tr>
+                </tbody>
+            </table>
+
+            <div class="code-header">Check & Close Unnecessary Ports</div>
+            <div class="code-block">
+<code><span class="comment"># Windows - Check listening ports</span>
+netstat -ano | findstr LISTENING
+Get-NetTCPConnection -State Listen
+
+<span class="comment"># Linux - Check listening ports</span>
+ss -tuln
+netstat -tulpn
+
+<span class="comment"># Windows - Disable a service</span>
+sc config "service_name" start= disabled
+
+<span class="comment"># Linux - Stop and disable a service</span>
+sudo systemctl stop service_name
+sudo systemctl disable service_name</code>
+            </div>
+        </div>
+
+        <!-- Section 7: Code Examples -->
+        <h2>💻 7. Port Scanning Commands</h2>
+        <div class="section">
+            <div class="code-header">🔍 Nmap — The Swiss Army Knife</div>
+            <div class="code-block">
+<code><span class="comment"># TCP connect scan, all 65535 ports</span>
+nmap -sT -p- 192.168.1.1
+
+<span class="comment"># UDP scan (slower, root required)</span>
+nmap -sU -p 53,161,500 192.168.1.1
+
+<span class="comment"># Version detection on common ports</span>
+nmap -sV -p 22,80,443,3306 target.com
+
+<span class="comment"># Aggressive scan (OS, version, scripts, traceroute)</span>
+nmap -A target.com
+
+<span class="comment"># Stealth SYN scan (half-open, faster)</span>
+sudo nmap -sS -p 1-1000 192.168.1.0/24
+
+<span class="comment"># Script scan for vulnerabilities</span>
+nmap --script vuln target.com</code>
+            </div>
+
+            <div class="code-header">📊 Check Local Listening Ports</div>
+            <div class="code-block">
+<code><span class="comment"># Windows</span>
+netstat -ano | findstr LISTENING
+netstat -ano | findstr :445    <span class="comment"># Check specific port</span>
+
+<span class="comment"># Linux</span>
+ss -tuln
+netstat -tulpn
+lsof -i :445                   <span class="comment"># What's using port 445</span></code>
+            </div>
+        </div>
+
+        <!-- Section 8: Protocol Deep Dives -->
+        <h2>🔬 8. Protocol Deep Dives</h2>
+        <div class="section">
+            <h3>8.1 DNS (Port 53)</h3>
+            <p><span class="highlight">How it works:</span> Translates human-readable domain names to IP addresses.</p>
+            
+            <h4>Resolution Types</h4>
+            <ul>
+                <li><span class="highlight">Recursive:</span> DNS server does all the work, returns final answer</li>
+                <li><span class="highlight">Iterative:</span> DNS server returns referrals, client follows chain</li>
+            </ul>
+
+            <h4>Record Types</h4>
+            <table>
+                <thead><tr><th>Type</th><th>Purpose</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td>A</td><td>IPv4 address</td><td>google.com → 142.250.190.46</td></tr>
+                    <tr><td>AAAA</td><td>IPv6 address</td><td>google.com → 2607:f8b0:4004:...</td></tr>
+                    <tr><td>MX</td><td>Mail server</td><td>Priority + mail server hostname</td></tr>
+                    <tr><td>CNAME</td><td>Alias</td><td>www.example.com → example.com</td></tr>
+                    <tr><td>TXT</td><td>Text data</td><td>SPF, DKIM, domain verification</td></tr>
+                    <tr><td>NS</td><td>Name servers</td><td>Authoritative DNS servers</td></tr>
+                    <tr><td>PTR</td><td>Reverse lookup</td><td>IP → domain name</td></tr>
+                </tbody>
+            </table>
+
+            <h4>DNS Attacks</h4>
+            <div class="security-box">
+                <ul>
+                    <li><span class="danger">DNS Poisoning:</span> Inject fake records into cache</li>
+                    <li><span class="danger">DNS Amplification:</span> DDoS using open resolvers</li>
+                    <li><span class="danger">DNS Tunneling:</span> Exfiltrate data over DNS queries</li>
+                </ul>
+            </div>
+
+            <div class="code-header">DNS Commands</div>
+            <div class="code-block">
+<code><span class="comment"># Windows/Linux</span>
+nslookup google.com
+nslookup -type=MX google.com
+
+<span class="comment"># Linux dig (more powerful)</span>
+dig google.com ANY
+dig +short google.com
+dig @8.8.8.8 google.com    <span class="comment"># Use specific DNS server</span>
+
+<span class="comment"># Reverse lookup</span>
+host 142.250.190.46</code>
+            </div>
+
+            <h3>8.2 DHCP (Ports 67, 68)</h3>
+            <p><span class="highlight">Purpose:</span> Automatically assigns IP addresses to devices on a network.</p>
+            
+            <h4>DORA Process</h4>
+            <div class="diagram">
+<pre>
+Client                           Server
+   │                                │
+   │─── Discover (broadcast) ─────▶│  "Who can give me an IP?"
+   │                                │
+   │◀────── Offer ─────────────────│  "I can offer 192.168.1.50"
+   │                                │
+   │─── Request ─────────────────▶│  "I'll take that IP"
+   │                                │
+   │◀────── Acknowledge ───────────│  "Here's your lease info"
+</pre>
+            </div>
+
+            <h4>DHCP Attacks</h4>
+            <div class="security-box">
+                <ul>
+                    <li><span class="danger">DHCP Starvation:</span> Exhaust all available IPs</li>
+                    <li><span class="danger">Rogue DHCP:</span> Attacker's server gives malicious settings (gateway, DNS)</li>
+                </ul>
+                <p><strong>Defense:</strong> DHCP snooping, port security</p>
+            </div>
+
+            <h3>8.3 ARP (Layer 2)</h3>
+            <p><span class="highlight">Purpose:</span> Maps IP addresses to MAC addresses on local network.</p>
+            
+            <h4>ARP Spoofing/Poisoning</h4>
+            <div class="security-box">
+                <p>Attacker sends fake ARP replies claiming to be the gateway → All traffic routes through attacker (MITM)</p>
+                <p><strong>Defense:</strong> Static ARP entries, Dynamic ARP Inspection (DAI)</p>
+            </div>
+
+            <div class="code-header">ARP Commands</div>
+            <div class="code-block">
+<code><span class="comment"># View ARP table</span>
+arp -a
+
+<span class="comment"># Clear ARP cache (Windows)</span>
+arp -d *
+
+<span class="comment"># Linux - show ARP</span>
+ip neighbor show</code>
+            </div>
+
+            <h3>8.4 ICMP (Layer 3)</h3>
+            <p><span class="highlight">Purpose:</span> Error reporting and diagnostics (ping, traceroute).</p>
+            
+            <h4>ICMP Types</h4>
+            <table>
+                <thead><tr><th>Type</th><th>Name</th><th>Use</th></tr></thead>
+                <tbody>
+                    <tr><td>0</td><td>Echo Reply</td><td>Ping response</td></tr>
+                    <tr><td>3</td><td>Destination Unreachable</td><td>Host/port unreachable</td></tr>
+                    <tr><td>5</td><td>Redirect</td><td>Route redirection (attackable!)</td></tr>
+                    <tr><td>8</td><td>Echo Request</td><td>Ping</td></tr>
+                    <tr><td>11</td><td>Time Exceeded</td><td>TTL expired (traceroute)</td></tr>
+                </tbody>
+            </table>
+
+            <h4>ICMP Attacks</h4>
+            <div class="security-box">
+                <ul>
+                    <li><span class="danger">Ping of Death:</span> Oversized ICMP packet crashes system (historical)</li>
+                    <li><span class="danger">ICMP Tunneling:</span> Hide data in ping packets to bypass firewalls</li>
+                    <li><span class="danger">Smurf Attack:</span> Broadcast ping flood (historical)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 9: Security Corner -->
+        <h2>🔒 9. Security Corner</h2>
+        <div class="section">
+            <h3>Port Scanning Ethics & Legality</h3>
+            <div class="warning-box">
+                <strong>⚠️ Legal Warning:</strong>
+                <ul>
+                    <li>NEVER scan systems you don't own or have written permission for</li>
+                    <li>Port scanning can be illegal in many jurisdictions</li>
+                    <li>Always get explicit authorization in writing before testing</li>
+                    <li>Use isolated lab environments for learning</li>
+                </ul>
+            </div>
+
+            <h3>Firewall Rules Based on Ports</h3>
+            <div class="code-header">Windows Firewall Examples</div>
+            <div class="code-block">
+<code><span class="comment"># Block incoming port 23 (Telnet)</span>
+netsh advfirewall firewall add rule name="Block Telnet" dir=in action=block protocol=tcp localport=23
+
+<span class="comment"># Allow only specific IP to access RDP</span>
+netsh advfirewall firewall add rule name="RDP Trusted" dir=in action=allow protocol=tcp localport=3389 remoteip=10.0.0.5</code>
+            </div>
+
+            <div class="code-header">Linux iptables Examples</div>
+            <div class="code-block">
+<code><span class="comment"># Block incoming Telnet</span>
+iptables -A INPUT -p tcp --dport 23 -j DROP
+
+<span class="comment"># Allow SSH only from specific subnet</span>
+iptables -A INPUT -p tcp -s 192.168.1.0/24 --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -j DROP</code>
+            </div>
+
+            <h3>Principle of Least Privilege for Ports</h3>
+            <ul>
+                <li><span class="highlight">Only open ports that are needed</span> — every open port is an attack surface</li>
+                <li><span class="highlight">Default deny</span> — block all, then allow specific ports</li>
+                <li><span class="highlight">Regular auditing</span> — check for unexpected listening services</li>
+                <li><span class="highlight">Network segmentation</span> — sensitive services on isolated networks</li>
+            </ul>
+        </div>
+
+        <!-- Section 10: Pentesting Relevance -->
+        <h2>🎯 10. Pentesting Relevance</h2>
+        <div class="section">
+            <h3>Port Scanning Methodology</h3>
+            <ol>
+                <li><span class="highlight">Discovery:</span> Find live hosts (ping sweep)</li>
+                <li><span class="highlight">Port Scan:</span> Identify open ports</li>
+                <li><span class="highlight">Service Detection:</span> What's running on each port</li>
+                <li><span class="highlight">Version Detection:</span> Specific software versions</li>
+                <li><span class="highlight">Vulnerability Scan:</span> Known CVEs for those versions</li>
+            </ol>
+
+            <h3>Banner Grabbing</h3>
+            <p>Retrieve service information to identify software and versions:</p>
+            
+            <div class="code-header">Banner Grabbing Techniques</div>
+            <div class="code-block">
+<code><span class="comment"># Netcat manual banner grab</span>
+nc -nv 192.168.1.1 22
+nc -nv 192.168.1.1 80
+
+<span class="comment"># Nmap banner script</span>
+nmap -sV --script=banner 192.168.1.1
+
+<span class="comment"># Telnet to web server (HTTP)</span>
+telnet target.com 80
+GET / HTTP/1.0
+[press Enter twice]
+
+<span class="comment"># cURL for HTTP headers</span>
+curl -I http://target.com</code>
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Pro Tip:</strong> Banner information often reveals exact software versions, making vulnerability research much easier. Look for CVEs matching those versions!
+            </div>
+        </div>
+
+        <!-- Section 11: Quiz -->
+        <h2>📝 11. Knowledge Check Quiz</h2>
+        <div class="section">
+            <div class="quiz-question">
+                <strong>Q1:</strong> What port does HTTPS use?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1"> 80</label>
+                    <label><input type="radio" name="q1"> 443</label>
+                    <label><input type="radio" name="q1"> 8080</label>
+                    <label><input type="radio" name="q1"> 22</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q2:</strong> Which protocol is connectionless?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2"> TCP</label>
+                    <label><input type="radio" name="q2"> UDP</label>
+                    <label><input type="radio" name="q2"> HTTP</label>
+                    <label><input type="radio" name="q2"> SSH</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q3:</strong> SMB runs on which port and is vulnerable to which famous exploit?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3"> Port 139, Heartbleed</label>
+                    <label><input type="radio" name="q3"> Port 445, EternalBlue</label>
+                    <label><input type="radio" name="q3"> Port 3389, BlueKeep</label>
+                    <label><input type="radio" name="q3"> Port 22, ShellShock</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q4:</strong> What is the correct order of TCP 3-way handshake?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4"> ACK → SYN → SYN-ACK</label>
+                    <label><input type="radio" name="q4"> SYN → SYN-ACK → ACK</label>
+                    <label><input type="radio" name="q4"> SYN → ACK → SYN-ACK</label>
+                    <label><input type="radio" name="q4"> SYN-ACK → SYN → ACK</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q5:</strong> Which port range is considered "well-known" ports?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5"> 0-1023</label>
+                    <label><input type="radio" name="q5"> 1024-49151</label>
+                    <label><input type="radio" name="q5"> 49152-65535</label>
+                    <label><input type="radio" name="q5"> 0-65535</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q6:</strong> Why is Telnet (port 23) considered high risk?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6"> It's too slow</label>
+                    <label><input type="radio" name="q6"> It transmits everything in cleartext</label>
+                    <label><input type="radio" name="q6"> It only works on Windows</label>
+                    <label><input type="radio" name="q6"> It requires root access</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q7:</strong> DNS primarily uses which transport protocol?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7"> TCP only</label>
+                    <label><input type="radio" name="q7"> UDP primarily (TCP for large transfers)</label>
+                    <label><input type="radio" name="q7"> ICMP</label>
+                    <label><input type="radio" name="q7"> Neither</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q8:</strong> What does DORA stand for in DHCP?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8"> Data, Offer, Request, Accept</label>
+                    <label><input type="radio" name="q8"> Discover, Offer, Request, Acknowledge</label>
+                    <label><input type="radio" name="q8"> Detect, Open, Relay, Accept</label>
+                    <label><input type="radio" name="q8"> Discover, Open, Reply, Acknowledge</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q9:</strong> Which Nmap flag performs a version detection scan?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q9"> -sT</label>
+                    <label><input type="radio" name="q9"> -sV</label>
+                    <label><input type="radio" name="q9"> -sS</label>
+                    <label><input type="radio" name="q9"> -sU</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q10:</strong> Redis (port 6379) is high risk because:
+                <div class="quiz-options">
+                    <label><input type="radio" name="q10"> It uses cleartext</label>
+                    <label><input type="radio" name="q10"> It often has no authentication enabled</label>
+                    <label><input type="radio" name="q10"> It's deprecated</label>
+                    <label><input type="radio" name="q10"> It only runs on Windows</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q11:</strong> What command shows listening ports on Linux?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q11"> ipconfig /all</label>
+                    <label><input type="radio" name="q11"> ss -tuln</label>
+                    <label><input type="radio" name="q11"> route print</label>
+                    <label><input type="radio" name="q11"> arp -a</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q12:</strong> ARP spoofing enables what type of attack?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q12"> Denial of Service</label>
+                    <label><input type="radio" name="q12"> Man-in-the-Middle</label>
+                    <label><input type="radio" name="q12"> SQL Injection</label>
+                    <label><input type="radio" name="q12"> Cross-Site Scripting</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q13:</strong> Which port is used for RDP?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q13"> 22</label>
+                    <label><input type="radio" name="q13"> 3389</label>
+                    <label><input type="radio" name="q13"> 5900</label>
+                    <label><input type="radio" name="q13"> 445</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q14:</strong> TCP header size is __ bytes minimum, UDP is __ bytes:
+                <div class="quiz-options">
+                    <label><input type="radio" name="q14"> 8, 20</label>
+                    <label><input type="radio" name="q14"> 20, 8</label>
+                    <label><input type="radio" name="q14"> 16, 16</label>
+                    <label><input type="radio" name="q14"> 32, 16</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q15:</strong> What is a socket?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q15"> An IP address only</label>
+                    <label><input type="radio" name="q15"> A port number only</label>
+                    <label><input type="radio" name="q15"> IP address + Port number combination</label>
+                    <label><input type="radio" name="q15"> A MAC address</label>
+                </div>
+            </div>
+
+            <div class="answers-section">
+                <button class="answers-toggle" onclick="toggleAnswers()">Show Answers</button>
+                <div class="answers-content" id="answersContent">
+                    <div class="answer-item"><strong>Q1:</strong> <span class="answer-correct">443</span></div>
+                    <div class="answer-item"><strong>Q2:</strong> <span class="answer-correct">UDP</span></div>
+                    <div class="answer-item"><strong>Q3:</strong> <span class="answer-correct">Port 445, EternalBlue</span></div>
+                    <div class="answer-item"><strong>Q4:</strong> <span class="answer-correct">SYN → SYN-ACK → ACK</span></div>
+                    <div class="answer-item"><strong>Q5:</strong> <span class="answer-correct">0-1023</span></div>
+                    <div class="answer-item"><strong>Q6:</strong> <span class="answer-correct">It transmits everything in cleartext</span></div>
+                    <div class="answer-item"><strong>Q7:</strong> <span class="answer-correct">UDP primarily (TCP for large transfers)</span></div>
+                    <div class="answer-item"><strong>Q8:</strong> <span class="answer-correct">Discover, Offer, Request, Acknowledge</span></div>
+                    <div class="answer-item"><strong>Q9:</strong> <span class="answer-correct">-sV</span></div>
+                    <div class="answer-item"><strong>Q10:</strong> <span class="answer-correct">It often has no authentication enabled</span></div>
+                    <div class="answer-item"><strong>Q11:</strong> <span class="answer-correct">ss -tuln</span></div>
+                    <div class="answer-item"><strong>Q12:</strong> <span class="answer-correct">Man-in-the-Middle</span></div>
+                    <div class="answer-item"><strong>Q13:</strong> <span class="answer-correct">3389</span></div>
+                    <div class="answer-item"><strong>Q14:</strong> <span class="answer-correct">20, 8</span></div>
+                    <div class="answer-item"><strong>Q15:</strong> <span class="answer-correct">IP address + Port number combination</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="page-nav">
+            <a href="1.5.2_osi_tcpip_models.html"><span>←</span><span>Previous: OSI & TCP/IP Models</span></a>
+            <a href="../1.5_networks.html"><span>↑</span><span>Networking Hub</span></a>
+            <a href="1.5.4_network_devices.html"><span>Next: Network Devices</span><span>→</span></a>
+        </nav>
+
+        <footer>
+            <p>Module 1.5.3: Protocols & Ports</p>
+            <p>Part of the Cybersecurity Beginner Course at <a href="../../../index.html">lokii.tech</a></p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswers() {
+            const content = document.getElementById('answersContent');
+            const button = document.querySelector('.answers-toggle');
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                button.textContent = 'Show Answers';
+            } else {
+                content.classList.add('show');
+                button.textContent = 'Hide Answers';
+            }
+        }
+
+        function sortTable(n) {
+            const table = document.getElementById("protocolTable");
+            let switching = true, shouldSwitch, i, x, y, dir = "asc", switchcount = 0;
+            while (switching) {
+                switching = false;
+                const rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir === "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true; break;
+                        }
+                    } else if (dir === "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true; break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true; switchcount++;
+                } else {
+                    if (switchcount === 0 && dir === "asc") {
+                        dir = "desc"; switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

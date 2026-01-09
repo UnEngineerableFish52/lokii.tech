@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.5.5 WiFi Explained | Networking | Cybersecurity Course</title>
+    <meta name="description" content="Complete WiFi security guide. Learn 802.11 standards, WEP/WPA/WPA2/WPA3, WiFi attacks, cracking techniques, and hardening best practices.">
+    <meta name="author" content="lokii (UnExplainableFish52)">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="icon" href="/favicon.ico">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6e6e6; font-family: system-ui, 'Segoe UI', sans-serif; line-height: 1.7; min-height: 100vh; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        
+        .site-header { padding: 15px 20px; border-bottom: 1px solid #30363d; background: rgba(13,17,23,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .branding { text-decoration: none; }
+        .branding .logo { color: #00ffff; font-size: 1.5rem; font-weight: 800; }
+        .site-nav { display: flex; gap: 25px; }
+        .site-nav .nav-link { color: #8b949e; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .site-nav .nav-link:hover { color: #00ffff; }
+        
+        header.page-header { text-align: center; padding: 50px 20px; margin-bottom: 40px; }
+        h1 { font-size: 2.5em; color: #00ffff; font-weight: bold; margin-bottom: 15px; }
+        h2 { font-size: 1.8em; color: #00ffff; font-weight: bold; margin: 50px 0 25px; padding-bottom: 10px; border-bottom: 2px solid #30363d; }
+        h3 { font-size: 1.4em; color: #00ffff; font-weight: bold; margin: 30px 0 15px; }
+        h4 { font-size: 1.2em; color: #fff; font-weight: bold; margin: 25px 0 12px; }
+        .subtitle { color: #8b949e; font-size: 1.2em; }
+        
+        .section { background: rgba(22,27,34,0.5); border: 1px solid #30363d; border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+        p { margin-bottom: 15px; font-weight: 500; }
+        .highlight { color: #ffd700; font-weight: bold; }
+        .code-text { color: #00ff88; font-family: 'Consolas', monospace; background: rgba(0,255,136,0.1); padding: 2px 6px; border-radius: 4px; }
+        .danger { color: #ff6b6b; font-weight: bold; }
+        .safe { color: #00ff88; font-weight: bold; }
+        a { color: #58a6ff; text-decoration: none; transition: all 0.3s; }
+        a:hover { color: #79c0ff; text-decoration: underline; }
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin-bottom: 10px; }
+        
+        .info-box { background: rgba(0,255,255,0.1); border-left: 4px solid #00ffff; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .security-box { background: rgba(255,0,85,0.1); border-left: 4px solid #ff0055; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .tip-box { background: rgba(0,255,136,0.1); border-left: 4px solid #00ff88; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .warning-box { background: rgba(255,107,107,0.1); border-left: 4px solid #ff6b6b; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .legal-box { background: rgba(255,193,7,0.1); border-left: 4px solid #ffc107; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.9em; }
+        th { background: rgba(0,255,255,0.2); color: #00ffff; padding: 12px 10px; text-align: left; border-bottom: 2px solid #00ffff; font-weight: bold; }
+        td { padding: 12px 10px; border-bottom: 1px solid #30363d; }
+        tr:nth-child(even) { background: rgba(22,27,34,0.5); }
+        tr:hover { background: rgba(0,255,255,0.05); }
+        .deprecated { background: rgba(255,0,0,0.15) !important; }
+        .legacy { background: rgba(255,165,0,0.15) !important; }
+        .current { background: rgba(0,255,0,0.1) !important; }
+        
+        .code-block { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin: 20px 0; overflow-x: auto; }
+        .code-block code { color: #00ff88; font-family: 'Consolas', monospace; font-size: 0.95em; line-height: 1.6; }
+        .code-header { background: rgba(0,255,136,0.15); color: #00ff88; padding: 8px 15px; border-radius: 8px 8px 0 0; margin: 20px 0 0 0; font-family: monospace; font-size: 0.85em; font-weight: bold; }
+        .code-header + .code-block { margin-top: 0; border-radius: 0 0 8px 8px; }
+        .comment { color: #8b949e; }
+        
+        .diagram { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 25px; margin: 20px 0; text-align: center; font-family: monospace; color: #00ffff; overflow-x: auto; }
+        .diagram pre { margin: 0; display: inline-block; text-align: left; line-height: 1.4; }
+        
+        .checklist { list-style: none; padding-left: 0; }
+        .checklist li { padding: 10px 15px; margin: 8px 0; background: rgba(22,27,34,0.5); border-radius: 8px; border-left: 3px solid #00ff88; }
+        .checklist li::before { content: "☐ "; color: #00ff88; font-weight: bold; }
+        
+        .attack-card { background: rgba(255,107,107,0.1); border: 1px solid #ff6b6b; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .attack-card h4 { color: #ff6b6b; margin-top: 0; }
+        
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .tool-card { background: rgba(22,27,34,0.7); border: 1px solid #30363d; border-radius: 8px; padding: 15px; text-align: center; }
+        .tool-card h5 { color: #00ffff; margin: 0 0 8px 0; }
+        .tool-card p { margin: 0; font-size: 0.9em; color: #8b949e; }
+        
+        .quiz-question { background: rgba(22,27,34,0.8); border: 1px solid #30363d; border-radius: 10px; padding: 20px; margin: 15px 0; }
+        .quiz-question strong { color: #ffd700; }
+        .quiz-options { margin: 15px 0 0 20px; }
+        .quiz-options label { display: block; padding: 8px 0; cursor: pointer; }
+        
+        .answers-toggle { background: rgba(0,255,136,0.15); color: #00ff88; border: 2px solid #00ff88; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; transition: all 0.3s; }
+        .answers-toggle:hover { background: rgba(0,255,136,0.25); }
+        .answers-content { display: none; background: rgba(22,27,34,0.8); border: 1px solid #30363d; border-radius: 10px; padding: 25px; margin-top: 15px; }
+        .answers-content.show { display: block; }
+        .answer-item { padding: 10px 0; border-bottom: 1px solid #30363d; }
+        .answer-item:last-child { border-bottom: none; }
+        .answer-correct { color: #00ff88; font-weight: bold; }
+        
+        .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 60px; padding-top: 30px; border-top: 2px solid #30363d; flex-wrap: wrap; gap: 10px; }
+        .page-nav a { display: flex; align-items: center; gap: 10px; color: #00ffff; text-decoration: none; padding: 15px 25px; border: 2px solid #30363d; border-radius: 10px; transition: all 0.3s; font-weight: 600; }
+        .page-nav a:hover { border-color: #00ffff; background: rgba(0,255,255,0.1); text-decoration: none; }
+        
+        .complete-badge { background: linear-gradient(135deg, #00ff88, #00ffff); color: #0d1117; padding: 10px 20px; border-radius: 8px; font-weight: bold; display: inline-block; margin: 20px 0; }
+        
+        footer { text-align: center; padding: 40px 20px; margin-top: 60px; border-top: 1px solid #30363d; color: #8b949e; }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            table { font-size: 0.7em; }
+            th, td { padding: 8px 5px; }
+            .page-nav { flex-direction: column; }
+            .page-nav a { width: 100%; justify-content: center; }
+            .header-content { flex-direction: column; gap: 15px; }
+            .tool-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <a href="../../../index.html" class="branding"><span class="logo">lokii.tech</span></a>
+            <nav class="site-nav">
+                <a href="../../../index.html#about" class="nav-link">About</a>
+                <a href="../../../index.html#resources" class="nav-link">Resources</a>
+                <a href="https://github.com/UnExplainableFish52" target="_blank" class="nav-link">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>📶 1.5.5 WiFi Explained</h1>
+            <p class="subtitle">Wireless security from basics to advanced attacks</p>
+        </header>
+
+        <!-- Section 1: Introduction -->
+        <h2>🌐 1. Introduction to WiFi</h2>
+        <div class="section">
+            <p><span class="highlight">WiFi</span> (Wireless Fidelity) is a marketing term for wireless networking technology based on the <span class="highlight">IEEE 802.11</span> standards.</p>
+            
+            <h3>How Wireless Communication Works</h3>
+            <ul>
+                <li><span class="highlight">Radio Waves:</span> Data transmitted via electromagnetic waves</li>
+                <li><span class="highlight">Frequencies:</span> 2.4 GHz, 5 GHz, and 6 GHz bands</li>
+                <li><span class="highlight">Modulation:</span> Data encoded into radio signals</li>
+                <li><span class="highlight">Half-Duplex:</span> Cannot send and receive simultaneously on same channel</li>
+            </ul>
+
+            <h3>Key Organizations</h3>
+            <ul>
+                <li><span class="highlight">IEEE:</span> Develops 802.11 technical standards</li>
+                <li><span class="highlight">WiFi Alliance:</span> Certifies devices, creates marketing names (WiFi 6, etc.)</li>
+            </ul>
+
+            <div class="info-box">
+                <strong>💡 Fun Fact:</strong> WiFi doesn't actually stand for anything! It's a play on "Hi-Fi" (High Fidelity) for marketing purposes.
+            </div>
+        </div>
+
+        <!-- Section 2: WiFi Standards -->
+        <h2>📊 2. WiFi Standards Evolution</h2>
+        <div class="section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Standard</th>
+                        <th>Year</th>
+                        <th>Frequency</th>
+                        <th>Max Speed</th>
+                        <th>Range</th>
+                        <th>Key Features</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="deprecated"><td>802.11</td><td>1997</td><td>2.4 GHz</td><td>2 Mbps</td><td>~20m</td><td>Original standard</td></tr>
+                    <tr class="legacy"><td>802.11a</td><td>1999</td><td>5 GHz</td><td>54 Mbps</td><td>~35m</td><td>OFDM</td></tr>
+                    <tr class="legacy"><td>802.11b</td><td>1999</td><td>2.4 GHz</td><td>11 Mbps</td><td>~35m</td><td>Popular but slow</td></tr>
+                    <tr class="legacy"><td>802.11g</td><td>2003</td><td>2.4 GHz</td><td>54 Mbps</td><td>~38m</td><td>Backward compatible</td></tr>
+                    <tr><td><span class="highlight">802.11n (WiFi 4)</span></td><td>2009</td><td>2.4/5 GHz</td><td>600 Mbps</td><td>~70m</td><td>MIMO, dual-band</td></tr>
+                    <tr><td><span class="highlight">802.11ac (WiFi 5)</span></td><td>2013</td><td>5 GHz</td><td>6.9 Gbps</td><td>~35m</td><td>MU-MIMO, beamforming</td></tr>
+                    <tr class="current"><td><span class="highlight">802.11ax (WiFi 6)</span></td><td>2019</td><td>2.4/5 GHz</td><td>9.6 Gbps</td><td>~35m</td><td>OFDMA, better density</td></tr>
+                    <tr class="current"><td><span class="highlight">WiFi 6E</span></td><td>2020</td><td>6 GHz</td><td>9.6 Gbps</td><td>~35m</td><td>6 GHz band added</td></tr>
+                    <tr class="current"><td><span class="highlight">802.11be (WiFi 7)</span></td><td>2024</td><td>2.4/5/6 GHz</td><td>46 Gbps</td><td>—</td><td>MLO, 320 MHz channels</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Key Technologies Explained</h3>
+            <ul>
+                <li><span class="highlight">MIMO:</span> Multiple antennas for parallel data streams</li>
+                <li><span class="highlight">MU-MIMO:</span> Serves multiple devices simultaneously</li>
+                <li><span class="highlight">OFDM/OFDMA:</span> Divides channel into sub-carriers for efficiency</li>
+                <li><span class="highlight">Beamforming:</span> Focuses signal toward devices</li>
+                <li><span class="highlight">Channel Bonding:</span> Combines channels for more bandwidth</li>
+            </ul>
+        </div>
+
+        <!-- Section 3: Frequency Bands -->
+        <h2>📡 3. WiFi Frequency Bands</h2>
+        <div class="section">
+            <table>
+                <thead><tr><th>Band</th><th>Range</th><th>Interference</th><th>Channels</th><th>Best For</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="highlight">2.4 GHz</span></td><td>Longer</td><td>High (microwaves, Bluetooth)</td><td>11 (3 non-overlapping: 1, 6, 11)</td><td>Range, older devices</td></tr>
+                    <tr><td><span class="highlight">5 GHz</span></td><td>Shorter</td><td>Lower</td><td>25+ non-overlapping</td><td>Speed, less congestion</td></tr>
+                    <tr><td><span class="highlight">6 GHz</span></td><td>Shortest</td><td>Minimal</td><td>59 channels</td><td>High density, latest devices</td></tr>
+                </tbody>
+            </table>
+
+            <h3>2.4 GHz Channel Overlap</h3>
+            <div class="diagram">
+<pre>
+Channel:    1    2    3    4    5    6    7    8    9   10   11
+         ┌────────────────────┐
+         │    Channel 1       │
+         └────────────────────┘
+                        ┌────────────────────┐
+                        │    Channel 6       │ ← Use these 3!
+                        └────────────────────┘
+                                       ┌────────────────────┐
+                                       │   Channel 11       │
+                                       └────────────────────┘
+
+Only channels 1, 6, 11 don't overlap! Using others causes interference.
+</pre>
+            </div>
+        </div>
+
+        <!-- Section 4: WiFi Components -->
+        <h2>🔧 4. WiFi Components</h2>
+        <div class="section">
+            <table>
+                <thead><tr><th>Component</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><span class="highlight">Access Point (AP)</span></td><td>Bridges wireless to wired network</td></tr>
+                    <tr><td><span class="highlight">Wireless Router</span></td><td>AP + router + (usually) modem combined</td></tr>
+                    <tr><td><span class="highlight">SSID</span></td><td>Network name (Service Set Identifier)</td></tr>
+                    <tr><td><span class="highlight">BSSID</span></td><td>MAC address of the AP</td></tr>
+                    <tr><td><span class="highlight">Wireless NIC</span></td><td>Client device interface</td></tr>
+                    <tr><td><span class="highlight">Antenna</span></td><td>Omnidirectional (360°) or Directional (focused)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 5: WiFi Security Protocols -->
+        <h2>⭐ 5. WiFi Security Protocols — Deep Dive</h2>
+        <div class="section">
+            <table>
+                <thead>
+                    <tr><th>Protocol</th><th>Year</th><th>Encryption</th><th>Key Size</th><th>Status</th><th>Vulnerabilities</th></tr>
+                </thead>
+                <tbody>
+                    <tr class="deprecated"><td>WEP</td><td>1997</td><td>RC4</td><td>40/104-bit</td><td><span class="danger">⛔ DEPRECATED</span></td><td>IV collision, crackable in minutes</td></tr>
+                    <tr class="legacy"><td>WPA</td><td>2003</td><td>TKIP (RC4)</td><td>128-bit</td><td><span class="danger">⚠️ LEGACY</span></td><td>TKIP weaknesses</td></tr>
+                    <tr class="current"><td>WPA2</td><td>2004</td><td>AES-CCMP</td><td>128-bit</td><td><span class="safe">✅ Current</span></td><td>KRACK attack</td></tr>
+                    <tr class="current"><td>WPA3</td><td>2018</td><td>AES-GCMP / SAE</td><td>192/256-bit</td><td><span class="safe">✅ Latest</span></td><td>Dragonblood (patched)</td></tr>
+                </tbody>
+            </table>
+
+            <h3>5.1 WEP (Wired Equivalent Privacy)</h3>
+            <div class="warning-box">
+                <strong>⛔ NEVER USE WEP. EVER.</strong>
+            </div>
+            
+            <h4>Why WEP is Broken</h4>
+            <ul>
+                <li><span class="danger">24-bit IV:</span> Only 16 million combinations → IV reuse inevitable</li>
+                <li><span class="danger">IV transmitted in cleartext:</span> Attacker can collect and analyze</li>
+                <li><span class="danger">Key recovery:</span> With enough packets, key is calculated</li>
+                <li><span class="danger">No mutual authentication:</span> Can't verify AP identity</li>
+            </ul>
+
+            <div class="code-header">Cracking WEP (Educational)</div>
+            <div class="code-block">
+<code><span class="comment"># 1. Enable monitor mode</span>
+airmon-ng start wlan0
+
+<span class="comment"># 2. Find target network</span>
+airodump-ng wlan0mon
+
+<span class="comment"># 3. Capture packets from target</span>
+airodump-ng -c [channel] --bssid [BSSID] -w capture wlan0mon
+
+<span class="comment"># 4. Generate traffic with ARP replay</span>
+aireplay-ng -3 -b [BSSID] wlan0mon
+
+<span class="comment"># 5. Crack the key (needs ~40,000 IVs)</span>
+aircrack-ng capture-01.cap</code>
+            </div>
+
+            <h3>5.2 WPA (WiFi Protected Access)</h3>
+            <ul>
+                <li>Temporary fix while WPA2 was developed</li>
+                <li><span class="highlight">TKIP:</span> Temporal Key Integrity Protocol (still uses RC4)</li>
+                <li><span class="highlight">MIC:</span> Message Integrity Check prevents tampering</li>
+                <li>Per-packet key mixing improved security</li>
+                <li>Still deprecated — don't use</li>
+            </ul>
+
+            <h3>5.3 WPA2</h3>
+            <p>Industry standard for over a decade. Uses <span class="highlight">AES-CCMP</span> encryption.</p>
+            
+            <h4>Personal (PSK) vs Enterprise</h4>
+            <ul>
+                <li><span class="highlight">WPA2-Personal:</span> Pre-Shared Key (password) — home use</li>
+                <li><span class="highlight">WPA2-Enterprise:</span> 802.1X + RADIUS server — corporate</li>
+            </ul>
+
+            <h4>4-Way Handshake</h4>
+            <div class="diagram">
+<pre>
+    Client                              Access Point
+       │                                     │
+       │◀─────── 1. ANonce ─────────────────│  AP sends nonce
+       │                                     │
+       │────── 2. SNonce + MIC ────────────▶│  Client sends nonce + proof
+       │                                     │
+       │◀─────── 3. GTK + MIC ──────────────│  AP sends Group Key
+       │                                     │
+       │────── 4. ACK ─────────────────────▶│  Connection established
+       │                                     │
+
+PTK (Pairwise Transient Key) = PMK + ANonce + SNonce + MACs
+</pre>
+            </div>
+
+            <h4>KRACK Attack (2017)</h4>
+            <div class="security-box">
+                <p><span class="danger">Key Reinstallation Attack</span> — targets the 4-way handshake</p>
+                <ul>
+                    <li>Attacker forces nonce reuse by replaying handshake messages</li>
+                    <li>Can decrypt packets and inject traffic</li>
+                    <li>Requires proximity to victim</li>
+                    <li><span class="safe">Most devices patched</span> — update your devices!</li>
+                </ul>
+            </div>
+
+            <h3>5.4 WPA3</h3>
+            <p>Latest and most secure WiFi encryption standard.</p>
+            
+            <h4>Key Improvements</h4>
+            <ul>
+                <li><span class="highlight">SAE (Simultaneous Authentication of Equals):</span> Dragonfly handshake, resistant to offline dictionary attacks</li>
+                <li><span class="highlight">Forward Secrecy:</span> Past sessions can't be decrypted even if password is compromised</li>
+                <li><span class="highlight">PMF (Protected Management Frames):</span> Prevents deauth attacks</li>
+                <li><span class="highlight">Enhanced Open (OWE):</span> Encryption for public WiFi without password</li>
+                <li><span class="highlight">192-bit Security:</span> Enterprise mode uses stronger crypto</li>
+            </ul>
+
+            <div class="tip-box">
+                <strong>🔐 Recommendation:</strong> Use WPA3 if devices support it. Otherwise, WPA2-AES with a strong password (12+ random characters).
+            </div>
+
+            <h3>5.5 WPS (WiFi Protected Setup)</h3>
+            <div class="warning-box">
+                <strong>⚠️ MAJOR VULNERABILITY — ALWAYS DISABLE WPS</strong>
+                <ul>
+                    <li>8-digit PIN split into two halves (4+4)</li>
+                    <li>First half: 10,000 combinations, Second half: 1,000 (last digit is checksum)</li>
+                    <li>Only ~11,000 total attempts needed</li>
+                    <li>Brute-forceable in hours</li>
+                </ul>
+            </div>
+
+            <div class="code-header">WPS Attack Tools</div>
+            <div class="code-block">
+<code><span class="comment"># Reaver - WPS brute force</span>
+reaver -i wlan0mon -b [BSSID] -vv
+
+<span class="comment"># Bully - alternative WPS cracker</span>
+bully wlan0mon -b [BSSID] -v 3
+
+<span class="comment"># Pixie Dust - offline WPS attack (faster)</span>
+reaver -i wlan0mon -b [BSSID] -K 1</code>
+            </div>
+        </div>
+
+        <!-- Section 6: WiFi Attacks -->
+        <h2>⭐ 6. WiFi Attacks & Exploits</h2>
+        <div class="section">
+            <div class="attack-card">
+                <h4>6.1 Reconnaissance</h4>
+                <p>First step — discover networks and clients.</p>
+                <div class="code-block">
+<code><span class="comment"># Put card in monitor mode</span>
+airmon-ng check kill
+airmon-ng start wlan0
+
+<span class="comment"># Scan all networks</span>
+airodump-ng wlan0mon
+
+<span class="comment"># Target specific network (capture handshakes)</span>
+airodump-ng -c [channel] --bssid [BSSID] -w output wlan0mon</code>
+                </div>
+            </div>
+
+            <div class="attack-card">
+                <h4>6.2 Deauthentication Attack</h4>
+                <p>Disconnect clients from AP by sending spoofed deauth frames.</p>
+                <ul>
+                    <li>Forces re-authentication (capture handshake)</li>
+                    <li>Denial of Service potential</li>
+                    <li>WPA3 PMF protects against this</li>
+                </ul>
+                <div class="code-block">
+<code><span class="comment"># Deauth specific client</span>
+aireplay-ng -0 10 -a [AP_BSSID] -c [CLIENT_MAC] wlan0mon
+
+<span class="comment"># Deauth all clients (broadcast)</span>
+aireplay-ng -0 10 -a [AP_BSSID] wlan0mon
+
+<span class="comment"># -0 = deauth attack, 10 = number of packets</span></code>
+                </div>
+            </div>
+
+            <div class="attack-card">
+                <h4>6.3 Handshake Capture & Cracking</h4>
+                <p>Capture 4-way handshake, then crack offline with wordlist.</p>
+                <div class="code-block">
+<code><span class="comment"># 1. Capture (wait for client or use deauth)</span>
+airodump-ng -c [channel] --bssid [BSSID] -w capture wlan0mon
+
+<span class="comment"># 2. Crack with aircrack-ng (CPU)</span>
+aircrack-ng capture-01.cap -w /usr/share/wordlists/rockyou.txt
+
+<span class="comment"># 3. Crack with hashcat (GPU - much faster)</span>
+<span class="comment"># Convert capture to hashcat format</span>
+hcxpcapngtool capture-01.cap -o hash.hc22000
+
+<span class="comment"># Run hashcat</span>
+hashcat -m 22000 hash.hc22000 rockyou.txt</code>
+                </div>
+            </div>
+
+            <div class="attack-card">
+                <h4>6.4 PMKID Attack</h4>
+                <p>Capture PMKID directly from AP — <span class="danger">no client needed!</span></p>
+                <div class="code-block">
+<code><span class="comment"># Capture PMKID</span>
+hcxdumptool -i wlan0mon -o output.pcapng --enable_status=1
+
+<span class="comment"># Convert and crack</span>
+hcxpcapngtool output.pcapng -o pmkid.hc22000
+hashcat -m 22000 pmkid.hc22000 wordlist.txt</code>
+                </div>
+            </div>
+
+            <div class="attack-card">
+                <h4>6.5 Evil Twin Attack</h4>
+                <p>Create fake AP with same SSID → victims connect to attacker.</p>
+                <ol>
+                    <li>Create fake AP with same name as target</li>
+                    <li>Deauth clients from real AP</li>
+                    <li>Clients reconnect to your fake AP</li>
+                    <li>Capture credentials or perform MITM</li>
+                </ol>
+                <p><strong>Tools:</strong> Fluxion, hostapd, WiFi Pumpkin</p>
+            </div>
+
+            <div class="attack-card">
+                <h4>6.6 Karma Attack</h4>
+                <p>Respond to ALL probe requests — devices looking for saved networks connect to you.</p>
+                <ul>
+                    <li>Exploits auto-connect behavior</li>
+                    <li>Works on devices probing for open networks</li>
+                    <li><strong>Tools:</strong> Hostapd-mana, WiFi Pumpkin</li>
+                </ul>
+            </div>
+
+            <div class="attack-card">
+                <h4>6.7 Rogue AP</h4>
+                <p>Unauthorized access point in corporate network → bypasses security.</p>
+                <ul>
+                    <li>May be malicious or just employee bringing personal router</li>
+                    <li>Enterprise uses WIDS/WIPS for detection</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 7: Attack Tools -->
+        <h2>⭐ 7. WiFi Attack Tools Summary</h2>
+        <div class="section">
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h5>Aircrack-ng</h5>
+                    <p>Complete WiFi audit suite</p>
+                </div>
+                <div class="tool-card">
+                    <h5>Wifite</h5>
+                    <p>Automated attacks</p>
+                </div>
+                <div class="tool-card">
+                    <h5>Reaver</h5>
+                    <p>WPS brute force</p>
+                </div>
+                <div class="tool-card">
+                    <h5>Bully</h5>
+                    <p>WPS attacks</p>
+                </div>
+                <div class="tool-card">
+                    <h5>Hashcat</h5>
+                    <p>GPU password cracking</p>
+                </div>
+                <div class="tool-card">
+                    <h5>Fluxion</h5>
+                    <p>Evil twin framework</p>
+                </div>
+                <div class="tool-card">
+                    <h5>Bettercap</h5>
+                    <p>MITM framework</p>
+                </div>
+                <div class="tool-card">
+                    <h5>WiFi Pumpkin</h5>
+                    <p>Rogue AP framework</p>
+                </div>
+                <div class="tool-card">
+                    <h5>Kismet</h5>
+                    <p>Wireless detector</p>
+                </div>
+                <div class="tool-card">
+                    <h5>hcxtools</h5>
+                    <p>PMKID capture/convert</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8: Hardening -->
+        <h2>⭐ 8. WiFi Hardening & Prevention</h2>
+        <div class="section">
+            <h3>8.1 For Home Users</h3>
+            <ul class="checklist">
+                <li>Use WPA3 (or WPA2-AES minimum)</li>
+                <li>Strong passphrase (12+ chars, random)</li>
+                <li>Disable WPS completely</li>
+                <li>Change default admin credentials</li>
+                <li>Hide SSID (minor security benefit)</li>
+                <li>Enable router firewall</li>
+                <li>Update firmware regularly</li>
+                <li>Use 5GHz when possible (shorter range)</li>
+                <li>MAC filtering (minor security)</li>
+                <li>Reduce transmit power if possible</li>
+            </ul>
+
+            <h3>8.2 For Enterprise</h3>
+            <ul class="checklist">
+                <li>WPA3-Enterprise with RADIUS</li>
+                <li>802.1X authentication</li>
+                <li>Certificate-based auth (EAP-TLS)</li>
+                <li>Network segmentation (guest vs corporate)</li>
+                <li>Rogue AP detection (WIDS/WIPS)</li>
+                <li>Regular security audits</li>
+                <li>Disable legacy protocols (WEP, WPA, TKIP)</li>
+                <li>Enable Protected Management Frames (PMF)</li>
+                <li>Monitor for deauth attacks</li>
+            </ul>
+
+            <h3>8.3 For Users (Client-side)</h3>
+            <ul class="checklist">
+                <li>Forget networks you don't use</li>
+                <li>Disable auto-connect to open networks</li>
+                <li>Use VPN on public WiFi</li>
+                <li>Verify network name before connecting</li>
+                <li>Keep devices updated</li>
+            </ul>
+        </div>
+
+        <!-- Section 9: Audit Checklist -->
+        <h2>📋 9. WiFi Security Audit Checklist</h2>
+        <div class="section">
+            <p>For authorized penetration testing engagements:</p>
+            <ul class="checklist">
+                <li>Identify all wireless networks in scope</li>
+                <li>Check encryption type (WEP/WPA/WPA2/WPA3)</li>
+                <li>Test WPS if enabled</li>
+                <li>Capture handshakes</li>
+                <li>Attempt password cracking (with permission)</li>
+                <li>Test for rogue APs</li>
+                <li>Check for client isolation</li>
+                <li>Verify guest network segmentation</li>
+                <li>Test for deauth vulnerability</li>
+                <li>Document findings and recommendations</li>
+            </ul>
+        </div>
+
+        <!-- Section 10: Legal -->
+        <h2>⚖️ 10. Legal & Ethical Considerations</h2>
+        <div class="section">
+            <div class="legal-box">
+                <strong>⚠️ WARNING — READ THIS</strong>
+                <ul>
+                    <li><span class="danger">Only test networks you OWN or have WRITTEN permission for</span></li>
+                    <li>Unauthorized WiFi attacks are illegal (CFAA, Computer Misuse Act, etc.)</li>
+                    <li>Even passive scanning can be legally gray in some jurisdictions</li>
+                    <li>Document scope and permissions BEFORE any engagement</li>
+                    <li>Penalties include fines and imprisonment</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 11: Code Compilation -->
+        <h2>💻 11. Command Reference</h2>
+        <div class="section">
+            <div class="code-header">Monitor Mode & Scanning</div>
+            <div class="code-block">
+<code><span class="comment"># Check interface</span>
+iwconfig
+
+<span class="comment"># Kill interfering processes</span>
+airmon-ng check kill
+
+<span class="comment"># Start monitor mode</span>
+airmon-ng start wlan0
+
+<span class="comment"># Stop monitor mode</span>
+airmon-ng stop wlan0mon
+
+<span class="comment"># Scan networks</span>
+airodump-ng wlan0mon
+
+<span class="comment"># Target specific network</span>
+airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon</code>
+            </div>
+
+            <div class="code-header">Attacks & Cracking</div>
+            <div class="code-block">
+<code><span class="comment"># Deauth attack</span>
+aireplay-ng -0 5 -a [AP_MAC] -c [CLIENT_MAC] wlan0mon
+
+<span class="comment"># Crack handshake</span>
+aircrack-ng capture-01.cap -w /path/to/wordlist
+
+<span class="comment"># Hashcat (GPU)</span>
+hcxpcapngtool capture.cap -o hash.hc22000
+hashcat -m 22000 hash.hc22000 wordlist.txt</code>
+            </div>
+
+            <div class="code-header">View Saved WiFi Passwords</div>
+            <div class="code-block">
+<code><span class="comment"># Windows - show password</span>
+netsh wlan show profile name="NETWORK_NAME" key=clear
+
+<span class="comment"># Linux - saved passwords</span>
+sudo cat /etc/NetworkManager/system-connections/NETWORK_NAME.nmconnection
+
+<span class="comment"># macOS</span>
+security find-generic-password -wa "NETWORK_NAME"</code>
+            </div>
+        </div>
+
+        <!-- Section 12: Scenarios -->
+        <h2>🎯 12. Real-World Scenarios</h2>
+        <div class="section">
+            <div class="info-box">
+                <h4>Scenario 1: Home Network Audit</h4>
+                <ol>
+                    <li>Login to router admin panel</li>
+                    <li>Verify using WPA2/WPA3-AES</li>
+                    <li>Ensure WPS is disabled</li>
+                    <li>Change default admin password</li>
+                    <li>Test password strength with aircrack-ng (on your own network)</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <h4>Scenario 2: Coffee Shop Safety</h4>
+                <ol>
+                    <li>Verify network name with staff (avoid evil twins)</li>
+                    <li>Connect to VPN immediately</li>
+                    <li>Avoid sensitive banking/passwords</li>
+                    <li>Use HTTPS everywhere</li>
+                    <li>Forget network after leaving</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <h4>Scenario 3: Corporate Pentest</h4>
+                <ol>
+                    <li>Obtain written authorization</li>
+                    <li>Define scope clearly</li>
+                    <li>Passive reconnaissance first</li>
+                    <li>Active testing with permission</li>
+                    <li>Document everything</li>
+                    <li>Responsible disclosure of findings</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Section 13: Quiz -->
+        <h2>📝 13. Knowledge Check Quiz</h2>
+        <div class="section">
+            <div class="quiz-question">
+                <strong>Q1:</strong> Which WiFi security protocol is completely broken and should never be used?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1"> WPA2</label>
+                    <label><input type="radio" name="q1"> WEP</label>
+                    <label><input type="radio" name="q1"> WPA3</label>
+                    <label><input type="radio" name="q1"> AES</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q2:</strong> What is the name for WiFi 6?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2"> 802.11ac</label>
+                    <label><input type="radio" name="q2"> 802.11ax</label>
+                    <label><input type="radio" name="q2"> 802.11n</label>
+                    <label><input type="radio" name="q2"> 802.11be</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q3:</strong> Why is WPS a security risk?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3"> It uses weak encryption</label>
+                    <label><input type="radio" name="q3"> 8-digit PIN is brute-forceable (~11,000 attempts)</label>
+                    <label><input type="radio" name="q3"> It's too slow</label>
+                    <label><input type="radio" name="q3"> It doesn't work</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q4:</strong> What attack forces clients to reconnect to capture handshakes?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4"> Evil Twin</label>
+                    <label><input type="radio" name="q4"> Deauthentication Attack</label>
+                    <label><input type="radio" name="q4"> PMKID Attack</label>
+                    <label><input type="radio" name="q4"> Karma Attack</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q5:</strong> Which 2.4 GHz channels don't overlap?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5"> 1, 2, 3</label>
+                    <label><input type="radio" name="q5"> 1, 6, 11</label>
+                    <label><input type="radio" name="q5"> All of them</label>
+                    <label><input type="radio" name="q5"> 5, 10, 15</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q6:</strong> What encryption does WPA2 use?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6"> RC4</label>
+                    <label><input type="radio" name="q6"> TKIP</label>
+                    <label><input type="radio" name="q6"> AES-CCMP</label>
+                    <label><input type="radio" name="q6"> DES</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q7:</strong> What WPA3 feature provides encryption on public WiFi without a password?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7"> SAE</label>
+                    <label><input type="radio" name="q7"> Enhanced Open (OWE)</label>
+                    <label><input type="radio" name="q7"> TKIP</label>
+                    <label><input type="radio" name="q7"> WPS</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q8:</strong> Which attack captures PMKID directly from AP without needing a client?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8"> Evil Twin</label>
+                    <label><input type="radio" name="q8"> Handshake Capture</label>
+                    <label><input type="radio" name="q8"> PMKID Attack</label>
+                    <label><input type="radio" name="q8"> Deauth Attack</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q9:</strong> What tool is used for GPU-accelerated password cracking?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q9"> Aircrack-ng</label>
+                    <label><input type="radio" name="q9"> Hashcat</label>
+                    <label><input type="radio" name="q9"> Wireshark</label>
+                    <label><input type="radio" name="q9"> Nmap</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q10:</strong> What is an Evil Twin attack?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q10"> Duplicating MAC addresses</label>
+                    <label><input type="radio" name="q10"> Creating fake AP with same SSID as target</label>
+                    <label><input type="radio" name="q10"> Jamming radio frequencies</label>
+                    <label><input type="radio" name="q10"> DNS poisoning</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q11:</strong> What WPA2 vulnerability was discovered in 2017?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q11"> Dragonblood</label>
+                    <label><input type="radio" name="q11"> KRACK</label>
+                    <label><input type="radio" name="q11"> Heartbleed</label>
+                    <label><input type="radio" name="q11"> Shellshock</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q12:</strong> Which command puts a wireless interface into monitor mode?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q12"> iwconfig wlan0 mode monitor</label>
+                    <label><input type="radio" name="q12"> airmon-ng start wlan0</label>
+                    <label><input type="radio" name="q12"> ifconfig wlan0 monitor</label>
+                    <label><input type="radio" name="q12"> netsh wlan monitor</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q13:</strong> What does SAE stand for in WPA3?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q13"> Secure Authentication Exchange</label>
+                    <label><input type="radio" name="q13"> Simultaneous Authentication of Equals</label>
+                    <label><input type="radio" name="q13"> Simple Access Encryption</label>
+                    <label><input type="radio" name="q13"> Standard Authentication Extension</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q14:</strong> What is the primary defense against deauth attacks?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q14"> Stronger password</label>
+                    <label><input type="radio" name="q14"> Protected Management Frames (PMF/802.11w)</label>
+                    <label><input type="radio" name="q14"> MAC filtering</label>
+                    <label><input type="radio" name="q14"> Hidden SSID</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q15:</strong> You're on public WiFi at a coffee shop. What's the MOST important security measure?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q15"> Use a strong password</label>
+                    <label><input type="radio" name="q15"> Use a VPN</label>
+                    <label><input type="radio" name="q15"> Use MAC filtering</label>
+                    <label><input type="radio" name="q15"> Disable Bluetooth</label>
+                </div>
+            </div>
+
+            <div class="answers-section">
+                <button class="answers-toggle" onclick="toggleAnswers()">Show Answers</button>
+                <div class="answers-content" id="answersContent">
+                    <div class="answer-item"><strong>Q1:</strong> <span class="answer-correct">WEP</span></div>
+                    <div class="answer-item"><strong>Q2:</strong> <span class="answer-correct">802.11ax</span></div>
+                    <div class="answer-item"><strong>Q3:</strong> <span class="answer-correct">8-digit PIN is brute-forceable (~11,000 attempts)</span></div>
+                    <div class="answer-item"><strong>Q4:</strong> <span class="answer-correct">Deauthentication Attack</span></div>
+                    <div class="answer-item"><strong>Q5:</strong> <span class="answer-correct">1, 6, 11</span></div>
+                    <div class="answer-item"><strong>Q6:</strong> <span class="answer-correct">AES-CCMP</span></div>
+                    <div class="answer-item"><strong>Q7:</strong> <span class="answer-correct">Enhanced Open (OWE)</span></div>
+                    <div class="answer-item"><strong>Q8:</strong> <span class="answer-correct">PMKID Attack</span></div>
+                    <div class="answer-item"><strong>Q9:</strong> <span class="answer-correct">Hashcat</span></div>
+                    <div class="answer-item"><strong>Q10:</strong> <span class="answer-correct">Creating fake AP with same SSID as target</span></div>
+                    <div class="answer-item"><strong>Q11:</strong> <span class="answer-correct">KRACK</span></div>
+                    <div class="answer-item"><strong>Q12:</strong> <span class="answer-correct">airmon-ng start wlan0</span></div>
+                    <div class="answer-item"><strong>Q13:</strong> <span class="answer-correct">Simultaneous Authentication of Equals</span></div>
+                    <div class="answer-item"><strong>Q14:</strong> <span class="answer-correct">Protected Management Frames (PMF/802.11w)</span></div>
+                    <div class="answer-item"><strong>Q15:</strong> <span class="answer-correct">Use a VPN</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 14: Resources -->
+        <h2>📚 14. Additional Resources</h2>
+        <div class="section">
+            <ul>
+                <li><a href="https://www.aircrack-ng.org/documentation.html" target="_blank">Aircrack-ng Documentation</a></li>
+                <li><a href="https://www.wi-fi.org/" target="_blank">WiFi Alliance Specifications</a></li>
+                <li><a href="https://csrc.nist.gov/publications/detail/sp/800-153/final" target="_blank">NIST Wireless Security Guidelines (SP 800-153)</a></li>
+                <li><a href="https://hashcat.net/wiki/" target="_blank">Hashcat Wiki</a></li>
+            </ul>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="page-nav">
+            <a href="1.5.4_network_devices.html"><span>←</span><span>Previous: Network Devices</span></a>
+            <a href="../1.5_networks.html"><span>↑</span><span>Networking Hub</span></a>
+            <a href="../1.5_networks.html"><span>🎉 Series Complete!</span><span>→</span></a>
+        </nav>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <span class="complete-badge">🎉 Networking Series Complete!</span>
+            <p style="margin-top: 15px; color: #8b949e;">You've completed the networking fundamentals. Ready for the next module!</p>
+        </div>
+
+        <footer>
+            <p>Module 1.5.5: WiFi Explained</p>
+            <p>Part of the Cybersecurity Beginner Course at <a href="../../../index.html">lokii.tech</a></p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswers() {
+            const content = document.getElementById('answersContent');
+            const button = document.querySelector('.answers-toggle');
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                button.textContent = 'Show Answers';
+            } else {
+                content.classList.add('show');
+                button.textContent = 'Hide Answers';
+            }
+        }
+    </script>
+</body>
+</html>
