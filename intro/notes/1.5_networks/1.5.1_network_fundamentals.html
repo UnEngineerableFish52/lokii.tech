@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.5.1 Network Fundamentals | Networking | Cybersecurity Beginner Course</title>
+    
+    <meta name="description" content="Learn networking fundamentals - network types, topologies, IP addressing, MAC addresses, and essential commands for cybersecurity professionals.">
+    <meta name="author" content="lokii (UnExplainableFish52)">
+    <meta name="theme-color" content="#0d1117">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://lokii.tech/intro/notes/1.5_networks/1.5.1_network_fundamentals.html">
+    <meta property="og:title" content="1.5.1 Network Fundamentals | lokii.tech">
+    <meta property="og:description" content="Learn networking fundamentals - network types, topologies, IP addressing, and essential commands.">
+    <meta property="og:image" content="https://lokii.tech/preview.jpg">
+    
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" href="/favicon.ico">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0d1117;
+            color: #e6e6e6;
+            font-family: system-ui, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Site Header */
+        .site-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #30363d;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .branding {
+            text-decoration: none;
+        }
+
+        .branding .logo {
+            color: #00ffff;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .site-nav {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .site-nav .nav-link {
+            color: #8b949e;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .site-nav .nav-link:hover {
+            color: #00ffff;
+        }
+
+        /* Page Header */
+        header.page-header {
+            text-align: center;
+            padding: 50px 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #00ffff;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            color: #00ffff;
+            font-weight: bold;
+            margin: 50px 0 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        h3 {
+            font-size: 1.4em;
+            color: #00ffff;
+            font-weight: bold;
+            margin: 30px 0 15px;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            color: #fff;
+            font-weight: bold;
+            margin: 25px 0 12px;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 1.2em;
+        }
+
+        /* Content Sections */
+        .section {
+            background: rgba(22, 27, 34, 0.5);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .code-text {
+            color: #00ff88;
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: rgba(0, 255, 136, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Links */
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: #79c0ff;
+            text-decoration: underline;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 4px solid #00ffff;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .security-box {
+            background: rgba(255, 0, 85, 0.1);
+            border-left: 4px solid #ff0055;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tip-box {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid #00ff88;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.95em;
+        }
+
+        th {
+            background: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #00ffff;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(22, 27, 34, 0.5);
+        }
+
+        tr:hover {
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .code-block code {
+            color: #00ff88;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .code-header {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            padding: 8px 15px;
+            border-radius: 8px 8px 0 0;
+            margin: 20px 0 0 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .code-header + .code-block {
+            margin-top: 0;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .comment {
+            color: #8b949e;
+        }
+
+        /* Topology Diagrams */
+        .diagram {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #00ffff;
+            overflow-x: auto;
+        }
+
+        .diagram pre {
+            margin: 0;
+            display: inline-block;
+            text-align: left;
+        }
+
+        /* Comparison Cards */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .compare-card {
+            background: linear-gradient(145deg, #161b22, #0d1117);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .compare-card h4 {
+            color: #00ffff;
+            margin-top: 0;
+        }
+
+        /* Quiz Section */
+        .quiz-question {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .quiz-question strong {
+            color: #ffd700;
+        }
+
+        .quiz-options {
+            margin: 15px 0 0 20px;
+        }
+
+        .quiz-options label {
+            display: block;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+
+        .quiz-options input {
+            margin-right: 10px;
+        }
+
+        /* Collapsible Answers */
+        .answers-section {
+            margin-top: 30px;
+        }
+
+        .answers-toggle {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            border: 2px solid #00ff88;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .answers-toggle:hover {
+            background: rgba(0, 255, 136, 0.25);
+        }
+
+        .answers-content {
+            display: none;
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 15px;
+        }
+
+        .answers-content.show {
+            display: block;
+        }
+
+        .answer-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .answer-item:last-child {
+            border-bottom: none;
+        }
+
+        .answer-correct {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        /* Page Navigation */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #30363d;
+        }
+
+        .page-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00ffff;
+            text-decoration: none;
+            padding: 15px 25px;
+            border: 2px solid #30363d;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .page-nav a:hover {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            text-decoration: none;
+        }
+
+        .page-nav .next {
+            margin-left: auto;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+
+            .compare-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            .page-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .page-nav a {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .diagram {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="header-content">
+            <a href="../../../index.html" class="branding">
+                <span class="logo">lokii.tech</span>
+            </a>
+            <nav class="site-nav">
+                <a href="../../../index.html#about" class="nav-link">About</a>
+                <a href="../../../index.html#resources" class="nav-link">Resources</a>
+                <a href="https://github.com/UnExplainableFish52" target="_blank" class="nav-link">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>🔌 1.5.1 Network Fundamentals</h1>
+            <p class="subtitle">The foundation of all cybersecurity knowledge</p>
+        </header>
+
+        <!-- Section 1: What is a Network? -->
+        <h2>🌐 1. What is a Network?</h2>
+        
+        <div class="section">
+            <h3>Simple Definition</h3>
+            <p>
+                A <span class="highlight">network</span> is a group of two or more devices connected together 
+                to share resources, exchange data, and communicate with each other.
+            </p>
+
+            <h3>Technical Definition</h3>
+            <p>
+                A computer network is an interconnected collection of computing devices — including computers, 
+                servers, switches, routers, and other hardware — that uses 
+                <span class="highlight">transmission media</span> (wired or wireless) and 
+                <span class="highlight">communication protocols</span> to enable data exchange and resource sharing.
+            </p>
+
+            <h3>Purpose of Networking</h3>
+            <ul>
+                <li><span class="highlight">Resource Sharing:</span> Printers, files, storage, software applications</li>
+                <li><span class="highlight">Communication:</span> Email, messaging, video calls, VoIP</li>
+                <li><span class="highlight">Data Transfer:</span> Moving files between devices quickly and reliably</li>
+                <li><span class="highlight">Centralized Management:</span> Managing users, permissions, and policies from one place</li>
+                <li><span class="highlight">Cost Efficiency:</span> Share expensive resources instead of buying for each user</li>
+            </ul>
+
+            <div class="info-box">
+                <strong>📬 Real-World Analogy: The Postal System</strong><br><br>
+                Think of a network like a postal system:
+                <ul>
+                    <li><span class="highlight">Your Device</span> = Your house (has a unique address)</li>
+                    <li><span class="highlight">IP Address</span> = Your postal address</li>
+                    <li><span class="highlight">Router</span> = Post office (routes mail to the right destination)</li>
+                    <li><span class="highlight">Packets</span> = Letters/packages being sent</li>
+                    <li><span class="highlight">Protocols</span> = Rules for addressing and delivering mail</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 2: Network vs Internet -->
+        <h2>🆚 2. Network vs Internet</h2>
+        
+        <div class="section">
+            <p>
+                Many beginners confuse "network" with "Internet." While related, they're distinctly different concepts.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Network</th>
+                        <th>Internet</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="highlight">Definition</span></td>
+                        <td>A group of connected devices</td>
+                        <td>A global network of networks</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Scope</span></td>
+                        <td>Limited (local, private)</td>
+                        <td>Worldwide (public)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Ownership</span></td>
+                        <td>Single entity (home, company)</td>
+                        <td>No single owner</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Access</span></td>
+                        <td>Restricted/controlled</td>
+                        <td>Publicly accessible</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Example</span></td>
+                        <td>Office LAN, home WiFi</td>
+                        <td>www, email services</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Intranet vs Extranet vs Internet</h3>
+            
+            <div class="compare-grid">
+                <div class="compare-card">
+                    <h4>🏢 Intranet</h4>
+                    <p>A <span class="highlight">private network</span> accessible only within an organization.</p>
+                    <ul>
+                        <li>Internal websites and apps</li>
+                        <li>Employee-only access</li>
+                        <li>Protected by firewall</li>
+                    </ul>
+                </div>
+                
+                <div class="compare-card">
+                    <h4>🤝 Extranet</h4>
+                    <p>An <span class="highlight">extended intranet</span> that allows limited access to authorized external users.</p>
+                    <ul>
+                        <li>Partner/vendor access</li>
+                        <li>Controlled external sharing</li>
+                        <li>VPN or secure login</li>
+                    </ul>
+                </div>
+                
+                <div class="compare-card">
+                    <h4>🌍 Internet</h4>
+                    <p>The <span class="highlight">global public network</span> connecting billions of devices worldwide.</p>
+                    <ul>
+                        <li>Open to everyone</li>
+                        <li>Uses TCP/IP protocols</li>
+                        <li>WWW, email, streaming</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="diagram">
+                <pre>
+┌─────────────────────────────────────────────────────────────┐
+│                        INTERNET                              │
+│                    (Public Network)                          │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                     EXTRANET                         │    │
+│  │              (Authorized Partners)                   │    │
+│  │  ┌─────────────────────────────────────────────┐    │    │
+│  │  │                INTRANET                      │    │    │
+│  │  │          (Internal Employees)                │    │    │
+│  │  │    [Servers] [Workstations] [Printers]      │    │    │
+│  │  └─────────────────────────────────────────────┘    │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+        </div>
+
+        <!-- Section 3: Types of Networks -->
+        <h2>📊 3. Types of Networks</h2>
+        
+        <div class="section">
+            <h3>Primary Network Types</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Full Form</th>
+                        <th>Range</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="code-text">PAN</span></td>
+                        <td>Personal Area Network</td>
+                        <td>~10 meters</td>
+                        <td>Bluetooth devices, USB connections</td>
+                    </tr>
+                    <tr>
+                        <td><span class="code-text">LAN</span></td>
+                        <td>Local Area Network</td>
+                        <td>Building/Campus</td>
+                        <td>Office network, school lab</td>
+                    </tr>
+                    <tr>
+                        <td><span class="code-text">MAN</span></td>
+                        <td>Metropolitan Area Network</td>
+                        <td>City (~50 km)</td>
+                        <td>Cable TV network, city-wide WiFi</td>
+                    </tr>
+                    <tr>
+                        <td><span class="code-text">WAN</span></td>
+                        <td>Wide Area Network</td>
+                        <td>Global</td>
+                        <td>The Internet, corporate VPNs</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Additional Network Types</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Full Form</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="code-text">CAN</span></td>
+                        <td>Campus Area Network</td>
+                        <td>Multiple LANs within a campus (university, business park)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="code-text">SAN</span></td>
+                        <td>Storage Area Network</td>
+                        <td>High-speed network for data storage devices</td>
+                    </tr>
+                    <tr>
+                        <td><span class="code-text">WLAN</span></td>
+                        <td>Wireless Local Area Network</td>
+                        <td>LAN using WiFi instead of cables</td>
+                    </tr>
+                    <tr>
+                        <td><span class="code-text">VPN</span></td>
+                        <td>Virtual Private Network</td>
+                        <td>Encrypted tunnel over public network</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="security-box">
+                <strong>🔒 Security Implications by Network Type</strong>
+                <ul>
+                    <li><span class="highlight">PAN:</span> Bluetooth vulnerabilities, device pairing attacks</li>
+                    <li><span class="highlight">LAN:</span> ARP spoofing, VLAN hopping, insider threats</li>
+                    <li><span class="highlight">WLAN:</span> Evil twin attacks, WPA cracking, deauth attacks</li>
+                    <li><span class="highlight">WAN:</span> DDoS attacks, MitM, traffic interception</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 4: Network Topologies -->
+        <h2>🔗 4. Network Topologies</h2>
+        
+        <div class="section">
+            <p>
+                <span class="highlight">Topology</span> refers to the physical or logical arrangement of devices in a network.
+            </p>
+
+            <h3>Bus Topology</h3>
+            <div class="diagram">
+                <pre>
+    [PC1]     [PC2]     [PC3]     [PC4]     [PC5]
+      │         │         │         │         │
+══════╧═════════╧═════════╧═════════╧═════════╧══════
+                    Main Cable (Bus)
+                </pre>
+            </div>
+            <p>All devices connect to a single backbone cable. Simple but a single point of failure.</p>
+
+            <h3>Star Topology</h3>
+            <div class="diagram">
+                <pre>
+           [PC1]          [PC2]
+              \            /
+               \          /
+                ┌────────┐
+                │ Switch │
+                │  /Hub  │
+                └────────┘
+               /          \
+              /            \
+           [PC3]          [PC4]
+                </pre>
+            </div>
+            <p>All devices connect to a central switch/hub. Most common in modern networks.</p>
+
+            <h3>Ring Topology</h3>
+            <div class="diagram">
+                <pre>
+        ┌──────[PC1]──────┐
+        │                 │
+     [PC4]             [PC2]
+        │                 │
+        └──────[PC3]──────┘
+                </pre>
+            </div>
+            <p>Each device connects to exactly two other devices, forming a circle.</p>
+
+            <h3>Mesh Topology</h3>
+            <div class="diagram">
+                <pre>
+           [PC1]─────────[PC2]
+            │ \         / │
+            │   \     /   │
+            │     \ /     │
+            │     / \     │
+            │   /     \   │
+            │ /         \ │
+           [PC3]─────────[PC4]
+                </pre>
+            </div>
+            <p>Every device connects to every other device. Highly redundant but expensive.</p>
+
+            <h3>Topology Comparison</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Topology</th>
+                        <th>Pros</th>
+                        <th>Cons</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="highlight">Bus</span></td>
+                        <td>Simple, cheap</td>
+                        <td>Single point of failure</td>
+                        <td>Small temp networks</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Star</span></td>
+                        <td>Easy to manage, scalable</td>
+                        <td>Hub failure = network down</td>
+                        <td>Offices, homes</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Ring</span></td>
+                        <td>Equal access, ordered</td>
+                        <td>One break = network down</td>
+                        <td>Token Ring (legacy)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Mesh</span></td>
+                        <td>Highly redundant</td>
+                        <td>Expensive, complex</td>
+                        <td>ISPs, data centers</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Hybrid</span></td>
+                        <td>Flexible, scalable</td>
+                        <td>Complex design</td>
+                        <td>Large enterprises</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Tree</span></td>
+                        <td>Hierarchical, scalable</td>
+                        <td>Root failure = critical</td>
+                        <td>WAN backbones</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="security-box">
+                <strong>🔒 Security Considerations by Topology</strong>
+                <ul>
+                    <li><span class="highlight">Bus:</span> Easy to sniff traffic — all data visible to all devices</li>
+                    <li><span class="highlight">Star:</span> Central switch is target — if compromised, attacker sees all traffic</li>
+                    <li><span class="highlight">Ring:</span> Traffic passes through all nodes — potential for interception</li>
+                    <li><span class="highlight">Mesh:</span> Most secure — multiple paths, harder to disrupt</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 5: Transmission Modes -->
+        <h2>📡 5. Transmission Modes</h2>
+        
+        <div class="section">
+            <p>
+                Transmission mode defines the <span class="highlight">direction of data flow</span> between devices.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mode</th>
+                        <th>Direction</th>
+                        <th>Example</th>
+                        <th>Visual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="highlight">Simplex</span></td>
+                        <td>One-way only</td>
+                        <td>Keyboard → Computer, Radio broadcast</td>
+                        <td><span class="code-text">A ──────→ B</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Half-Duplex</span></td>
+                        <td>Both ways, one at a time</td>
+                        <td>Walkie-talkie, old WiFi</td>
+                        <td><span class="code-text">A ←─────→ B</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Full-Duplex</span></td>
+                        <td>Both ways simultaneously</td>
+                        <td>Phone call, modern Ethernet</td>
+                        <td><span class="code-text">A ⇄ B</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip-box">
+                <strong>💡 For Security:</strong> Full-duplex connections are harder to monitor since traffic flows 
+                in both directions simultaneously. Half-duplex networks can create bottlenecks that attackers might exploit for DoS.
+            </div>
+        </div>
+
+        <!-- Section 6: Network Architecture -->
+        <h2>🏗️ 6. Network Architecture</h2>
+        
+        <div class="section">
+            <div class="compare-grid">
+                <div class="compare-card">
+                    <h4>🖥️ Client-Server</h4>
+                    <p>Centralized model where <span class="highlight">servers</span> provide resources and <span class="highlight">clients</span> request them.</p>
+                    <ul>
+                        <li>Centralized control</li>
+                        <li>Easier to manage/secure</li>
+                        <li>Server = single point of failure</li>
+                        <li>Example: Web servers, file servers</li>
+                    </ul>
+                </div>
+                
+                <div class="compare-card">
+                    <h4>👥 Peer-to-Peer (P2P)</h4>
+                    <p>Decentralized model where each device acts as <span class="highlight">both client and server</span>.</p>
+                    <ul>
+                        <li>No central authority</li>
+                        <li>Harder to manage/secure</li>
+                        <li>More resilient (no single failure point)</li>
+                        <li>Example: BitTorrent, small home networks</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Comparison Table</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Client-Server</th>
+                        <th>Peer-to-Peer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="highlight">Control</span></td>
+                        <td>Centralized</td>
+                        <td>Distributed</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Security</span></td>
+                        <td>Easier to enforce policies</td>
+                        <td>Harder to secure uniformly</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Scalability</span></td>
+                        <td>Requires server upgrades</td>
+                        <td>Scales naturally with peers</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Cost</span></td>
+                        <td>Higher (servers needed)</td>
+                        <td>Lower (no dedicated servers)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Failure Impact</span></td>
+                        <td>Server down = major impact</td>
+                        <td>One peer down = minimal impact</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="security-box">
+                <strong>🔒 Security Implications</strong>
+                <ul>
+                    <li><span class="highlight">Client-Server:</span> Target the server — one breach = access to all data</li>
+                    <li><span class="highlight">P2P:</span> Malware spreads peer-to-peer, harder to track/contain</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 7: IP Addressing Basics -->
+        <h2>🔢 7. IP Addressing Basics</h2>
+        
+        <div class="section">
+            <h3>IPv4 vs IPv6</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>IPv4</th>
+                        <th>IPv6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="highlight">Format</span></td>
+                        <td><span class="code-text">192.168.1.1</span></td>
+                        <td><span class="code-text">2001:0db8:85a3::8a2e:0370:7334</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Bits</span></td>
+                        <td>32-bit</td>
+                        <td>128-bit</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Total Addresses</span></td>
+                        <td>~4.3 billion</td>
+                        <td>~340 undecillion</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Notation</span></td>
+                        <td>Decimal (dots)</td>
+                        <td>Hexadecimal (colons)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Public vs Private IP Addresses</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Ranges</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="highlight">Public</span></td>
+                        <td>Globally unique, routable on internet</td>
+                        <td>Assigned by ISPs</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Private</span></td>
+                        <td>Used within local networks, not routable</td>
+                        <td>See below</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Private IP Address Ranges (RFC 1918)</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Range</th>
+                        <th>CIDR</th>
+                        <th>Common Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A</td>
+                        <td><span class="code-text">10.0.0.0 – 10.255.255.255</span></td>
+                        <td>10.0.0.0/8</td>
+                        <td>Large enterprises</td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td><span class="code-text">172.16.0.0 – 172.31.255.255</span></td>
+                        <td>172.16.0.0/12</td>
+                        <td>Medium networks</td>
+                    </tr>
+                    <tr>
+                        <td>C</td>
+                        <td><span class="code-text">192.168.0.0 – 192.168.255.255</span></td>
+                        <td>192.168.0.0/16</td>
+                        <td>Home networks</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Special IP Addresses</h3>
+            <ul>
+                <li><span class="code-text">127.0.0.1</span> — <span class="highlight">Loopback</span> (localhost, refers to your own machine)</li>
+                <li><span class="code-text">0.0.0.0</span> — <span class="highlight">Default route</span> or "all interfaces"</li>
+                <li><span class="code-text">255.255.255.255</span> — <span class="highlight">Broadcast</span> (send to all devices on network)</li>
+                <li><span class="code-text">169.254.x.x</span> — <span class="highlight">APIPA</span> (auto-assigned when DHCP fails)</li>
+            </ul>
+
+            <h3>CIDR Notation Basics</h3>
+            <p>
+                <span class="highlight">CIDR</span> (Classless Inter-Domain Routing) notation represents IP ranges efficiently.
+            </p>
+            <ul>
+                <li><span class="code-text">192.168.1.0/24</span> = 256 addresses (192.168.1.0 to 192.168.1.255)</li>
+                <li><span class="code-text">/24</span> means 24 bits for network, 8 bits for hosts</li>
+                <li>Smaller number = more hosts (e.g., /16 = 65,536 addresses)</li>
+            </ul>
+        </div>
+
+        <!-- Section 8: MAC Address -->
+        <h2>🏷️ 8. MAC Address</h2>
+        
+        <div class="section">
+            <h3>What is a MAC Address?</h3>
+            <p>
+                A <span class="highlight">MAC (Media Access Control) address</span> is a unique hardware identifier 
+                burned into every network interface card (NIC) by the manufacturer.
+            </p>
+
+            <h3>Format</h3>
+            <div class="code-block">
+                <code>
+AA:BB:CC:DD:EE:FF   (colon notation)
+AA-BB-CC-DD-EE-FF   (hyphen notation)
+AABB.CCDD.EEFF      (Cisco notation)
+                </code>
+            </div>
+
+            <ul>
+                <li><span class="highlight">48 bits</span> (6 bytes) in total</li>
+                <li>First 3 bytes: <span class="highlight">OUI</span> (Organizationally Unique Identifier) — identifies manufacturer</li>
+                <li>Last 3 bytes: <span class="highlight">NIC Specific</span> — unique to the device</li>
+            </ul>
+
+            <div class="diagram">
+                <pre>
+┌──────────────────────────────────────────┐
+│              MAC Address                  │
+│           AA:BB:CC:DD:EE:FF              │
+├─────────────────┬────────────────────────┤
+│   OUI (Vendor)  │    Device Specific     │
+│    AA:BB:CC     │       DD:EE:FF         │
+└─────────────────┴────────────────────────┘
+                </pre>
+            </div>
+
+            <h3>MAC vs IP Address</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>MAC Address</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="highlight">Layer</span></td>
+                        <td>Layer 2 (Data Link)</td>
+                        <td>Layer 3 (Network)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Assigned By</span></td>
+                        <td>Manufacturer</td>
+                        <td>Network admin / DHCP</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Permanence</span></td>
+                        <td>Usually permanent*</td>
+                        <td>Can change</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Scope</span></td>
+                        <td>Local network only</td>
+                        <td>Can be global (public IP)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Format</span></td>
+                        <td>Hexadecimal (48 bits)</td>
+                        <td>Decimal/Hex (32/128 bits)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="security-box">
+                <strong>🔒 MAC Spoofing</strong><br>
+                Despite being "permanent," MAC addresses can be changed/spoofed using software tools. 
+                Attackers use MAC spoofing to:
+                <ul>
+                    <li>Bypass MAC-based access controls</li>
+                    <li>Impersonate trusted devices</li>
+                    <li>Evade network monitoring</li>
+                    <li>Perform ARP poisoning attacks</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 9: Commands -->
+        <h2>💻 9. Essential Commands</h2>
+        
+        <div class="section">
+            <div class="code-header">🪟 Windows Commands</div>
+            <div class="code-block">
+                <pre><code><span class="comment"># View IP configuration and MAC address</span>
+ipconfig /all
+
+<span class="comment"># View only IP address info</span>
+ipconfig
+
+<span class="comment"># Release DHCP lease</span>
+ipconfig /release
+
+<span class="comment"># Renew DHCP lease</span>
+ipconfig /renew
+
+<span class="comment"># Flush DNS cache</span>
+ipconfig /flushdns
+
+<span class="comment"># View ARP table (IP to MAC mappings)</span>
+arp -a
+
+<span class="comment"># View routing table</span>
+route print</code></pre>
+            </div>
+
+            <div class="code-header">🐧 Linux Commands</div>
+            <div class="code-block">
+                <pre><code><span class="comment"># View IP and MAC address (modern)</span>
+ip a
+ip addr show
+
+<span class="comment"># View IP and MAC address (legacy)</span>
+ifconfig
+
+<span class="comment"># View only IP addresses</span>
+ip -4 addr show
+
+<span class="comment"># View ARP table</span>
+arp -a
+ip neigh show
+
+<span class="comment"># View routing table</span>
+ip route show
+route -n
+
+<span class="comment"># View DNS configuration</span>
+cat /etc/resolv.conf</code></pre>
+            </div>
+
+            <div class="code-header">🌐 Network Testing (Cross-Platform)</div>
+            <div class="code-block">
+                <pre><code><span class="comment"># Test connectivity (Windows)</span>
+ping 8.8.8.8
+ping google.com
+
+<span class="comment"># Test connectivity (Linux - limit to 4 packets)</span>
+ping -c 4 8.8.8.8
+ping -c 4 google.com
+
+<span class="comment"># Trace route to destination (Windows)</span>
+tracert google.com
+
+<span class="comment"># Trace route to destination (Linux)</span>
+traceroute google.com
+
+<span class="comment"># DNS lookup</span>
+nslookup google.com
+
+<span class="comment"># View open connections</span>
+netstat -an</code></pre>
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Pro Tip:</strong> Run these commands on your own machine to see your network configuration. 
+                Understanding command output is crucial for network troubleshooting and security analysis.
+            </div>
+        </div>
+
+        <!-- Section 10: Real-World Use Cases -->
+        <h2>🌍 10. Real-World Use Cases</h2>
+        
+        <div class="section">
+            <h3>🏠 Setting Up a Home Network</h3>
+            <p>When configuring a home network, you'll apply these concepts:</p>
+            <ul>
+                <li>Your router creates a <span class="highlight">LAN</span> using <span class="highlight">Star topology</span></li>
+                <li>Router acts as <span class="highlight">DHCP server</span> assigning private IPs (192.168.x.x)</li>
+                <li>Uses <span class="highlight">NAT</span> to share one public IP among all devices</li>
+                <li>WiFi creates a <span class="highlight">WLAN</span> overlay</li>
+            </ul>
+
+            <h3>🏢 Corporate LAN Segmentation</h3>
+            <p>Enterprise networks use these concepts for security:</p>
+            <ul>
+                <li><span class="highlight">VLANs</span> separate departments (HR, Finance, IT)</li>
+                <li>Different <span class="highlight">subnets</span> for different security zones</li>
+                <li><span class="highlight">Client-server</span> architecture with domain controllers</li>
+                <li>Multiple <span class="highlight">Hybrid topology</span> with redundancy</li>
+            </ul>
+
+            <h3>🔍 Security Audit Starting Point</h3>
+            <p>When performing a security assessment:</p>
+            <ol>
+                <li>Identify network <span class="highlight">topology</span> — how devices are connected</li>
+                <li>Map <span class="highlight">IP ranges</span> and subnets in use</li>
+                <li>Catalog <span class="highlight">network types</span> — wired vs wireless</li>
+                <li>Understand <span class="highlight">architecture</span> — client-server relationships</li>
+                <li>Document <span class="highlight">entry points</span> — internet-facing systems</li>
+            </ol>
+        </div>
+
+        <!-- Section 11: Security Corner -->
+        <h2>🔒 11. Security Corner</h2>
+        
+        <div class="section">
+            <div class="security-box">
+                <strong>Why Network Fundamentals Matter for Pentesting</strong><br><br>
+                Before exploiting vulnerabilities, pentesters need to understand the target environment. 
+                Network fundamentals enable:
+                <ul>
+                    <li><span class="highlight">Reconnaissance:</span> Mapping the target network structure</li>
+                    <li><span class="highlight">Enumeration:</span> Identifying active hosts, services, and topology</li>
+                    <li><span class="highlight">Attack Planning:</span> Understanding which attacks are feasible</li>
+                    <li><span class="highlight">Lateral Movement:</span> Knowing how to pivot through the network</li>
+                </ul>
+            </div>
+
+            <h3>Attack Surface Differences</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Network Exposure</th>
+                        <th>Attack Surface</th>
+                        <th>Common Attacks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="highlight">LAN Exposure</span></td>
+                        <td>Internal attackers, compromised devices</td>
+                        <td>ARP spoofing, VLAN hopping, credential theft</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">WAN Exposure</span></td>
+                        <td>Internet-facing services</td>
+                        <td>DDoS, port scanning, web exploits</td>
+                    </tr>
+                    <tr>
+                        <td><span class="highlight">Wireless Exposure</span></td>
+                        <td>Anyone within radio range</td>
+                        <td>Evil twin, deauth, handshake capture</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <strong>🎯 Key Takeaway:</strong> Understanding network fundamentals is the <span class="highlight">first step</span> 
+                in both attacking and defending networks. Reconnaissance starts with basic network mapping — 
+                the concepts you learned in this module!
+            </div>
+        </div>
+
+        <!-- Section 12: Quiz -->
+        <h2>📝 12. Knowledge Check Quiz</h2>
+        
+        <div class="section">
+            <p>Test your understanding with these 10 questions!</p>
+
+            <div class="quiz-question">
+                <strong>Q1:</strong> What does LAN stand for?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1"> Large Area Network</label>
+                    <label><input type="radio" name="q1"> Local Area Network</label>
+                    <label><input type="radio" name="q1"> Long Area Network</label>
+                    <label><input type="radio" name="q1"> Limited Access Network</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q2:</strong> Which topology has every device connected to every other device?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2"> Star</label>
+                    <label><input type="radio" name="q2"> Bus</label>
+                    <label><input type="radio" name="q2"> Mesh</label>
+                    <label><input type="radio" name="q2"> Ring</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q3:</strong> True or False: A MAC address is assigned by DHCP.
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3"> True</label>
+                    <label><input type="radio" name="q3"> False</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q4:</strong> Which private IP range is commonly used in home networks?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4"> 10.0.0.0/8</label>
+                    <label><input type="radio" name="q4"> 172.16.0.0/12</label>
+                    <label><input type="radio" name="q4"> 192.168.0.0/16</label>
+                    <label><input type="radio" name="q4"> 8.8.8.0/24</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q5:</strong> The loopback address in IPv4 is __________.
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5"> 0.0.0.0</label>
+                    <label><input type="radio" name="q5"> 127.0.0.1</label>
+                    <label><input type="radio" name="q5"> 192.168.1.1</label>
+                    <label><input type="radio" name="q5"> 255.255.255.255</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q6:</strong> Which transmission mode allows simultaneous two-way communication?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6"> Simplex</label>
+                    <label><input type="radio" name="q6"> Half-Duplex</label>
+                    <label><input type="radio" name="q6"> Full-Duplex</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q7:</strong> True or False: An Intranet is accessible to the general public.
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7"> True</label>
+                    <label><input type="radio" name="q7"> False</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q8:</strong> How many bits are in a MAC address?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8"> 32 bits</label>
+                    <label><input type="radio" name="q8"> 48 bits</label>
+                    <label><input type="radio" name="q8"> 64 bits</label>
+                    <label><input type="radio" name="q8"> 128 bits</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q9:</strong> Which command shows IP configuration on Windows?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q9"> ifconfig</label>
+                    <label><input type="radio" name="q9"> ip a</label>
+                    <label><input type="radio" name="q9"> ipconfig</label>
+                    <label><input type="radio" name="q9"> netstat</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q10:</strong> In client-server architecture, what happens if the server fails?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q10"> Only one client is affected</label>
+                    <label><input type="radio" name="q10"> The network continues working normally</label>
+                    <label><input type="radio" name="q10"> All clients lose access to server resources</label>
+                    <label><input type="radio" name="q10"> Clients automatically become servers</label>
+                </div>
+            </div>
+
+            <div class="answers-section">
+                <button class="answers-toggle" onclick="toggleAnswers()">Show Answers</button>
+                <div class="answers-content" id="answersContent">
+                    <div class="answer-item"><strong>Q1:</strong> <span class="answer-correct">Local Area Network</span></div>
+                    <div class="answer-item"><strong>Q2:</strong> <span class="answer-correct">Mesh</span></div>
+                    <div class="answer-item"><strong>Q3:</strong> <span class="answer-correct">False</span> — MAC addresses are assigned by the manufacturer, not DHCP</div>
+                    <div class="answer-item"><strong>Q4:</strong> <span class="answer-correct">192.168.0.0/16</span></div>
+                    <div class="answer-item"><strong>Q5:</strong> <span class="answer-correct">127.0.0.1</span></div>
+                    <div class="answer-item"><strong>Q6:</strong> <span class="answer-correct">Full-Duplex</span></div>
+                    <div class="answer-item"><strong>Q7:</strong> <span class="answer-correct">False</span> — An Intranet is private and internal to an organization</div>
+                    <div class="answer-item"><strong>Q8:</strong> <span class="answer-correct">48 bits</span></div>
+                    <div class="answer-item"><strong>Q9:</strong> <span class="answer-correct">ipconfig</span></div>
+                    <div class="answer-item"><strong>Q10:</strong> <span class="answer-correct">All clients lose access to server resources</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Navigation -->
+        <nav class="page-nav">
+            <a href="../1.5_networks.html">
+                <span>←</span>
+                <span>Back to Networking Hub</span>
+            </a>
+            <a href="1.5.2_osi_tcpip_models.html" class="next">
+                <span>Next: OSI & TCP/IP Models</span>
+                <span>→</span>
+            </a>
+        </nav>
+
+        <footer>
+            <p>Module 1.5.1: Network Fundamentals</p>
+            <p>Part of the Cybersecurity Beginner Course at <a href="../../../index.html">lokii.tech</a></p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswers() {
+            const content = document.getElementById('answersContent');
+            const button = document.querySelector('.answers-toggle');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                button.textContent = 'Show Answers';
+            } else {
+                content.classList.add('show');
+                button.textContent = 'Hide Answers';
+            }
+        }
+    </script>
+</body>
+</html>
