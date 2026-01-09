@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.4 Introduction to Operating Systems | lokii.tech</title>
+    
+    <meta name="description" content="Comprehensive guide to operating systems: from the revolutionary GNU/Linux story to practical cybersecurity skills across Windows, Linux, and macOS.">
+    <meta name="author" content="lokii (UnExplainableFish52)">
+    <meta name="theme-color" content="#0d1117">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://lokii.tech/intro/notes/1.4-intro-to-os.html">
+    <meta property="og:title" content="Introduction to Operating Systems | lokii.tech">
+    <meta property="og:description" content="From Richard Stallman and Linus Torvalds to modern OS internals - a comprehensive guide for aspiring security professionals.">
+    <meta property="og:image" content="https://lokii.tech/preview.jpg">
+    
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" href="/favicon.ico">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #0d1117;
+            color: #e6edf3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        
+        /* Header */
+        .site-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #30363d;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .branding { text-decoration: none; }
+        .branding .logo { color: #00bcd4; font-size: 1.5rem; font-weight: 800; }
+        
+        .site-nav { display: flex; gap: 25px; align-items: center; }
+        .site-nav .nav-link {
+            color: #8b949e;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .site-nav .nav-link:hover { color: #00bcd4; }
+        
+        /* Typography */
+        header.page-header { text-align: center; padding: 40px 20px; margin-bottom: 30px; }
+        
+        h1 { font-size: 2.5em; color: #00bcd4; font-weight: bold; margin-bottom: 15px; }
+        h2 { font-size: 1.8em; color: #00bcd4; margin: 50px 0 25px; padding-bottom: 10px; border-bottom: 2px solid #30363d; }
+        h3 { font-size: 1.4em; color: #fff; margin: 30px 0 15px; }
+        h4 { font-size: 1.15em; color: #ffd700; margin: 20px 0 10px; }
+        
+        .subtitle { color: #8b949e; font-size: 1.1em; }
+        
+        /* Sections */
+        .section {
+            background: rgba(22, 27, 34, 0.5);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        p { margin-bottom: 15px; }
+        .highlight { color: #ffd700; font-weight: bold; }
+        .cyan { color: #00bcd4; }
+        
+        .code-text {
+            color: #4ec9b0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: rgba(78, 201, 176, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin-bottom: 10px; }
+        
+        /* Info Boxes */
+        .info-box {
+            background: rgba(0, 188, 212, 0.1);
+            border-left: 4px solid #00bcd4;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .story-box {
+            background: linear-gradient(145deg, rgba(22, 27, 34, 0.8), rgba(13, 17, 23, 0.9));
+            border: 1px solid #30363d;
+            border-left: 4px solid #ffd700;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+        }
+        
+        .story-box .story-year {
+            color: #00bcd4;
+            font-weight: bold;
+            font-style: normal;
+            font-size: 1.2em;
+        }
+        
+        /* Timeline */
+        .timeline { position: relative; padding-left: 30px; margin: 30px 0; }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #00bcd4, #ffd700, #e91e63);
+            border-radius: 3px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 14px;
+            height: 14px;
+            background: #00bcd4;
+            border-radius: 50%;
+            border: 3px solid #0d1117;
+        }
+        
+        .timeline-year {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        /* Code Blocks */
+        pre {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #4ec9b0;
+        }
+        
+        pre code { color: #e6edf3; }
+        
+        .cmd-windows { color: #00bcd4; }
+        .cmd-linux { color: #4ec9b0; }
+        .cmd-macos { color: #ff6b6b; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.9em; }
+        th { background: rgba(0, 188, 212, 0.2); color: #00bcd4; padding: 12px; text-align: left; border-bottom: 2px solid #00bcd4; }
+        td { padding: 12px; border-bottom: 1px solid #30363d; }
+        tr:hover { background: rgba(0, 188, 212, 0.05); }
+        
+        /* OS Cards */
+        .os-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .os-card {
+            background: linear-gradient(145deg, #161b22, #0d1117);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .os-card:hover { border-color: #00bcd4; transform: translateY(-3px); }
+        .os-card.windows { border-top: 4px solid #00bcd4; }
+        .os-card.linux { border-top: 4px solid #4ec9b0; }
+        .os-card.macos { border-top: 4px solid #ff6b6b; }
+        
+        .os-icon { font-size: 2em; margin-bottom: 15px; }
+        
+        /* Layer Diagram */
+        .layer-diagram {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .layer {
+            padding: 20px;
+            margin: 10px auto;
+            border-radius: 8px;
+            max-width: 500px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        
+        .layer:hover { transform: scale(1.02); }
+        .layer-user { background: rgba(255, 215, 0, 0.2); border: 2px solid #ffd700; color: #ffd700; }
+        .layer-apps { background: rgba(156, 39, 176, 0.2); border: 2px solid #9c27b0; color: #ce93d8; }
+        .layer-os { background: rgba(0, 188, 212, 0.2); border: 2px solid #00bcd4; color: #00bcd4; }
+        .layer-hardware { background: rgba(233, 30, 99, 0.2); border: 2px solid #e91e63; color: #f48fb1; }
+        
+        .layer-arrow { color: #8b949e; font-size: 1.5em; margin: 5px 0; }
+        
+        /* Command comparison */
+        .cmd-compare {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .cmd-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .cmd-box h5 {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        
+        .cmd-box.windows h5 { color: #00bcd4; }
+        .cmd-box.linux h5 { color: #4ec9b0; }
+        .cmd-box.macos h5 { color: #ff6b6b; }
+        
+        /* Page Navigation */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #30363d;
+        }
+        
+        .page-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00bcd4;
+            text-decoration: none;
+            padding: 15px 25px;
+            border: 2px solid #30363d;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .page-nav a:hover { border-color: #00bcd4; background: rgba(0, 188, 212, 0.1); }
+        
+        /* TOC */
+        .toc {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .toc h3 { margin-top: 0; margin-bottom: 15px; }
+        .toc ul { list-style: none; padding-left: 0; }
+        .toc li { margin-bottom: 8px; }
+        .toc a { color: #8b949e; text-decoration: none; transition: color 0.3s; }
+        .toc a:hover { color: #00bcd4; }
+        .toc .section-num { color: #ffd700; margin-right: 8px; }
+        
+        /* Footer */
+        footer { text-align: center; padding: 40px 20px; margin-top: 60px; border-top: 1px solid #30363d; color: #8b949e; }
+        footer a { color: #00bcd4; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            .page-nav { flex-direction: column; gap: 15px; }
+            .page-nav a { width: 100%; justify-content: center; }
+            .os-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="header-content">
+            <a href="../../index.html" class="branding">
+                <span class="logo">lokii.tech</span>
+            </a>
+            <nav class="site-nav">
+                <a href="../../index.html#about" class="nav-link">About</a>
+                <a href="../../index.html#resources" class="nav-link">Resources</a>
+                <a href="https://github.com/UnExplainableFish52" target="_blank" class="nav-link">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>💻 1.4 Introduction to Operating Systems</h1>
+            <p class="subtitle">From rebellious hackers to the software that runs the world</p>
+        </header>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>📑 Table of Contents</h3>
+            <ul>
+                <li><a href="#storytime"><span class="section-num">1.</span> Storytime: The Birth of Operating Systems</a></li>
+                <li><a href="#what-is-os"><span class="section-num">2.</span> What is an Operating System?</a></li>
+                <li><a href="#virtualization"><span class="section-num">3.</span> Virtualization & Modern Concepts</a></li>
+                <li><a href="#core-functions"><span class="section-num">4.</span> Core OS Functions (Practical Skills)</a></li>
+                <li><a href="#windows-internals"><span class="section-num">5.</span> Windows Internals Deep Dive</a></li>
+                <li><a href="#linux-internals"><span class="section-num">6.</span> Linux Internals Deep Dive</a></li>
+                <li><a href="#macos-internals"><span class="section-num">7.</span> macOS Internals Deep Dive</a></li>
+            </ul>
+        </div>
+
+        <!-- SECTION 1: STORYTIME -->
+        <h2 id="storytime">📖 1. Storytime: The Birth of Operating Systems</h2>
+        
+        <div class="section">
+            <p>
+                Before we dive into technical details, let me tell you a story. A story about <span class="highlight">rebellion</span>, 
+                <span class="highlight">genius</span>, and how a couple of stubborn programmers changed the world forever — 
+                and in the process, absolutely <span class="cyan">smoked</span> the billion-dollar corporations at their own game.
+            </p>
+
+            <h3>🏛️ The Dark Ages: Before Personal Computers</h3>
+            
+            <div class="story-box">
+                <span class="story-year">1960s-1970s</span><br><br>
+                Imagine a world where computers filled entire rooms. Where you couldn't just "use" a computer — 
+                you had to submit punch cards and wait hours (sometimes days) for your results. 
+                These were the mainframe days, and computing was reserved for universities, governments, and massive corporations.
+            </div>
+
+            <p>
+                In <span class="highlight">1969</span>, at AT&T's Bell Labs, something magical happened. 
+                Ken Thompson and Dennis Ritchie created <span class="cyan">Unix</span> — an operating system written 
+                in the C programming language (which Ritchie also invented). Unix was elegant, portable, and 
+                introduced concepts we still use today: hierarchical file systems, pipes, and the shell.
+            </p>
+
+            <div class="info-box">
+                <strong>💡 Fun Fact:</strong> Unix was originally a play on words from "Multics" (another OS project). 
+                Where Multics tried to do everything, Unix did just a few things — but did them incredibly well.
+            </div>
+
+            <h3>✊ The Rebellion: Enter Richard Stallman (1983)</h3>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-year">September 27, 1983</span>
+                    <p>
+                        <span class="highlight">Richard Stallman</span>, a programmer at MIT's AI Lab, was furious. 
+                        Software was becoming proprietary. Companies locked away their code. You couldn't study it, 
+                        modify it, or share it. For Stallman, this was a moral crisis.
+                    </p>
+                    <p>
+                        So he did something radical: he announced the <span class="cyan">GNU Project</span>. 
+                        His mission? Create a complete, free (as in freedom) operating system.
+                    </p>
+                </div>
+            </div>
+
+            <div class="story-box">
+                "I consider that the Golden Rule requires that if I like a program I must share it with other people who like it."
+                <br>— <span class="highlight">Richard Stallman</span>, GNU Manifesto (1985)
+            </div>
+
+            <p>
+                GNU stood for "GNU's Not Unix" — a recursive acronym (programmers love those). 
+                Stallman and his team created <span class="cyan">GCC</span> (the compiler), <span class="cyan">Bash</span> (the shell), 
+                <span class="cyan">Emacs</span> (the text editor), and countless utilities. 
+                They built almost everything needed for a complete operating system.
+            </p>
+
+            <p>
+                <em>Almost.</em> They were missing one critical piece: <span class="highlight">the kernel</span>.
+            </p>
+
+            <h3>🐧 The Finnish Student Who Changed Everything (1991)</h3>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-year">August 25, 1991</span>
+                    <p>
+                        A 21-year-old computer science student in Finland named <span class="highlight">Linus Torvalds</span> 
+                        posted this message to a Usenet newsgroup:
+                    </p>
+                </div>
+            </div>
+
+            <div class="story-box">
+                "Hello everybody out there using minix — I'm doing a (free) operating system (just a hobby, won't be big and 
+                professional like gnu) for 386(486) AT clones."
+                <br>— <span class="highlight">Linus Torvalds</span>
+            </div>
+
+            <p>
+                "Won't be big." <em>Right.</em>
+            </p>
+
+            <p>
+                Linus had created a kernel — the missing piece of GNU. When combined with all the GNU tools 
+                Stallman's team had built, you had a complete, free operating system: <span class="cyan">GNU/Linux</span>.
+            </p>
+
+            <div class="warning-box">
+                <strong>⚡ The Impact Today:</strong><br>
+                • Linux runs <span class="highlight">96.3%</span> of the top 1 million web servers<br>
+                • All of the world's top 500 supercomputers run Linux<br>
+                • Android (2.5 billion devices) is built on the Linux kernel<br>
+                • Most of the internet's infrastructure runs on Linux<br>
+                • NASA, SpaceX, and the ISS run Linux
+            </p>
+
+            <p>
+                <span class="highlight">Two guys</span> — one driven by moral conviction, one by curiosity — 
+                created an operating system that now powers most of the world. FOR FREE. 
+                That's what I mean when I say they <span class="cyan">absolutely smoked</span> the commercial giants.
+            </div>
+
+            <h3>🪟 Meanwhile, in the Corporate World: Microsoft's Journey</h3>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-year">1981</span>
+                    <p>
+                        IBM needs an OS for their new personal computer. Bill Gates licenses <span class="cyan">MS-DOS</span> 
+                        to them — crucially, he keeps the rights to sell it to other manufacturers. 
+                        This decision makes Microsoft.
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-year">1985</span>
+                    <p>
+                        <span class="cyan">Windows 1.0</span> launches — a graphical shell running on top of DOS. 
+                        It's clunky, but it's the beginning.
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-year">1995</span>
+                    <p>
+                        <span class="cyan">Windows 95</span> changes everything. The Start menu, taskbar, 
+                        and 32-bit architecture. Microsoft dominates the desktop.
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-year">2001</span>
+                    <p>
+                        <span class="cyan">Windows XP</span> merges the consumer (9x) and business (NT) lines. 
+                        It becomes legendary for its stability and longevity.
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-year">2015 → 2021</span>
+                    <p>
+                        <span class="cyan">Windows 10</span> brings "Windows as a Service." Then <span class="cyan">Windows 11</span> 
+                        arrives with a modern UI and native Android app support. Oh, and <span class="highlight">WSL</span> — 
+                        Windows Subsystem for Linux. Microsoft finally embraced Linux.
+                    </p>
+                </div>
+            </div>
+
+            <h3>🍎 Apple's Transformation: From Mac OS to macOS</h3>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-year">1984</span>
+                    <p>
+                        The original <span class="cyan">Macintosh</span> launches with the classic "Mac OS" — 
+                        a revolutionary GUI that influenced everything after it.
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-year">2001</span>
+                    <p>
+                        Apple releases <span class="cyan">Mac OS X</span> — built on <span class="highlight">Darwin</span>, 
+                        a Unix-based kernel derived from BSD and Mach. Suddenly, Macs had the power of Unix under the hood.
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-year">2020</span>
+                    <p>
+                        macOS Big Sur arrives alongside Apple's <span class="cyan">M1 chip</span> — ARM-based silicon 
+                        that fundamentally changes the game for performance and efficiency.
+                    </p>
+                </div>
+            </div>
+
+            <h3>📱 The Mobile Revolution: Android's Linux Heart</h3>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-year">2003</span>
+                    <p>
+                        Android Inc. is founded. Their secret weapon? Building on the <span class="cyan">Linux kernel</span>.
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-year">2005</span>
+                    <p>
+                        Google acquires Android. They see the future of mobile.
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-year">2008 → Today</span>
+                    <p>
+                        First Android phone launches. Today, Android powers <span class="highlight">72%</span> of all smartphones globally. 
+                        That's over 2.5 billion active devices — all running Linus's kernel.
+                    </p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>🔐 Why This Matters for Cybersecurity:</strong><br><br>
+                • <strong>Open Source = Auditable Code</strong> — You can verify what Linux is doing. With proprietary OS, you trust the vendor.<br>
+                • <strong>Understanding Lineage = Understanding Vulnerabilities</strong> — Windows vulnerabilities differ from Unix ones.<br>
+                • <strong>Attack Surfaces Vary</strong> — Servers (Linux) vs Endpoints (Windows) vs Mobile (Android/iOS)<br>
+                • <strong>80% of enterprise breaches</strong> involve Windows endpoints — know thy target.
+            </div>
+        </div>
+
+        <!-- SECTION 2: WHAT IS AN OS -->
+        <h2 id="what-is-os">🖥️ 2. What is an Operating System?</h2>
+
+        <div class="section">
+            <p>
+                Now that you know the history, let's understand <em>what</em> an operating system actually does. 
+                At its core, an OS is the <span class="highlight">layer between you and the hardware</span>.
+            </p>
+
+            <div class="layer-diagram">
+                <div class="layer layer-user">👤 USER (You)</div>
+                <div class="layer-arrow">↕</div>
+                <div class="layer layer-apps">📱 APPLICATIONS (Browsers, Tools, Games)</div>
+                <div class="layer-arrow">↕</div>
+                <div class="layer layer-os">⚙️ OPERATING SYSTEM (Kernel + System Services)</div>
+                <div class="layer-arrow">↕</div>
+                <div class="layer layer-hardware">🔧 HARDWARE (CPU, RAM, Disk, Network)</div>
+            </div>
+
+            <h3>The OS as a Translator</h3>
+            <p>
+                When you click "Save" in a document, you don't manually tell the hard drive to write specific bits 
+                to specific sectors. The <span class="highlight">operating system handles that translation</span>.
+            </p>
+
+            <p>Your application says: <em>"Save this file"</em></p>
+            <p>The OS translates it to: <em>"Write these bytes to sectors 34892-34910 on disk 0, update the file table, 
+            set permissions, record the timestamp..."</em></p>
+
+            <h3>Kernel Space vs User Space</h3>
+
+            <table>
+                <tr>
+                    <th>Kernel Space</th>
+                    <th>User Space</th>
+                </tr>
+                <tr>
+                    <td>Full hardware access</td>
+                    <td>Limited, controlled access</td>
+                </tr>
+                <tr>
+                    <td>Operating system core (kernel)</td>
+                    <td>Applications, user programs</td>
+                </tr>
+                <tr>
+                    <td>Device drivers</td>
+                    <td>Browsers, games, tools</td>
+                </tr>
+                <tr>
+                    <td>Crash here = system crash (BSOD, kernel panic)</td>
+                    <td>Crash here = app closes, system continues</td>
+                </tr>
+            </table>
+
+            <h3>System Calls: The Bridge</h3>
+            <p>
+                Applications in user space can't directly access hardware. They must request services through 
+                <span class="cyan">system calls</span> — the official API between user space and kernel space.
+            </p>
+
+            <div class="info-box">
+                <strong>Common System Calls:</strong><br>
+                • <code>open()</code>, <code>read()</code>, <code>write()</code>, <code>close()</code> — File operations<br>
+                • <code>fork()</code>, <code>exec()</code>, <code>exit()</code> — Process management<br>
+                • <code>socket()</code>, <code>bind()</code>, <code>connect()</code> — Networking<br>
+                • <code>mmap()</code>, <code>brk()</code> — Memory management
+            </div>
+        </div>
+
+        <!-- SECTION 3: VIRTUALIZATION -->
+        <h2 id="virtualization">🔧 3. Virtualization & Modern Concepts</h2>
+
+        <div class="section">
+            <p>
+                Modern computing isn't just about one OS on one machine anymore. Understanding these concepts 
+                is <span class="highlight">critical</span> for cybersecurity work.
+            </p>
+
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>What It Is</th>
+                    <th>Use Case</th>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Bare Metal</span></td>
+                    <td>OS installed directly on physical hardware</td>
+                    <td>Daily driver, production servers, gaming</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Virtualization</span></td>
+                    <td>OS running on virtual hardware (VMs)</td>
+                    <td>Labs, malware analysis, testing</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Type 1 Hypervisor</span></td>
+                    <td>Runs directly on hardware (ESXi, Hyper-V)</td>
+                    <td>Enterprise servers, data centers</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Type 2 Hypervisor</span></td>
+                    <td>Runs on host OS (VirtualBox, VMware Workstation)</td>
+                    <td>Home labs, development</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">WSL / WSL2</span></td>
+                    <td>Linux kernel running inside Windows</td>
+                    <td>Best of both worlds, development</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Containers</span></td>
+                    <td>Isolated processes sharing the host kernel (Docker)</td>
+                    <td>Deployment, microservices, CI/CD</td>
+                </tr>
+            </table>
+
+            <h3>Why Virtualization Matters for Security</h3>
+
+            <div class="os-grid">
+                <div class="os-card">
+                    <div class="os-icon">🔬</div>
+                    <h4>Malware Analysis</h4>
+                    <p>Detonate malware safely in isolated VMs. Take snapshots. Analyze behavior. Restore. Repeat.</p>
+                </div>
+                <div class="os-card">
+                    <div class="os-icon">🧪</div>
+                    <h4>Penetration Testing Labs</h4>
+                    <p>Build vulnerable networks (DVWA, Metasploitable) without risking real systems.</p>
+                </div>
+                <div class="os-card">
+                    <div class="os-icon">🔄</div>
+                    <h4>Incident Response</h4>
+                    <p>Capture and analyze disk images in isolated environments for forensics.</p>
+                </div>
+            </div>
+
+            <h4>WSL2: A Game Changer</h4>
+            <p>
+                Windows Subsystem for Linux 2 runs a real Linux kernel inside Windows. 
+                You get native Linux performance with full Windows integration.
+            </p>
+
+            <pre><code># Install WSL2 from PowerShell (Admin)
+wsl --install
+
+# List available Linux distros
+wsl --list --online
+
+# Install Ubuntu
+wsl --install -d Ubuntu
+
+# Enter your Linux environment
+wsl</code></pre>
+        </div>
+
+        <!-- SECTION 4: CORE OS FUNCTIONS -->
+        <h2 id="core-functions">⚙️ 4. Core OS Functions (Practical Skills)</h2>
+
+        <div class="section">
+            <p>
+                Every operating system handles these five core functions. As a security professional, you need to know 
+                how to <span class="highlight">inspect, manage, and manipulate</span> each one across all major platforms.
+            </p>
+
+            <h3>4.1 Process Management</h3>
+            <p>
+                A <span class="cyan">process</span> is a running instance of a program. Every application, service, 
+                and malware sample runs as a process. Knowing how to find, analyze, and kill processes is fundamental.
+            </p>
+
+            <h4>Viewing Processes</h4>
+
+            <div class="cmd-compare">
+                <div class="cmd-box windows">
+                    <h5>🪟 Windows</h5>
+                    <pre><code># Task Manager (GUI)
+taskmgr
+
+# Command line - list all processes
+tasklist
+
+# PowerShell - detailed process info
+Get-Process
+
+# Find process by name
+Get-Process -Name "chrome"
+
+# Find by PID
+Get-Process -Id 1234</code></pre>
+                </div>
+                <div class="cmd-box linux">
+                    <h5>🐧 Linux</h5>
+                    <pre><code># List all processes
+ps aux
+
+# Interactive process viewer
+top
+htop  # Better version
+
+# Find process by name
+ps aux | grep nginx
+
+# Process tree
+pstree
+
+# View /proc filesystem
+ls /proc/[PID]/</code></pre>
+                </div>
+                <div class="cmd-box macos">
+                    <h5>🍎 macOS</h5>
+                    <pre><code># Activity Monitor (GUI)
+open -a "Activity Monitor"
+
+# Command line
+ps aux
+
+# Top processes
+top
+
+# Find process
+ps aux | grep Safari</code></pre>
+                </div>
+            </div>
+
+            <h4>Killing Processes</h4>
+
+            <div class="cmd-compare">
+                <div class="cmd-box windows">
+                    <h5>🪟 Windows</h5>
+                    <pre><code># Kill by name
+taskkill /IM notepad.exe
+
+# Force kill by PID
+taskkill /F /PID 1234
+
+# Kill and all child processes
+taskkill /F /T /PID 1234
+
+# PowerShell
+Stop-Process -Name "chrome" -Force
+Stop-Process -Id 1234 -Force</code></pre>
+                </div>
+                <div class="cmd-box linux">
+                    <h5>🐧 Linux</h5>
+                    <pre><code># Graceful terminate (SIGTERM)
+kill 1234
+
+# Force kill (SIGKILL)
+kill -9 1234
+
+# Kill by name
+killall nginx
+pkill nginx
+
+# Kill all processes of user
+pkill -u username</code></pre>
+                </div>
+                <div class="cmd-box macos">
+                    <h5>🍎 macOS</h5>
+                    <pre><code># Same as Linux
+kill 1234
+kill -9 1234
+
+# Kill by name
+killall Safari
+
+# Using pkill
+pkill -f "process name"</code></pre>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>🔐 Security Relevance:</strong><br>
+                • Malware often spawns multiple processes — learn to identify and kill process trees<br>
+                • Look for unusual parent-child relationships (e.g., Word spawning PowerShell)<br>
+                • Check for processes with high privileges (SYSTEM, root) that shouldn't have them<br>
+                • Tools like <span class="code-text">Process Monitor</span> (Windows) reveal what processes do
+            </div>
+
+            <h3>4.2 Memory Management</h3>
+            <p>
+                The OS manages RAM allocation, virtual memory, and swap space. Understanding memory is crucial for 
+                forensics and exploit development.
+            </p>
+
+            <div class="cmd-compare">
+                <div class="cmd-box windows">
+                    <h5>🪟 Windows</h5>
+                    <pre><code># System memory info
+systeminfo | findstr Memory
+
+# PowerShell - detailed
+Get-WmiObject Win32_OperatingSystem | 
+  Select FreePhysicalMemory, 
+         TotalVisibleMemorySize
+
+# Process memory
+Get-Process | Sort WorkingSet -Desc | 
+  Select -First 10</code></pre>
+                </div>
+                <div class="cmd-box linux">
+                    <h5>🐧 Linux</h5>
+                    <pre><code># Memory info
+free -h
+
+# Detailed from proc
+cat /proc/meminfo
+
+# Process memory map
+pmap [PID]
+
+# Memory top
+top -o %MEM</code></pre>
+                </div>
+                <div class="cmd-box macos">
+                    <h5>🍎 macOS</h5>
+                    <pre><code># Memory pressure
+vm_stat
+
+# Memory usage
+top -o mem
+
+# System profiler
+system_profiler SPHardwareDataType</code></pre>
+                </div>
+            </div>
+
+            <h3>4.3 File System Management</h3>
+            <p>
+                File systems determine how data is stored, organized, and secured on disk.
+            </p>
+
+            <table>
+                <tr>
+                    <th>OS</th>
+                    <th>Primary File System</th>
+                    <th>Key Features</th>
+                </tr>
+                <tr>
+                    <td>Windows</td>
+                    <td>NTFS</td>
+                    <td>ACLs, Alternate Data Streams, journaling, encryption (EFS)</td>
+                </tr>
+                <tr>
+                    <td>Linux</td>
+                    <td>ext4 / xfs / btrfs</td>
+                    <td>Unix permissions, ACLs, extended attributes</td>
+                </tr>
+                <tr>
+                    <td>macOS</td>
+                    <td>APFS</td>
+                    <td>Snapshots, encryption, space sharing, clones</td>
+                </tr>
+            </table>
+
+            <h4>File Permissions</h4>
+
+            <div class="cmd-compare">
+                <div class="cmd-box windows">
+                    <h5>🪟 Windows (NTFS ACLs)</h5>
+                    <pre><code># View permissions
+icacls C:\path\to\file
+
+# Grant permission
+icacls file.txt /grant User:F
+
+# Remove permission  
+icacls file.txt /remove User
+
+# Inheritance
+icacls folder /inheritance:r</code></pre>
+                </div>
+                <div class="cmd-box linux">
+                    <h5>🐧 Linux (Unix Permissions)</h5>
+                    <pre><code># View permissions
+ls -la
+
+# Change permissions (rwx)
+chmod 755 script.sh
+chmod u+x file
+
+# Change owner
+chown user:group file
+
+# Special bits
+chmod u+s program  # SUID
+chmod g+s folder   # SGID
+chmod +t folder    # Sticky</code></pre>
+                </div>
+                <div class="cmd-box macos">
+                    <h5>🍎 macOS</h5>
+                    <pre><code># Same as Linux
+chmod 755 script.sh
+chown user:group file
+
+# Extended attributes
+xattr -l file
+xattr -d attr file
+
+# ACLs
+chmod +a "user:admin allow write" file</code></pre>
+                </div>
+            </div>
+
+            <h3>4.4 Log Locations</h3>
+            <p>
+                Logs are your best friend in security. Know where to find them.
+            </p>
+
+            <div class="cmd-compare">
+                <div class="cmd-box windows">
+                    <h5>🪟 Windows</h5>
+                    <pre><code># Event Viewer GUI
+eventvwr.msc
+
+# PowerShell query
+Get-EventLog -LogName Security -Newest 50
+
+# Key logs:
+# Security, System, Application
+# Path: C:\Windows\System32\winevt\Logs\
+
+# Sysmon (if installed)
+Get-WinEvent -LogName Microsoft-Windows-Sysmon/Operational</code></pre>
+                </div>
+                <div class="cmd-box linux">
+                    <h5>🐧 Linux</h5>
+                    <pre><code># Main log directory
+/var/log/
+
+# Key files:
+/var/log/auth.log    # Auth attempts
+/var/log/syslog      # System events
+/var/log/messages    # General
+/var/log/secure      # RHEL auth
+
+# Systemd journal
+journalctl
+journalctl -u nginx
+journalctl --since "1 hour ago"</code></pre>
+                </div>
+                <div class="cmd-box macos">
+                    <h5>🍎 macOS</h5>
+                    <pre><code># Console app (GUI)
+open -a Console
+
+# Unified logging
+log show --last 1h
+
+# Filter by process
+log show --predicate 'process == "sshd"'
+
+# Traditional logs
+/var/log/system.log
+/var/log/install.log</code></pre>
+                </div>
+            </div>
+
+            <h3>4.5 Security & Access Control</h3>
+
+            <h4>User & Group Management</h4>
+
+            <div class="cmd-compare">
+                <div class="cmd-box windows">
+                    <h5>🪟 Windows</h5>
+                    <pre><code># Local users
+net user
+net user username /add
+net user username /delete
+
+# Groups
+net localgroup
+net localgroup Administrators user /add
+
+# Current user info
+whoami /all
+
+# Security policy
+secpol.msc</code></pre>
+                </div>
+                <div class="cmd-box linux">
+                    <h5>🐧 Linux</h5>
+                    <pre><code># Users
+cat /etc/passwd
+useradd username
+userdel username
+
+# Groups
+cat /etc/group
+groupadd groupname
+usermod -aG sudo username
+
+# Password hashes
+cat /etc/shadow  # root only
+
+# Current user
+id
+whoami</code></pre>
+                </div>
+                <div class="cmd-box macos">
+                    <h5>🍎 macOS</h5>
+                    <pre><code># Users (GUI)
+System Preferences > Users & Groups
+
+# Command line
+dscl . -list /Users
+dscl . -read /Users/username
+
+# Groups
+dscl . -list /Groups
+
+# Create user
+sysadminctl -addUser username</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: WINDOWS INTERNALS -->
+        <h2 id="windows-internals">🪟 5. Windows Internals Deep Dive</h2>
+
+        <div class="section">
+            <p>
+                Windows is the primary target for most attacks (80% of enterprise endpoints). 
+                Understanding its internals is <span class="highlight">non-negotiable</span> for security professionals.
+            </p>
+
+            <h3>NTFS: The Windows File System</h3>
+
+            <h4>Master File Table (MFT)</h4>
+            <p>
+                The <span class="cyan">MFT</span> is the heart of NTFS. It's a database containing entries for every file 
+                and directory — including metadata, timestamps, and data locations.
+            </p>
+
+            <div class="info-box">
+                <strong>MACB Timestamps:</strong><br>
+                • <strong>M</strong>odified — Content last changed<br>
+                • <strong>A</strong>ccessed — File last opened<br>
+                • <strong>C</strong>hanged (MFT) — Metadata last changed<br>
+                • <strong>B</strong>orn — File creation time<br><br>
+                <em>Attackers often try to modify these (timestomping) to hide activity!</em>
+            </div>
+
+            <h4>Alternate Data Streams (ADS)</h4>
+            <p>
+                NTFS allows multiple data streams per file. Malware loves this for hiding payloads.
+            </p>
+
+            <pre><code># Create hidden stream
+echo "hidden data" > normal.txt:hidden.txt
+
+# View streams
+dir /R
+Get-Item .\normal.txt -Stream *
+
+# Read hidden stream
+Get-Content .\normal.txt -Stream hidden.txt
+
+# Check all files in directory for streams
+Get-ChildItem -Recurse | ForEach-Object { Get-Item $_.FullName -Stream * }</code></pre>
+
+            <h3>Windows Registry</h3>
+            <p>
+                The registry is a hierarchical database storing OS and application configuration. 
+                It's a goldmine for forensics and a playground for persistence.
+            </p>
+
+            <table>
+                <tr>
+                    <th>Hive</th>
+                    <th>Content</th>
+                    <th>File Location</th>
+                </tr>
+                <tr>
+                    <td>HKEY_LOCAL_MACHINE (HKLM)</td>
+                    <td>System-wide settings</td>
+                    <td>C:\Windows\System32\config\</td>
+                </tr>
+                <tr>
+                    <td>HKEY_CURRENT_USER (HKCU)</td>
+                    <td>Current user settings</td>
+                    <td>C:\Users\{user}\NTUSER.DAT</td>
+                </tr>
+                <tr>
+                    <td>HKEY_USERS (HKU)</td>
+                    <td>All user profiles</td>
+                    <td>Aggregated from user hives</td>
+                </tr>
+            </table>
+
+            <h4>Common Persistence Locations</h4>
+            <pre><code># Run keys (execute at login)
+HKCU\Software\Microsoft\Windows\CurrentVersion\Run
+HKLM\Software\Microsoft\Windows\CurrentVersion\Run
+HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce
+
+# Services
+HKLM\SYSTEM\CurrentControlSet\Services
+
+# Scheduled Tasks
+C:\Windows\System32\Tasks\
+
+# Query via PowerShell
+Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"
+Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"</code></pre>
+
+            <h3>Windows Services</h3>
+            <pre><code># List services
+Get-Service
+sc query
+
+# Start/Stop service
+Start-Service -Name "ServiceName"
+Stop-Service -Name "ServiceName"
+net start ServiceName
+net stop ServiceName
+
+# Service details
+sc qc ServiceName
+
+# Find service executable path
+Get-WmiObject win32_service | Select Name, PathName | Where-Object { $_.PathName -like "*suspicious*" }</code></pre>
+
+            <h3>PowerShell for Security</h3>
+            <pre><code># Get running processes with network connections
+Get-NetTCPConnection | Where-Object { $_.State -eq "Established" } | 
+  Select LocalAddress, LocalPort, RemoteAddress, RemotePort, 
+         @{Name="Process";Expression={(Get-Process -Id $_.OwningProcess).ProcessName}}
+
+# Find recently modified files
+Get-ChildItem -Path C:\ -Recurse -File | 
+  Where-Object { $_.LastWriteTime -gt (Get-Date).AddDays(-1) }
+
+# Check startup programs
+Get-CimInstance Win32_StartupCommand | Select Name, Command, Location
+
+# Get logged-in users
+query user
+Get-WmiObject Win32_LoggedOnUser
+
+# Network shares
+net share
+Get-SmbShare</code></pre>
+
+            <h3>Process Monitor (Sysinternals)</h3>
+            <p>
+                <span class="highlight">Process Monitor</span> is the ultimate tool for understanding what processes 
+                are doing in real-time: file access, registry changes, network activity.
+            </p>
+
+            <div class="info-box">
+                <strong>Download:</strong> <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/procmon" target="_blank">Sysinternals Process Monitor</a><br><br>
+                <strong>Key Filters for Security:</strong><br>
+                • Operation is WriteFile<br>
+                • Path contains Run<br>
+                • Process Name is powershell.exe or cmd.exe<br>
+                • Event Class is Network
+            </div>
+        </div>
+
+        <!-- SECTION 6: LINUX INTERNALS -->
+        <h2 id="linux-internals">🐧 6. Linux Internals Deep Dive</h2>
+
+        <div class="section">
+            <p>
+                Linux powers most servers, cloud infrastructure, and security tools. Mastering it is essential.
+            </p>
+
+            <h3>File System Hierarchy</h3>
+
+            <table>
+                <tr>
+                    <th>Directory</th>
+                    <th>Purpose</th>
+                    <th>Security Relevance</th>
+                </tr>
+                <tr>
+                    <td><code>/etc</code></td>
+                    <td>System configuration</td>
+                    <td>User accounts, services, cron jobs</td>
+                </tr>
+                <tr>
+                    <td><code>/var</code></td>
+                    <td>Variable data (logs, mail, spool)</td>
+                    <td>Logs for forensics</td>
+                </tr>
+                <tr>
+                    <td><code>/home</code></td>
+                    <td>User home directories</td>
+                    <td>User data, ~/.ssh keys, history files</td>
+                </tr>
+                <tr>
+                    <td><code>/tmp</code></td>
+                    <td>Temporary files</td>
+                    <td>Malware staging area, world-writable</td>
+                </tr>
+                <tr>
+                    <td><code>/proc</code></td>
+                    <td>Virtual filesystem (process info)</td>
+                    <td>Live process analysis</td>
+                </tr>
+                <tr>
+                    <td><code>/root</code></td>
+                    <td>Root user's home</td>
+                    <td>High-value target</td>
+                </tr>
+            </table>
+
+            <h3>Special Permission Bits</h3>
+
+            <table>
+                <tr>
+                    <th>Bit</th>
+                    <th>Numeric</th>
+                    <th>Effect</th>
+                    <th>Security Impact</th>
+                </tr>
+                <tr>
+                    <td>SUID</td>
+                    <td>4000</td>
+                    <td>Execute as file owner</td>
+                    <td>Privilege escalation if misconfigured</td>
+                </tr>
+                <tr>
+                    <td>SGID</td>
+                    <td>2000</td>
+                    <td>Execute as group owner</td>
+                    <td>Similar risk, check group privileges</td>
+                </tr>
+                <tr>
+                    <td>Sticky</td>
+                    <td>1000</td>
+                    <td>Only owner can delete files</td>
+                    <td>Important for /tmp</td>
+                </tr>
+            </table>
+
+            <pre><code># Find SUID binaries (privilege escalation goldmine)
+find / -perm -4000 -type f 2>/dev/null
+
+# Find SGID binaries
+find / -perm -2000 -type f 2>/dev/null
+
+# Find world-writable files
+find / -perm -o+w -type f 2>/dev/null
+
+# Find files with no owner
+find / -nouser -type f 2>/dev/null</code></pre>
+
+            <h3>systemd: The Init System</h3>
+            <pre><code># List all services
+systemctl list-units --type=service
+
+# Service status
+systemctl status nginx
+
+# Start/Stop/Restart
+systemctl start nginx
+systemctl stop nginx
+systemctl restart nginx
+
+# Enable at boot
+systemctl enable nginx
+
+# View service configuration
+systemctl cat nginx
+
+# View logs for service
+journalctl -u nginx -f</code></pre>
+
+            <h3>Critical Files for Security</h3>
+
+            <pre><code># User accounts
+/etc/passwd      # User info (readable by all)
+/etc/shadow      # Password hashes (root only)
+/etc/group       # Group memberships
+
+# Sudoers configuration
+/etc/sudoers
+/etc/sudoers.d/*
+
+# SSH configuration
+/etc/ssh/sshd_config
+~/.ssh/authorized_keys
+~/.ssh/known_hosts
+
+# Cron jobs (persistence)
+/etc/crontab
+/etc/cron.d/*
+/var/spool/cron/crontabs/*
+
+# Bash history
+~/.bash_history
+~/.zsh_history</code></pre>
+
+            <h3>Network Investigation</h3>
+            <pre><code># Active connections
+ss -tunapl
+netstat -tunapl
+
+# Listening ports
+ss -tlnp
+
+# Connection associated with PID
+lsof -i -P -n
+
+# Which process is using a port
+lsof -i :80
+
+# ARP table
+arp -a
+ip neighbor</code></pre>
+        </div>
+
+        <!-- SECTION 7: MACOS INTERNALS -->
+        <h2 id="macos-internals">🍎 7. macOS Internals Deep Dive</h2>
+
+        <div class="section">
+            <p>
+                macOS is Unix-based (Darwin kernel = BSD + Mach). Many Linux commands work, but there are unique aspects.
+            </p>
+
+            <h3>Darwin/XNU Kernel</h3>
+            <p>
+                macOS uses the <span class="cyan">XNU</span> kernel (X is Not Unix), a hybrid of:
+            </p>
+            <ul>
+                <li><strong>Mach</strong> — Microkernel handling low-level tasks (IPC, memory)</li>
+                <li><strong>BSD</strong> — Unix layer providing POSIX compatibility, file systems, networking</li>
+            </ul>
+
+            <h3>launchd: The macOS Init System</h3>
+            <p>
+                Unlike Linux's systemd, macOS uses <span class="cyan">launchd</span> for service management.
+            </p>
+
+            <table>
+                <tr>
+                    <th>Location</th>
+                    <th>Purpose</th>
+                    <th>Runs As</th>
+                </tr>
+                <tr>
+                    <td><code>~/Library/LaunchAgents/</code></td>
+                    <td>Current user agents</td>
+                    <td>User</td>
+                </tr>
+                <tr>
+                    <td><code>/Library/LaunchAgents/</code></td>
+                    <td>All users agents</td>
+                    <td>User</td>
+                </tr>
+                <tr>
+                    <td><code>/Library/LaunchDaemons/</code></td>
+                    <td>System daemons</td>
+                    <td>Root</td>
+                </tr>
+                <tr>
+                    <td><code>/System/Library/LaunchDaemons/</code></td>
+                    <td>Apple system daemons</td>
+                    <td>Root</td>
+                </tr>
+            </table>
+
+            <pre><code># List launch services
+launchctl list
+
+# Load/Unload a service
+launchctl load /Library/LaunchAgents/com.example.plist
+launchctl unload /Library/LaunchAgents/com.example.plist
+
+# Start/Stop
+launchctl start com.example.service
+launchctl stop com.example.service
+
+# Check for suspicious items
+ls -la ~/Library/LaunchAgents/
+ls -la /Library/LaunchAgents/
+ls -la /Library/LaunchDaemons/</code></pre>
+
+            <h3>macOS Security Features</h3>
+
+            <table>
+                <tr>
+                    <th>Feature</th>
+                    <th>What It Does</th>
+                    <th>Bypass Implications</th>
+                </tr>
+                <tr>
+                    <td><strong>SIP (System Integrity Protection)</strong></td>
+                    <td>Protects system files from modification, even by root</td>
+                    <td>Disabling requires recovery mode boot</td>
+                </tr>
+                <tr>
+                    <td><strong>Gatekeeper</strong></td>
+                    <td>Blocks unsigned/untrusted apps</td>
+                    <td>Check app notarization status</td>
+                </tr>
+                <tr>
+                    <td><strong>TCC (Transparency, Consent, Control)</strong></td>
+                    <td>Controls app access to camera, mic, files</td>
+                    <td>TCC.db manipulation is common malware target</td>
+                </tr>
+                <tr>
+                    <td><strong>XProtect</strong></td>
+                    <td>Built-in malware signatures</td>
+                    <td>Basic AV, signature-based only</td>
+                </tr>
+            </table>
+
+            <pre><code># Check SIP status
+csrutil status
+
+# Gatekeeper status
+spctl --status
+
+# List TCC permissions
+# Database at ~/Library/Application Support/com.apple.TCC/TCC.db
+
+# Check code signing
+codesign -dv --verbose=4 /path/to/app
+
+# Verify notarization
+spctl -a -v /path/to/app</code></pre>
+
+            <h3>Useful Security Commands</h3>
+            <pre><code># List all users
+dscl . -list /Users
+
+# Get user details
+dscl . -read /Users/username
+
+# Check sudo access
+sudo -l
+
+# Find recently modified files
+find / -mtime -1 -type f 2>/dev/null
+
+# Network connections
+lsof -i -P
+netstat -an
+
+# Running processes with network
+lsof -i | grep ESTABLISHED</code></pre>
+        </div>
+
+        <!-- Page Navigation -->
+        <div class="page-nav">
+            <a href="1.3-landscape.html">← Previous: The Cybersecurity Landscape</a>
+            <a href="../../index.html#resources">Back to Resources →</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            &copy; 2025 <a href="../../index.html">lokii.tech</a> — Open source and community-driven.<br>
+            Created by <strong>lokii</strong> (UnExplainableFish52)
+        </p>
+    </footer>
+</body>
+</html>

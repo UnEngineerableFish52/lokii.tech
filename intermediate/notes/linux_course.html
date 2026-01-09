@@ -3,420 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linux Mastery Course · Dark Theme</title>
+    <title>Linux Mastery Course · Notes</title>
     
-    <!-- PWA Meta Tags -->
-    <meta name="description" content="Complete Linux command-line and cybersecurity mastery course with 17 modules. Learn bash, system administration, security, and more.">
-    <meta name="theme-color" content="#0E0E0E">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Linux Master">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Linux Mastery Course">
-    <meta name="msapplication-TileColor" content="#0E0E0E">
-    <meta name="msapplication-config" content="none">
+    <meta name="description" content="Complete Linux command-line and cybersecurity mastery course notes. Learn bash, system administration, security, and more.">
+    <meta name="author" content="lokii (UnExplainableFish52)">
+    <meta name="theme-color" content="#050505">
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Highlight.js for bash syntax coloring -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/tomorrow-night.min.css">
-
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://lokii.tech/intermediate/notes/linux_course.html">
+    <meta property="og:title" content="Linux Mastery Course | lokii.tech">
+    <meta property="og:description" content="Complete Linux command-line and cybersecurity mastery course notes. Learn bash, system administration, security, and more.">
+    <meta property="og:image" content="https://lokii.tech/preview.jpg">
+    <meta property="og:site_name" content="lokii.tech">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Linux Mastery Course | lokii.tech">
+    <meta name="twitter:description" content="Complete Linux command-line and cybersecurity mastery course notes. Learn bash, system administration, security, and more.">
+    <meta name="twitter:image" content="https://lokii.tech/preview.jpg">
+    
+    <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
-
+    <link rel="icon" href="/favicon.ico">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Shared Premium Styles -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Highlight.js for syntax coloring (Can be customized in style.css or kept separate) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/tomorrow-night.min.css">
     <style>
-        :root {
-            --bg: #0E0E0E;
-            --bg-alt: #141414;
-            --card: #1A1A1A;
-            --muted: #888888;
-            --text: #EDEDED;
-            --accent: #98C379;
-            --accent-2: #61AFEF;
-            --keyword: #E5C07B;
-            --variable: #C678DD;
-            --string: #98C379;
-            --number: #56B6C2;
-            --comment: #5A5A5A;
-            --error: #E06C75;
-            --border: #2A2A2A;
-            --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            --radius: 12px;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: var(--bg);
-            color: var(--text);
-            font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-            font-weight: 500;
-            line-height: 1.75;
-            letter-spacing: 0.01em;
-            padding: 40px 20px 60px;
-        }
-
-        .page { max-width: 1000px; margin: 0 auto; }
-
-        .hero {
-            position: relative;
-            padding: 32px;
-            border-radius: var(--radius);
-            background: linear-gradient(135deg, rgba(97, 175, 239, 0.1) 0%, rgba(152, 195, 121, 0.08) 100%);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            margin-bottom: 32px;
-        }
-
-        .hero-title {
-            margin: 0 0 12px;
-            font-weight: 800;
-            font-size: 38px;
-            letter-spacing: -0.02em;
-            color: #FFFFFF;
-        }
-
-        .hero-subtitle {
-            margin: 0 0 20px;
-            color: var(--muted);
-            max-width: 700px;
-            font-size: 17px;
-            font-weight: 400;
-        }
-
-        .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-        .pill {
-            padding: 8px 14px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
-        .stat {
-            padding: 16px;
-            border-radius: var(--radius);
-            background: var(--bg-alt);
-            border: 1px solid var(--border);
-        }
-        .stat-label { color: var(--muted); font-size: 13px; font-weight: 500; margin: 0 0 4px; }
-        .stat-value { margin: 0; font-size: 20px; font-weight: 700; color: #FFFFFF; }
-
-        .card {
-            padding: 32px;
-            border-radius: var(--radius);
-            background: var(--card);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
-        .toolbar .hint { color: var(--muted); font-size: 13px; }
-
-        .markdown { color: var(--text); font-size: 16px; font-weight: 500; }
-        .markdown h1, .markdown h2, .markdown h3, .markdown h4, .markdown h5, .markdown h6 {
-            color: #FFFFFF;
-            font-weight: 800;
-            letter-spacing: -0.01em;
-            margin-top: 36px;
-            margin-bottom: 16px;
-        }
-
-        .markdown h1 { font-size: 32px; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
-        .markdown h2 { font-size: 26px; color: var(--accent-2); }
-        .markdown h3 { font-size: 22px; color: var(--keyword); }
-        .markdown h4 { font-size: 18px; }
-
-        .markdown p { margin: 14px 0; color: var(--text); }
-        .markdown strong { color: #FFFFFF; font-weight: 700; }
-        .markdown em { color: var(--variable); font-style: italic; }
-        .markdown a { color: var(--accent-2); text-decoration: none; font-weight: 600; }
-        .markdown a:hover { text-decoration: underline; }
-
-        .markdown blockquote {
-            margin: 20px 0;
-            padding: 16px 20px;
-            border-left: 4px solid var(--accent);
-            background: rgba(152, 195, 121, 0.08);
-            color: var(--text);
-            border-radius: 0 var(--radius) var(--radius) 0;
-            font-weight: 500;
-        }
-
-        .markdown code {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-family: "JetBrains Mono", "Fira Code", monospace;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--accent);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .markdown pre {
-            background: #0A0A0A;
-            padding: 20px;
-            border-radius: var(--radius);
-            overflow-x: auto;
-            border: 1px solid var(--border);
-            margin: 20px 0;
-        }
-
-        .markdown pre code {
-            background: transparent;
-            padding: 0;
-            border: none;
-            color: var(--text);
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        /* Bash syntax highlighting overrides - SUPER COLORFUL */
-        .hljs { background: transparent !important; color: var(--text) !important; }
-        .hljs-keyword { color: #E5C07B !important; font-weight: 700; }
-        .hljs-built_in { color: #61AFEF !important; font-weight: 700; }
-        .hljs-string { color: #98C379 !important; font-weight: 600; }
-        .hljs-variable { color: #C678DD !important; font-weight: 600; }
-        .hljs-number { color: #56B6C2 !important; font-weight: 600; }
-        .hljs-comment { color: #5A5A5A !important; font-style: italic; }
-        .hljs-function { color: #61AFEF !important; font-weight: 700; }
-        .hljs-title { color: #61AFEF !important; font-weight: 700; }
-        .hljs-params { color: #E06C75 !important; font-weight: 600; }
-        .hljs-attr { color: #E5C07B !important; font-weight: 600; }
-        .hljs-literal { color: #56B6C2 !important; font-weight: 600; }
-        .hljs-symbol { color: #C678DD !important; font-weight: 600; }
-        .hljs-meta { color: #E06C75 !important; font-weight: 600; }
-        .hljs-meta .hljs-keyword { color: #E06C75 !important; }
-        .hljs-meta .hljs-string { color: #98C379 !important; }
-        /* Shell prompt and operators */
-        .hljs-doctag { color: #E5C07B !important; font-weight: 700; }
-        .hljs-selector-tag { color: #E06C75 !important; font-weight: 700; }
-        .hljs-selector-class { color: #E5C07B !important; }
-        .hljs-selector-id { color: #61AFEF !important; }
-        .hljs-subst { color: #C678DD !important; }
-        .hljs-section { color: #61AFEF !important; font-weight: 700; }
-        .hljs-link { color: #56B6C2 !important; }
-        .hljs-regexp { color: #56B6C2 !important; }
-        .hljs-deletion { color: #E06C75 !important; background: rgba(224, 108, 117, 0.15); }
-        .hljs-addition { color: #98C379 !important; background: rgba(152, 195, 121, 0.15); }
-        .hljs-emphasis { font-style: italic; }
-        .hljs-strong { font-weight: 700; }
-        .hljs-type { color: #56B6C2 !important; font-weight: 600; }
-        .hljs-class { color: #E5C07B !important; }
-        .hljs-name { color: #E06C75 !important; font-weight: 600; }
-        .hljs-attribute { color: #E5C07B !important; }
-        .hljs-property { color: #61AFEF !important; }
-        /* Shebang and special */
-        .hljs-shebang { color: #5A5A5A !important; font-style: italic; }
-        .hljs-operator { color: #56B6C2 !important; font-weight: 700; }
-        .hljs-punctuation { color: #ABB2BF !important; }
-
-        .markdown table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: var(--bg-alt);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-        }
-        .markdown th, .markdown td {
-            border: 1px solid var(--border);
-            padding: 12px 16px;
-            text-align: left;
-            color: var(--text);
-        }
-        .markdown th {
-            background: rgba(255, 255, 255, 0.05);
-            font-weight: 700;
-            color: #FFFFFF;
-        }
-        .markdown tr:nth-child(even) td { background: rgba(255, 255, 255, 0.02); }
-
-        .markdown ul, .markdown ol { padding-left: 24px; margin: 14px 0; }
-        .markdown li { margin: 8px 0; }
-        .markdown li::marker { color: var(--accent); }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: rgba(97, 175, 239, 0.15);
-            border: 1px solid rgba(97, 175, 239, 0.3);
-            color: var(--accent-2);
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .muted { color: var(--muted); }
-
-        .github-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--muted);
-            font-size: 13px;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .github-link:hover { color: var(--text); }
-
-        .footer {
-            margin-top: 40px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            color: var(--muted);
-            font-size: 14px;
-        }
-        .footer a { color: var(--accent-2); }
-
-        /* Site Header Navigation */
+        /* Site Header - Homepage Style */
         .site-header {
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border);
-            background: rgba(14, 14, 14, 0.85);
+            padding: 15px 20px;
+            border-bottom: 1px solid #262626;
+            background: rgba(5, 5, 5, 0.95);
             backdrop-filter: blur(10px);
             position: sticky;
             top: 0;
             z-index: 100;
-            margin: -40px -20px 0;
-            padding-left: 20px;
-            padding-right: 20px;
         }
 
-        .site-header .container {
-            max-width: 1000px;
+        .site-header .header-content {
+            max-width: 900px;
             margin: 0 auto;
-        }
-
-        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 100%;
         }
 
         .branding {
+            text-decoration: none;
+        }
+
+        .branding .logo {
+            color: #00bcd4;
+            font-size: 1.5rem;
             font-weight: 800;
-            color: white;
-            font-size: 1.25rem;
-            letter-spacing: -0.025em;
-            transition: opacity 150ms ease-in-out;
-            text-decoration: none;
         }
 
-        .branding:hover {
-            opacity: 0.8;
-            text-decoration: none;
-        }
-
-        .nav-links {
+        .site-nav {
             display: flex;
-            gap: 1.5rem;
+            gap: 25px;
             align-items: center;
         }
 
-        .nav-link {
-            color: var(--muted);
-            font-size: 0.95rem;
+        .site-nav .nav-link {
+            color: #A1A1AA;
+            text-decoration: none;
             font-weight: 500;
-            transition: color 150ms ease-in-out;
-            text-decoration: none;
+            transition: color 0.3s ease;
         }
 
-        .nav-link:hover {
-            color: var(--accent-2);
-            text-decoration: none;
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 20px 16px 40px; }
-            .hero, .card { padding: 20px; }
-            .toolbar { flex-direction: column; align-items: flex-start; }
-            .hero-title { font-size: 28px; }
-            .site-header {
-                margin: -20px -16px 0;
-                padding-left: 16px;
-                padding-right: 16px;
-            }
-            .header-content {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-            .nav-links {
-                gap: 1rem;
-            }
-            .nav-link {
-                font-size: 0.85rem;
-            }
+        .site-nav .nav-link:hover {
+            color: #00bcd4;
         }
     </style>
 </head>
 <body>
-    <!-- Persistent Navigation -->
+
+    <!-- Site Header -->
     <header class="site-header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="branding">
-                    <span class="logo" style="color: #00bcd4; font-size: 1.5rem; font-weight: 800;">lokii.tech</span>
-                </a>
-                <nav class="nav-links">
-                    <a href="/#about" class="nav-link">About</a>
-                    <a href="/#resources" class="nav-link">Resources</a>
-                    <a href="https://github.com/UnExplainableFish52" target="_blank" class="nav-link">GitHub</a>
-                </nav>
-            </div>
+        <div class="header-content">
+            <a href="../../index.html" class="branding">
+                <span class="logo">lokii.tech</span>
+            </a>
+            <nav class="site-nav">
+                <a href="../../index.html#about" class="nav-link">About</a>
+                <a href="../../index.html#resources" class="nav-link">Resources</a>
+                <a href="https://github.com/UnExplainableFish52" target="_blank" class="nav-link">GitHub</a>
+            </nav>
         </div>
     </header>
 
-    <div class="page">
-        <section class="hero">
-            <div class="pill-row">
-                <span class="pill">🐧 Linux Mastery Course</span>
-                <span class="pill">Cybersecurity Focus</span>
-                <span class="pill">Beginner → Intermediate+</span>
-            </div>
-            <h1 class="hero-title">Linux Mastery, Dark & Readable</h1>
-            <p class="hero-subtitle">All of your existing notes rendered beautifully in a focused dark theme. Everything remains intact; just easier to read, search, and navigate.</p>
-            <div class="stats">
-                <div class="stat">
-                    <p class="stat-label">Modules</p>
-                    <p class="stat-value">17 total</p>
-                </div>
-                <div class="stat">
-                    <p class="stat-label">Audience</p>
-                    <p class="stat-value">CSIT · Hackers · Admins</p>
-                </div>
-                <div class="stat">
-                    <p class="stat-label">Theme</p>
-                    <p class="stat-value">Low-glare night mode</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="card">
-            <div class="toolbar">
-                <div class="badge">📒 Rendered Markdown</div>
-                <span class="hint">Tip: Press Ctrl+F to jump anywhere instantly.</span>
-            </div>
-            <article id="md-target" class="markdown">Loading course notes…</article>
-        </section>
-    </div>
-
+    <main class="container">
+        <!-- Content will be injected here or exist here staticly -->
+        <article class="markdown">
+            <!-- Existing content is preserved below -->
+            <div id="md-target">Loading...</div>
+        </article>
+    </main>
+    
+    <!-- Markdown scripts helper (Merging existing script logic) -->
     <script id="md-source" type="text/markdown">
 # 🐧 Linux Mastery Course
 
@@ -14223,6 +13918,19 @@ You've covered 17 modules, from foundation to mastery. The commands and concepts
                     });
             });
         }
+    </script>
+</body>
+    <!-- Markdown Parsing Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const source = document.getElementById('md-source').textContent;
+            const target = document.getElementById('md-target');
+            if(source && target && window.marked) {
+                target.innerHTML = marked.parse(source);
+            }
+            if (window.hljs) hljs.highlightAll();
+        });
     </script>
 </body>
 </html>
