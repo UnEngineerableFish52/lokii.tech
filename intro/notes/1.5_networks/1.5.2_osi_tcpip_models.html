@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1.5.2 OSI & TCP/IP Models | Networking | Cybersecurity Course</title>
+    <meta name="description" content="Master the OSI 7-layer model and TCP/IP 4-layer model. Understand how data flows through networks with protocols, attacks, and real examples.">
+    <meta name="author" content="lokii (UnExplainableFish52)">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="icon" href="/favicon.ico">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0d1117; color: #e6e6e6; font-family: system-ui, 'Segoe UI', sans-serif; line-height: 1.7; min-height: 100vh; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        
+        .site-header { padding: 15px 20px; border-bottom: 1px solid #30363d; background: rgba(13,17,23,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .branding { text-decoration: none; }
+        .branding .logo { color: #00ffff; font-size: 1.5rem; font-weight: 800; }
+        .site-nav { display: flex; gap: 25px; }
+        .site-nav .nav-link { color: #8b949e; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .site-nav .nav-link:hover { color: #00ffff; }
+        
+        header.page-header { text-align: center; padding: 50px 20px; margin-bottom: 40px; }
+        h1 { font-size: 2.5em; color: #00ffff; font-weight: bold; margin-bottom: 15px; }
+        h2 { font-size: 1.8em; color: #00ffff; font-weight: bold; margin: 50px 0 25px; padding-bottom: 10px; border-bottom: 2px solid #30363d; }
+        h3 { font-size: 1.4em; color: #00ffff; font-weight: bold; margin: 30px 0 15px; }
+        h4 { font-size: 1.2em; color: #fff; font-weight: bold; margin: 25px 0 12px; }
+        .subtitle { color: #8b949e; font-size: 1.2em; }
+        
+        .section { background: rgba(22,27,34,0.5); border: 1px solid #30363d; border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+        p { margin-bottom: 15px; font-weight: 500; }
+        .highlight { color: #ffd700; font-weight: bold; }
+        .code-text { color: #00ff88; font-family: 'Consolas', monospace; background: rgba(0,255,136,0.1); padding: 2px 6px; border-radius: 4px; }
+        a { color: #58a6ff; text-decoration: none; transition: all 0.3s; }
+        a:hover { color: #79c0ff; text-decoration: underline; }
+        ul, ol { margin: 15px 0; padding-left: 25px; }
+        li { margin-bottom: 10px; }
+        
+        .info-box { background: rgba(0,255,255,0.1); border-left: 4px solid #00ffff; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .security-box { background: rgba(255,0,85,0.1); border-left: 4px solid #ff0055; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .tip-box { background: rgba(0,255,136,0.1); border-left: 4px solid #00ff88; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.95em; }
+        th { background: rgba(0,255,255,0.2); color: #00ffff; padding: 15px; text-align: left; border-bottom: 2px solid #00ffff; font-weight: bold; }
+        td { padding: 15px; border-bottom: 1px solid #30363d; }
+        tr:nth-child(even) { background: rgba(22,27,34,0.5); }
+        tr:hover { background: rgba(0,255,255,0.05); }
+        
+        .code-block { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin: 20px 0; overflow-x: auto; }
+        .code-block code { color: #00ff88; font-family: 'Consolas', monospace; font-size: 0.95em; line-height: 1.6; }
+        .code-header { background: rgba(0,255,136,0.15); color: #00ff88; padding: 8px 15px; border-radius: 8px 8px 0 0; margin: 20px 0 0 0; font-family: monospace; font-size: 0.85em; font-weight: bold; }
+        .code-header + .code-block { margin-top: 0; border-radius: 0 0 8px 8px; }
+        .comment { color: #8b949e; }
+        
+        .diagram { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 25px; margin: 20px 0; text-align: center; font-family: monospace; color: #00ffff; overflow-x: auto; }
+        .diagram pre { margin: 0; display: inline-block; text-align: left; }
+        
+        /* OSI Layer Colors */
+        .layer-7 { background: rgba(255,107,107,0.2); border-left: 4px solid #ff6b6b; }
+        .layer-6 { background: rgba(255,159,67,0.2); border-left: 4px solid #ff9f43; }
+        .layer-5 { background: rgba(255,234,167,0.2); border-left: 4px solid #ffeaa7; }
+        .layer-4 { background: rgba(85,239,196,0.2); border-left: 4px solid #55efc4; }
+        .layer-3 { background: rgba(116,185,255,0.2); border-left: 4px solid #74b9ff; }
+        .layer-2 { background: rgba(162,155,254,0.2); border-left: 4px solid #a29bfe; }
+        .layer-1 { background: rgba(253,121,168,0.2); border-left: 4px solid #fd79a8; }
+        
+        .layer-card { padding: 20px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .layer-card h4 { margin-top: 0; }
+        
+        .osi-stack, .tcp-stack { display: flex; flex-direction: column; gap: 5px; margin: 20px 0; }
+        .stack-layer { padding: 15px; text-align: center; border-radius: 8px; font-weight: bold; }
+        
+        .quiz-question { background: rgba(22,27,34,0.8); border: 1px solid #30363d; border-radius: 10px; padding: 20px; margin: 15px 0; }
+        .quiz-question strong { color: #ffd700; }
+        .quiz-options { margin: 15px 0 0 20px; }
+        .quiz-options label { display: block; padding: 8px 0; cursor: pointer; }
+        
+        .answers-toggle { background: rgba(0,255,136,0.15); color: #00ff88; border: 2px solid #00ff88; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; transition: all 0.3s; }
+        .answers-toggle:hover { background: rgba(0,255,136,0.25); }
+        .answers-content { display: none; background: rgba(22,27,34,0.8); border: 1px solid #30363d; border-radius: 10px; padding: 25px; margin-top: 15px; }
+        .answers-content.show { display: block; }
+        .answer-item { padding: 10px 0; border-bottom: 1px solid #30363d; }
+        .answer-item:last-child { border-bottom: none; }
+        .answer-correct { color: #00ff88; font-weight: bold; }
+        
+        .page-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 60px; padding-top: 30px; border-top: 2px solid #30363d; flex-wrap: wrap; gap: 10px; }
+        .page-nav a { display: flex; align-items: center; gap: 10px; color: #00ffff; text-decoration: none; padding: 15px 25px; border: 2px solid #30363d; border-radius: 10px; transition: all 0.3s; font-weight: 600; }
+        .page-nav a:hover { border-color: #00ffff; background: rgba(0,255,255,0.1); text-decoration: none; }
+        
+        footer { text-align: center; padding: 40px 20px; margin-top: 60px; border-top: 1px solid #30363d; color: #8b949e; }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            table { font-size: 0.8em; }
+            th, td { padding: 8px; }
+            .page-nav { flex-direction: column; }
+            .page-nav a { width: 100%; justify-content: center; }
+            .header-content { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <a href="../../../index.html" class="branding"><span class="logo">lokii.tech</span></a>
+            <nav class="site-nav">
+                <a href="../../../index.html#about" class="nav-link">About</a>
+                <a href="../../../index.html#resources" class="nav-link">Resources</a>
+                <a href="https://github.com/UnExplainableFish52" target="_blank" class="nav-link">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>📊 1.5.2 OSI & TCP/IP Models</h1>
+            <p class="subtitle">Understanding how data travels through networks</p>
+        </header>
+
+        <!-- Section 1: Why Networking Models -->
+        <h2>🎯 1. Why Networking Models?</h2>
+        <div class="section">
+            <p>Networking models provide a <span class="highlight">standardized framework</span> for understanding how data moves through networks.</p>
+            
+            <h3>Purpose of Networking Models</h3>
+            <ul>
+                <li><span class="highlight">Interoperability:</span> Devices from different vendors can communicate</li>
+                <li><span class="highlight">Troubleshooting:</span> Isolate problems to specific layers</li>
+                <li><span class="highlight">Design:</span> Standardize network architecture and protocols</li>
+                <li><span class="highlight">Education:</span> Common language for networking concepts</li>
+            </ul>
+
+            <h3>Brief History</h3>
+            <ul>
+                <li><span class="highlight">OSI Model (1984):</span> Developed by ISO as theoretical reference</li>
+                <li><span class="highlight">TCP/IP Model (1970s):</span> Developed by DARPA/DoD for ARPANET — practical implementation</li>
+            </ul>
+        </div>
+
+        <!-- Section 2: OSI Model -->
+        <h2>🔷 2. OSI Model (7 Layers)</h2>
+        <div class="section">
+            <p>The <span class="highlight">Open Systems Interconnection</span> model divides networking into 7 distinct layers.</p>
+
+            <div class="osi-stack">
+                <div class="stack-layer" style="background: rgba(255,107,107,0.3); color: #ff6b6b;">Layer 7 - Application</div>
+                <div class="stack-layer" style="background: rgba(255,159,67,0.3); color: #ff9f43;">Layer 6 - Presentation</div>
+                <div class="stack-layer" style="background: rgba(255,234,167,0.3); color: #d4a300;">Layer 5 - Session</div>
+                <div class="stack-layer" style="background: rgba(85,239,196,0.3); color: #00b894;">Layer 4 - Transport</div>
+                <div class="stack-layer" style="background: rgba(116,185,255,0.3); color: #0984e3;">Layer 3 - Network</div>
+                <div class="stack-layer" style="background: rgba(162,155,254,0.3); color: #6c5ce7;">Layer 2 - Data Link</div>
+                <div class="stack-layer" style="background: rgba(253,121,168,0.3); color: #fd79a8;">Layer 1 - Physical</div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr><th>Layer</th><th>Name</th><th>PDU</th><th>Key Protocols</th><th>Devices</th><th>Common Attacks</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>7</td><td><span class="highlight">Application</span></td><td>Data</td><td>HTTP, FTP, SMTP, DNS, SSH</td><td>—</td><td>Phishing, SQLi, XSS</td></tr>
+                    <tr><td>6</td><td><span class="highlight">Presentation</span></td><td>Data</td><td>SSL/TLS, JPEG, ASCII, MPEG</td><td>—</td><td>SSL stripping</td></tr>
+                    <tr><td>5</td><td><span class="highlight">Session</span></td><td>Data</td><td>NetBIOS, RPC, PPTP, SIP</td><td>—</td><td>Session hijacking</td></tr>
+                    <tr><td>4</td><td><span class="highlight">Transport</span></td><td>Segment</td><td>TCP, UDP</td><td>—</td><td>SYN flood, UDP flood</td></tr>
+                    <tr><td>3</td><td><span class="highlight">Network</span></td><td>Packet</td><td>IP, ICMP, ARP, OSPF</td><td>Router, L3 Switch</td><td>IP spoofing, MITM</td></tr>
+                    <tr><td>2</td><td><span class="highlight">Data Link</span></td><td>Frame</td><td>Ethernet, PPP, MAC</td><td>Switch, Bridge, NIC</td><td>MAC spoofing, ARP poison</td></tr>
+                    <tr><td>1</td><td><span class="highlight">Physical</span></td><td>Bits</td><td>Cables, Fiber, Radio</td><td>Hub, Repeater, Cables</td><td>Wiretapping, jamming</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Layer Details -->
+            <div class="layer-card layer-7">
+                <h4>Layer 7 - Application</h4>
+                <p><strong>Function:</strong> User interface to network services (browsers, email clients)</p>
+                <p><strong>Analogy:</strong> The person writing and reading the letter</p>
+            </div>
+
+            <div class="layer-card layer-6">
+                <h4>Layer 6 - Presentation</h4>
+                <p><strong>Function:</strong> Data translation, encryption/decryption, compression</p>
+                <p><strong>Analogy:</strong> Translator between different languages</p>
+            </div>
+
+            <div class="layer-card layer-5">
+                <h4>Layer 5 - Session</h4>
+                <p><strong>Function:</strong> Establishes, manages, terminates sessions between applications</p>
+                <p><strong>Analogy:</strong> Phone call setup — dialing, talking, hanging up</p>
+            </div>
+
+            <div class="layer-card layer-4">
+                <h4>Layer 4 - Transport</h4>
+                <p><strong>Function:</strong> End-to-end delivery, flow control, error recovery</p>
+                <p><strong>Analogy:</strong> Postal tracking system ensuring delivery</p>
+            </div>
+
+            <div class="layer-card layer-3">
+                <h4>Layer 3 - Network</h4>
+                <p><strong>Function:</strong> Logical addressing (IP), routing between networks</p>
+                <p><strong>Analogy:</strong> GPS navigation choosing the best route</p>
+            </div>
+
+            <div class="layer-card layer-2">
+                <h4>Layer 2 - Data Link</h4>
+                <p><strong>Function:</strong> Physical addressing (MAC), local delivery, error detection</p>
+                <p><strong>Analogy:</strong> Street addresses within a neighborhood</p>
+            </div>
+
+            <div class="layer-card layer-1">
+                <h4>Layer 1 - Physical</h4>
+                <p><strong>Function:</strong> Transmits raw bits over physical medium</p>
+                <p><strong>Analogy:</strong> The actual roads and highways</p>
+            </div>
+        </div>
+
+        <!-- Section 3: Mnemonics -->
+        <h2>🧠 3. OSI Mnemonics</h2>
+        <div class="section">
+            <div class="tip-box">
+                <strong>Layer 1 → 7 (Bottom-Up):</strong><br>
+                <span class="highlight">"Please Do Not Throw Sausage Pizza Away"</span><br>
+                Physical → Data Link → Network → Transport → Session → Presentation → Application
+            </div>
+            <div class="info-box">
+                <strong>Layer 7 → 1 (Top-Down):</strong><br>
+                <span class="highlight">"All People Seem To Need Data Processing"</span><br>
+                Application → Presentation → Session → Transport → Network → Data Link → Physical
+            </div>
+        </div>
+
+        <!-- Section 4: TCP/IP Model -->
+        <h2>🔶 4. TCP/IP Model (4 Layers)</h2>
+        <div class="section">
+            <p>The <span class="highlight">practical model</span> actually used on the internet. Simpler than OSI.</p>
+
+            <div class="tcp-stack">
+                <div class="stack-layer" style="background: rgba(255,107,107,0.3); color: #ff6b6b;">Layer 4 - Application (OSI 5,6,7)</div>
+                <div class="stack-layer" style="background: rgba(85,239,196,0.3); color: #00b894;">Layer 3 - Transport (OSI 4)</div>
+                <div class="stack-layer" style="background: rgba(116,185,255,0.3); color: #0984e3;">Layer 2 - Internet (OSI 3)</div>
+                <div class="stack-layer" style="background: rgba(162,155,254,0.3); color: #6c5ce7;">Layer 1 - Network Access (OSI 1,2)</div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr><th>TCP/IP Layer</th><th>Name</th><th>OSI Equivalent</th><th>Key Protocols</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>4</td><td><span class="highlight">Application</span></td><td>5, 6, 7</td><td>HTTP, FTP, SMTP, DNS, SSH, TLS</td></tr>
+                    <tr><td>3</td><td><span class="highlight">Transport</span></td><td>4</td><td>TCP, UDP</td></tr>
+                    <tr><td>2</td><td><span class="highlight">Internet</span></td><td>3</td><td>IP, ICMP, ARP, RARP</td></tr>
+                    <tr><td>1</td><td><span class="highlight">Network Access</span></td><td>1, 2</td><td>Ethernet, WiFi, MAC, PPP</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 5: Comparison -->
+        <h2>⚖️ 5. OSI vs TCP/IP Comparison</h2>
+        <div class="section">
+            <table>
+                <thead>
+                    <tr><th>Aspect</th><th>OSI Model</th><th>TCP/IP Model</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><span class="highlight">Layers</span></td><td>7</td><td>4</td></tr>
+                    <tr><td><span class="highlight">Developed By</span></td><td>ISO (1984)</td><td>DARPA/DoD (1970s)</td></tr>
+                    <tr><td><span class="highlight">Type</span></td><td>Theoretical/Reference</td><td>Practical/Implementation</td></tr>
+                    <tr><td><span class="highlight">Usage</span></td><td>Teaching, troubleshooting</td><td>Real internet traffic</td></tr>
+                    <tr><td><span class="highlight">Protocol Dependency</span></td><td>Protocol-independent</td><td>Protocol-dependent</td></tr>
+                    <tr><td><span class="highlight">Approach</span></td><td>Layer-by-layer strict</td><td>Flexible, merged layers</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 6: Data Flow Walkthrough -->
+        <h2>⭐ 6. Data Flow Walkthrough</h2>
+        <div class="section">
+            <div class="info-box">
+                <strong>Scenario:</strong> You type <span class="code-text">https://www.google.com</span> in your browser. What happens?
+            </div>
+
+            <h3>Step-by-Step Journey</h3>
+            
+            <h4>1️⃣ Application Layer</h4>
+            <ul>
+                <li>Browser creates HTTP GET request for "/"</li>
+                <li>HTTPS means TLS handshake will be initiated</li>
+            </ul>
+
+            <h4>2️⃣ DNS Resolution</h4>
+            <ul>
+                <li>Browser checks cache → OS cache → Router cache</li>
+                <li>DNS query sent (UDP port 53)</li>
+                <li>Returns IP: <span class="code-text">142.250.190.46</span></li>
+            </ul>
+
+            <h4>3️⃣ Transport Layer</h4>
+            <ul>
+                <li>TCP 3-way handshake: <span class="code-text">SYN → SYN-ACK → ACK</span></li>
+                <li>Connection to port 443 (HTTPS)</li>
+                <li>Data segmented with sequence numbers</li>
+            </ul>
+
+            <h4>4️⃣ Network Layer</h4>
+            <ul>
+                <li>IP packet created with source/destination IPs</li>
+                <li>Routing table consulted for next hop</li>
+                <li>TTL set to prevent infinite loops</li>
+            </ul>
+
+            <h4>5️⃣ Data Link Layer</h4>
+            <ul>
+                <li>ARP resolves gateway's MAC address</li>
+                <li>Ethernet frame created with MAC addresses</li>
+            </ul>
+
+            <h4>6️⃣ Physical Layer</h4>
+            <ul>
+                <li>Bits transmitted as electrical/optical/radio signals</li>
+            </ul>
+
+            <h4>7️⃣ At Destination (Reverse)</h4>
+            <ul>
+                <li>Each layer removes its header (decapsulation)</li>
+                <li>Response travels back the same way</li>
+            </ul>
+
+            <div class="diagram">
+<pre>
+    ENCAPSULATION (Sending)                DECAPSULATION (Receiving)
+    
+    [    DATA    ] ← Application           Application ← [    DATA    ]
+         ↓                                                     ↑
+    [TCP|  DATA  ] ← Transport             Transport ← [TCP|  DATA  ]
+         ↓                                                     ↑
+   [IP|TCP| DATA ] ← Network                Network ← [IP|TCP| DATA ]
+         ↓                                                     ↑
+[ETH|IP|TCP|DATA|FCS] ← Data Link       Data Link ← [ETH|IP|TCP|DATA|FCS]
+         ↓                                                     ↑
+  10110101001... ← Physical              Physical ← 10110101001...
+</pre>
+            </div>
+        </div>
+
+        <!-- Section 7: Encapsulation -->
+        <h2>📦 7. Encapsulation & Decapsulation</h2>
+        <div class="section">
+            <p><span class="highlight">Encapsulation:</span> Each layer adds its header to the data from the layer above.</p>
+            <p><span class="highlight">Decapsulation:</span> Each layer removes its header when receiving.</p>
+
+            <table>
+                <thead>
+                    <tr><th>Layer</th><th>PDU Name</th><th>Added Header</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Application/Presentation/Session</td><td><span class="highlight">Data</span></td><td>Application-specific</td></tr>
+                    <tr><td>Transport</td><td><span class="highlight">Segment</span></td><td>TCP/UDP header (ports, seq#)</td></tr>
+                    <tr><td>Network</td><td><span class="highlight">Packet</span></td><td>IP header (src/dst IP)</td></tr>
+                    <tr><td>Data Link</td><td><span class="highlight">Frame</span></td><td>Ethernet header + trailer (MAC)</td></tr>
+                    <tr><td>Physical</td><td><span class="highlight">Bits</span></td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 8: Commands -->
+        <h2>💻 8. Useful Commands</h2>
+        <div class="section">
+            <div class="code-header">🐧 Linux / 🪟 Windows</div>
+            <div class="code-block">
+<code><span class="comment"># Trace route (see Layer 3 hops)</span>
+traceroute google.com      <span class="comment"># Linux</span>
+tracert google.com         <span class="comment"># Windows</span>
+
+<span class="comment"># Capture packets (see all layers)</span>
+sudo tcpdump -i eth0 -n
+
+<span class="comment"># View what layer 4 connections are active</span>
+netstat -an
+ss -tuln                   <span class="comment"># Linux modern</span></code>
+            </div>
+
+            <div class="code-header">🦈 Wireshark Filters</div>
+            <div class="code-block">
+<code><span class="comment"># Filter by protocol (Layer 7)</span>
+http
+dns
+
+<span class="comment"># Filter by port (Layer 4)</span>
+tcp.port == 443
+udp.port == 53
+
+<span class="comment"># Filter by IP (Layer 3)</span>
+ip.addr == 192.168.1.1
+
+<span class="comment"># Filter by MAC (Layer 2)</span>
+eth.addr == aa:bb:cc:dd:ee:ff</code>
+            </div>
+        </div>
+
+        <!-- Section 9: Wireshark -->
+        <h2>🦈 9. Seeing Layers in Wireshark</h2>
+        <div class="section">
+            <p>When you capture a packet in Wireshark, you'll see layers displayed:</p>
+            <ul>
+                <li><span class="highlight">Frame:</span> Layer 1-2 info (timing, size)</li>
+                <li><span class="highlight">Ethernet II:</span> Layer 2 (src/dst MAC)</li>
+                <li><span class="highlight">Internet Protocol:</span> Layer 3 (src/dst IP, TTL)</li>
+                <li><span class="highlight">TCP/UDP:</span> Layer 4 (ports, flags, seq#)</li>
+                <li><span class="highlight">HTTP/TLS:</span> Layer 7 (application data)</li>
+            </ul>
+            <div class="tip-box">
+                <strong>💡 Pro Tip:</strong> In Wireshark, click on each layer section to see the corresponding bytes highlighted in the hex dump. This helps you understand exactly what each layer contributes to the packet.
+            </div>
+        </div>
+
+        <!-- Section 10: Security Corner -->
+        <h2>🔒 10. Security Corner</h2>
+        <div class="section">
+            <div class="security-box">
+                <strong>Most Attacked Layers:</strong>
+                <ul>
+                    <li><span class="highlight">Layer 7 (Application):</span> SQLi, XSS, phishing — most attacks target here</li>
+                    <li><span class="highlight">Layer 4 (Transport):</span> SYN floods, port scanning</li>
+                    <li><span class="highlight">Layer 3 (Network):</span> IP spoofing, routing attacks</li>
+                    <li><span class="highlight">Layer 2 (Data Link):</span> ARP poisoning, MAC spoofing</li>
+                </ul>
+            </div>
+
+            <h3>Defense in Depth</h3>
+            <p>Protect <span class="highlight">every layer</span> — don't rely on one control:</p>
+            <table>
+                <thead><tr><th>Layer</th><th>Defense Examples</th></tr></thead>
+                <tbody>
+                    <tr><td>7 - Application</td><td>WAF, input validation, secure coding</td></tr>
+                    <tr><td>4 - Transport</td><td>TLS encryption, rate limiting</td></tr>
+                    <tr><td>3 - Network</td><td>Firewalls, ACLs, IDS/IPS</td></tr>
+                    <tr><td>2 - Data Link</td><td>Port security, 802.1X, VLAN segmentation</td></tr>
+                    <tr><td>1 - Physical</td><td>Locked server rooms, cable protection</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 11: Quiz -->
+        <h2>📝 11. Knowledge Check Quiz</h2>
+        <div class="section">
+            <div class="quiz-question">
+                <strong>Q1:</strong> How many layers does the OSI model have?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1"> 4</label>
+                    <label><input type="radio" name="q1"> 5</label>
+                    <label><input type="radio" name="q1"> 7</label>
+                    <label><input type="radio" name="q1"> 8</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q2:</strong> Which layer is responsible for IP addressing and routing?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2"> Transport</label>
+                    <label><input type="radio" name="q2"> Network</label>
+                    <label><input type="radio" name="q2"> Data Link</label>
+                    <label><input type="radio" name="q2"> Session</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q3:</strong> What is the PDU at the Transport layer called?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3"> Packet</label>
+                    <label><input type="radio" name="q3"> Frame</label>
+                    <label><input type="radio" name="q3"> Segment</label>
+                    <label><input type="radio" name="q3"> Bits</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q4:</strong> Which protocol operates at Layer 4?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4"> IP</label>
+                    <label><input type="radio" name="q4"> HTTP</label>
+                    <label><input type="radio" name="q4"> TCP</label>
+                    <label><input type="radio" name="q4"> Ethernet</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q5:</strong> ARP poisoning is an attack at which layer?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5"> Physical</label>
+                    <label><input type="radio" name="q5"> Data Link</label>
+                    <label><input type="radio" name="q5"> Network</label>
+                    <label><input type="radio" name="q5"> Application</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q6:</strong> True or False: The TCP/IP model has more layers than OSI.
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6"> True</label>
+                    <label><input type="radio" name="q6"> False</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q7:</strong> Which device operates primarily at Layer 3?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7"> Hub</label>
+                    <label><input type="radio" name="q7"> Switch</label>
+                    <label><input type="radio" name="q7"> Router</label>
+                    <label><input type="radio" name="q7"> Repeater</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q8:</strong> The Presentation layer handles:
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8"> Routing</label>
+                    <label><input type="radio" name="q8"> Encryption and data format</label>
+                    <label><input type="radio" name="q8"> MAC addressing</label>
+                    <label><input type="radio" name="q8"> TCP handshake</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q9:</strong> DNS operates at which OSI layer?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q9"> Layer 3</label>
+                    <label><input type="radio" name="q9"> Layer 4</label>
+                    <label><input type="radio" name="q9"> Layer 7</label>
+                    <label><input type="radio" name="q9"> Layer 2</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q10:</strong> What process adds headers at each layer when sending?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q10"> Decapsulation</label>
+                    <label><input type="radio" name="q10"> Encapsulation</label>
+                    <label><input type="radio" name="q10"> Fragmentation</label>
+                    <label><input type="radio" name="q10"> Multiplexing</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q11:</strong> SYN flood is an attack targeting which layer?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q11"> Application</label>
+                    <label><input type="radio" name="q11"> Transport</label>
+                    <label><input type="radio" name="q11"> Network</label>
+                    <label><input type="radio" name="q11"> Physical</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <strong>Q12:</strong> Which model is actually used on the Internet?
+                <div class="quiz-options">
+                    <label><input type="radio" name="q12"> OSI</label>
+                    <label><input type="radio" name="q12"> TCP/IP</label>
+                    <label><input type="radio" name="q12"> Both equally</label>
+                    <label><input type="radio" name="q12"> Neither</label>
+                </div>
+            </div>
+
+            <div class="answers-section">
+                <button class="answers-toggle" onclick="toggleAnswers()">Show Answers</button>
+                <div class="answers-content" id="answersContent">
+                    <div class="answer-item"><strong>Q1:</strong> <span class="answer-correct">7</span></div>
+                    <div class="answer-item"><strong>Q2:</strong> <span class="answer-correct">Network</span></div>
+                    <div class="answer-item"><strong>Q3:</strong> <span class="answer-correct">Segment</span></div>
+                    <div class="answer-item"><strong>Q4:</strong> <span class="answer-correct">TCP</span></div>
+                    <div class="answer-item"><strong>Q5:</strong> <span class="answer-correct">Data Link</span> (Layer 2)</div>
+                    <div class="answer-item"><strong>Q6:</strong> <span class="answer-correct">False</span> — TCP/IP has 4 layers, OSI has 7</div>
+                    <div class="answer-item"><strong>Q7:</strong> <span class="answer-correct">Router</span></div>
+                    <div class="answer-item"><strong>Q8:</strong> <span class="answer-correct">Encryption and data format</span></div>
+                    <div class="answer-item"><strong>Q9:</strong> <span class="answer-correct">Layer 7</span> (Application)</div>
+                    <div class="answer-item"><strong>Q10:</strong> <span class="answer-correct">Encapsulation</span></div>
+                    <div class="answer-item"><strong>Q11:</strong> <span class="answer-correct">Transport</span> (Layer 4)</div>
+                    <div class="answer-item"><strong>Q12:</strong> <span class="answer-correct">TCP/IP</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="page-nav">
+            <a href="1.5.1_network_fundamentals.html"><span>←</span><span>Previous: Network Fundamentals</span></a>
+            <a href="../1.5_networks.html"><span>↑</span><span>Networking Hub</span></a>
+            <a href="1.5.3_protocols_and_ports.html"><span>Next: Protocols & Ports</span><span>→</span></a>
+        </nav>
+
+        <footer>
+            <p>Module 1.5.2: OSI & TCP/IP Models</p>
+            <p>Part of the Cybersecurity Beginner Course at <a href="../../../index.html">lokii.tech</a></p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswers() {
+            const content = document.getElementById('answersContent');
+            const button = document.querySelector('.answers-toggle');
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                button.textContent = 'Show Answers';
+            } else {
+                content.classList.add('show');
+                button.textContent = 'Hide Answers';
+            }
+        }
+    </script>
+</body>
+</html>
