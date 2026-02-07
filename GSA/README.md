@@ -1,377 +1,270 @@
-# Global Students Association (GSA) App
+# GSA - Global Students Association
 
-A complete React Native mobile application with a production-ready Node.js/Express backend for students worldwide to connect, learn, and collaborate.
+A complete React Native Expo mobile application for student collaboration, Q&A, private chats, and exam taking.
 
-## 🚀 Deploy in 1 Minute!
+## 🌟 Features
 
-### ⚡ Super Simple Deployment
-```bash
-cd GSA
-./start.sh
-```
+### Authentication
+- **Anonymous Login**: Quick access with auto-generated user ID
+- **OAuth Placeholders**: Google and Facebook login support (mock implementation)
+- **User Verification System**: Verified and unverified user roles
 
-That's it! The script will:
-- ✅ Install all dependencies
-- ✅ Configure environment
-- ✅ Start backend & frontend
-- ✅ Show QR code to scan
+### Global Public Chat
+- View all public messages
+- Unverified users: Read-only access
+- Verified users: Can reply to existing questions
+- Real-time message display with timestamps
+- User verification badges
 
-### 📱 Open on Your Phone
-1. Install **Expo Go** app (App Store or Play Store)
-2. Scan the QR code shown in terminal
-3. App loads automatically!
+### Questions & Answers
+- Post new questions (verified users only)
+- Reply to existing questions
+- Thread-based discussion view
+- Author and timestamp tracking
+- Modal-based question detail view
 
-### 🔴 To Stop
-```bash
-./stop.sh
-```
+### Private Servers/Friend Chats
+- Create invite-only private chats
+- Join with invite codes
+- **Consent-based**: Users must accept invites
+- End-to-end encryption (mock implementation)
+- Admin-restricted access (enforced in UI)
+- Secure messaging between members
 
-📖 **New to this?** Read [START.md](START.md) - the easiest guide ever!
+### Exam System
+- **Grade-restricted access**: Only see exams for your grade level
+- **Multiple question types**:
+  - Multiple choice (auto-graded)
+  - True/False (auto-graded)
+  - Essay (manual grading placeholder)
+- Auto-calculated scores for objective questions
+- Teacher/Admin grading notes for essays
+- Exam results display
 
----
+### Privacy & Security
+- No personal data stored without verification
+- Permission-based features
+- Consent required for private chat invites
+- Mock encryption for private chats
+- Admin access restrictions
 
-## ✨ Key Features
+## 📱 UI/UX Design
 
-### 🎓 **Student Discovery** (NEW!)
-- **Find Same-Grade Classmates** - Discover students in your grade for study groups
-- **Profile Setup** - Customize your profile with bio, interests, and subjects
-- **Subject-Based Matching** - See what subjects your peers excel in
-- **Easy Connection** - Connect with classmates to start private chats
+- **Dark Discord-inspired Theme**
+  - Background: `#36393f`
+  - Cards: `#2f3136`
+  - Text: `#dcddde`
+- Rounded buttons with smooth interactions
+- Card-based layouts
+- Icon placeholders using emojis
+- Scrollable lists for all content
+- Loading states and error handling
 
-### 🔐 Authentication
-- Anonymous user generation with JWT tokens
-- OAuth ready (Google, Facebook, GitHub)
-- Persistent sessions with AsyncStorage
-
-### 💬 Communication
-- Real-time messaging with Socket.io
-- Read-only for anonymous users
-- Full access for verified users
-
-### ❓ Questions & Answers
-- Post questions with subjects (math, science, history, english)
-- Nested reply system
-- Real-time updates
-
-### 🔒 Private Chats
-- Create private study groups
-- Invite-code based joining
-- Consent system (users must accept before joining)
-- Admin cannot access (enforced server-side)
-
-### 📝 Exam System
-- Grade-level restricted exams
-- Auto-grading for multiple choice
-- Score calculation and results
-- Mock exam data included
-
-### ⚡ Real-time Updates
-- Socket.io integration
-- Instant message delivery
-- Typing indicators
-- Online status tracking
-
-## Quick Start
+## 🛠️ Installation
 
 ### Prerequisites
-- Node.js 14+ installed
+- Node.js (v14 or higher)
 - npm or yarn
-- Expo CLI (`npm install -g expo-cli`)
-- iOS Simulator (Mac) or Android Emulator
+- Expo CLI (install globally: `npm install -g expo-cli`)
 
-### Installation
+### Setup Steps
 
-```bash
-# Clone repository
-cd GSA
+1. **Navigate to the GSA directory**:
+   ```bash
+   cd GSA
+   ```
 
-# Install frontend dependencies
-npm install
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-# Install backend dependencies
-cd backend
-npm install
-cd ..
-```
+3. **Start the development server**:
+   ```bash
+   npm start
+   # or
+   expo start
+   ```
 
-### Configuration
+4. **Run on a device**:
+   - **Android**: Press `a` in the terminal or scan QR code with Expo Go app
+   - **iOS**: Press `i` in the terminal or scan QR code with Expo Go app
+   - **Web**: Press `w` in the terminal
 
-#### Backend Setup
+## 📦 Build for Production
 
-1. Configure environment variables:
-```bash
-cd backend
-cp .env.example .env
-```
+### Using Expo Build (Classic)
 
-2. Edit `.env`:
-```env
-PORT=3000
-SOCKET_PORT=3001
-DB_TYPE=mongodb
-MONGODB_URI=mongodb://localhost:27017/gsa
-JWT_SECRET=your-secret-key-change-this
-ALLOWED_ORIGINS=http://localhost:19000,http://localhost:19001
-DEBUG=true
-```
-
-#### Frontend Setup
-
-The frontend automatically connects to `http://localhost:3000` (API) and `http://localhost:3001` (Socket.io).
-
-To change these URLs, edit `app.config.js`:
-```javascript
-extra: {
-  apiUrl: process.env.API_URL || 'http://your-server:3000/api',
-  socketUrl: process.env.SOCKET_URL || 'http://your-server:3001'
-}
-```
-
-### Running the App
-
-#### Terminal 1: Start Backend
-```bash
-cd backend
-npm run dev
-```
-
-The backend will start on:
-- API: http://localhost:3000
-- Socket.io: http://localhost:3001
-
-#### Terminal 2: Start Frontend
-```bash
-# In GSA directory
-expo start
-```
-
-Then:
-- Press `i` for iOS Simulator
-- Press `a` for Android Emulator
-- Scan QR code with Expo Go app on your phone
-
-## Project Structure
-
-```
-GSA/
-├── App.js                  # Main React Native app
-├── app.json               # App configuration (replaced by app.config.js)
-├── app.config.js          # App configuration with environment variables
-├── package.json           # Frontend dependencies
-├── assets/
-│   ├── icon.png          # App icon (1024x1024)
-│   ├── adaptive-icon.png # Android adaptive icon
-│   ├── favicon.png       # Web favicon (48x48)
-│   └── favicon.svg       # Original SVG logo
-├── services/
-│   ├── api.js            # API service layer with axios
-│   └── socket.js         # Socket.io service
-├── backend/              # Complete Node.js/Express backend
-│   ├── server.js         # Main Express server
-│   ├── package.json      # Backend dependencies
-│   ├── .env.example      # Environment variables template
-│   ├── config/           # Database configuration
-│   ├── routes/           # API routes
-│   ├── controllers/      # Business logic
-│   ├── models/           # Data models
-│   ├── middleware/       # Auth, permissions, validation
-│   ├── socket/           # Socket.io handlers
-│   ├── utils/            # Logger, helpers
-│   └── README.md         # Complete API documentation
-```
-
-## Building for Production
-
-### Android APK
-
-1. Update API URLs in `app.config.js` to your production server
-2. Build APK:
 ```bash
 expo build:android
 ```
 
-3. Download APK from Expo and install on Android device
+### Using EAS Build (Recommended)
 
-### iOS IPA
+1. **Install EAS CLI**:
+   ```bash
+   npm install -g eas-cli
+   ```
 
-1. Update API URLs in `app.config.js`
-2. Build IPA:
-```bash
-expo build:ios
+2. **Configure EAS**:
+   ```bash
+   eas build:configure
+   ```
+
+3. **Build APK**:
+   ```bash
+   eas build --platform android --profile preview
+   ```
+
+4. **Build for App Store**:
+   ```bash
+   eas build --platform android --profile production
+   ```
+
+## 📂 Project Structure
+
+```
+GSA/
+├── App.js              # Main application file (all code)
+├── package.json        # Dependencies and scripts
+├── app.json           # Expo configuration
+├── babel.config.js    # Babel configuration
+├── .gitignore         # Git ignore rules
+└── README.md          # This file
 ```
 
-3. Download IPA and submit to App Store
+## 🧪 Mock Data & API
 
-## Backend Deployment
+All backend functionality is mocked using `setTimeout` to simulate API calls. This includes:
 
-### Deploy to Heroku
+- User authentication (anonymous and OAuth)
+- Global chat messages
+- Questions and replies
+- Private chat creation and messaging
+- Exam fetching and submission
+- Auto-grading for objective questions
 
-```bash
-cd backend
+### Debug Logging
 
-# Login and create app
-heroku login
-heroku create gsa-backend
+The app includes extensive console logging:
+- `[API]` - API call lifecycle
+- `[User Action]` - User interactions
+- `[Navigation]` - Screen navigation
+- `[State]` - State changes
+- `[Auth]` - Authentication events
+- `[Error]` - Error messages
 
-# Add MongoDB
-heroku addons:create mongolab:sandbox
+Check the console/terminal for detailed debug information.
 
-# Set environment variables
-heroku config:set NODE_ENV=production
-heroku config:set JWT_SECRET=your-production-secret
-heroku config:set ALLOWED_ORIGINS=https://your-app.com
+## 🎮 Usage Guide
 
-# Deploy
-git subtree push --prefix GSA/backend heroku main
-```
+### Getting Started
 
-### Deploy to DigitalOcean/AWS
+1. **Login**: Choose anonymous login or OAuth (mock)
+2. **Dashboard**: Your main hub with all features
+3. **Toggle Verification**: Use the debug toggle to test verified user features
 
-1. Set up a VPS with Node.js
-2. Clone repository
-3. Install dependencies: `npm install`
-4. Configure `.env` with production values
-5. Install PM2: `npm install -g pm2`
-6. Start server: `pm2 start server.js`
-7. Set up Nginx reverse proxy
-8. Configure SSL with Let's Encrypt
+### Testing Features
 
-## Testing
+#### Global Chat
+- Unverified: Can only read messages
+- Verified: Can post replies to questions
 
-### Test Backend
+#### Questions
+- Post new questions (verified only)
+- View and reply to existing questions
+- Thread-based discussion
 
-```bash
-cd backend
+#### Private Chats
+- Create a new private chat with invite code
+- Join existing chats with code
+- Consent modal appears before joining
+- Send messages in private chats
 
-# Start server
-npm run dev
+#### Exams
+- View exams for your grade level (default: Grade 10)
+- Take exams with multiple question types
+- Auto-grading for multiple choice and true/false
+- Essay questions marked for manual grading
+- View results after submission
 
-# Test health endpoint
-curl http://localhost:3000/health
+### Mock Users
 
-# Test anonymous authentication
-curl -X POST http://localhost:3000/api/auth/anonymous
-```
+The app generates anonymous users with:
+- Random user ID
+- Anonymous username
+- Unverified status (can be toggled in dashboard)
+- Default grade level: 10
 
-### Test Frontend
+## 🔧 Configuration
 
-1. Start backend server
-2. Start Expo: `expo start`
-3. Open in simulator/emulator
-4. Test features:
-   - Authentication (automatic on first load)
-   - Send a global chat message
-   - Create a question
-   - Create a private chat
-   - View exams
+### App Configuration (`app.json`)
 
-## API Documentation
+- **App Name**: GSA
+- **Package**: com.unengineerablefish52.gsa
+- **Version**: 1.0.0
+- **Orientation**: Portrait
+- **Permissions**: INTERNET
 
-See [backend/README.md](backend/README.md) for complete API documentation including:
-- All endpoints with request/response examples
-- Socket.io events
-- Authentication flow
-- Permission system
-- Database setup guides
+### Dependencies
 
-## Troubleshooting
+- **expo**: ~51.0.0
+- **react**: 18.2.0
+- **react-native**: 0.74.0
+- **@react-navigation/native**: ^6.1.0
+- **@react-navigation/stack**: ^6.3.0
+- **react-native-screens**: ~3.31.0
+- **react-native-safe-area-context**: 4.10.0
+- **react-native-gesture-handler**: ~2.16.0
 
-### Backend won't start
+## 🚀 Future Enhancements
 
-**Problem:** Port already in use
-**Solution:** Change `PORT` in `.env` or kill process on port 3000
+This is a complete starter project ready for:
+- Real backend integration (REST API or GraphQL)
+- Firebase authentication
+- Real-time messaging with Socket.io
+- Push notifications
+- File uploads and attachments
+- User profiles and avatars
+- More exam question types
+- Gradebook and progress tracking
+- Teacher/Admin dashboard
+- Component refactoring for better maintainability
 
-**Problem:** Database connection failed
-**Solution:** Server will use in-memory storage in development mode
+## 🐛 Known Limitations
 
-### Frontend can't connect
+- All data is in-memory (resets on app restart)
+- No persistent storage
+- Mock API calls with simulated delays
+- Encryption is noted but not implemented
+- Admin features are UI-restricted only
+- Asset files (icons, splash screens) use Expo defaults
 
-**Problem:** Network error / timeout
-**Solution:** 
-- Verify backend is running
-- Check API URL in `app.config.js`
-- On physical device, use your computer's IP instead of localhost
+## 📝 Notes
 
-### Socket.io not connecting
+- **Single File Architecture**: All code is in `App.js` for simplicity
+- **Mock Backend**: All API calls are simulated
+- **Privacy First**: Designed with privacy and consent in mind
+- **Expo Compatible**: Ready for Expo build system
+- **Production Ready**: Can be extended with real backend
 
-**Problem:** Real-time updates not working
-**Solution:**
-- Check Socket.io server is running on port 3001
-- Verify CORS is configured for your frontend URL
-- Check console logs for connection errors
+## 📄 License
 
-## Technologies Used
+This project is part of the lokii.tech repository.
 
-### Frontend
-- React Native
-- Expo
-- Socket.io Client
-- Axios
-- AsyncStorage
+## 👥 Author
 
-### Backend
-- Node.js
-- Express
-- Socket.io
-- JWT (jsonwebtoken)
-- Mongoose (MongoDB)
-- PostgreSQL / MySQL support
-- Helmet (security)
-- CORS
+UnEngineerableFish52
 
-## Features Roadmap
+## 🤝 Contributing
 
-- [x] Anonymous authentication
-- [x] Global chat
-- [x] Questions & answers
-- [x] Private chats with consent
-- [x] Exam system with auto-grading
-- [x] Real-time updates
-- [ ] OAuth integration (Google, Facebook)
-- [ ] User profiles
-- [ ] File attachments
-- [ ] Push notifications
-- [ ] Video chat integration
-
-## Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## Deployment
-
-The GSA app is **production-ready**! See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for:
-- Step-by-step deployment instructions
-- Backend hosting options (Heroku, AWS, DigitalOcean)
-- APK building for Android
-- Testing checklist
-- Troubleshooting guide
-
-### Quick Deploy
-```bash
-# Backend
-cd backend && npm install && npm start
-
-# Frontend
-cd .. && npm install && expo start
-```
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Support
-
-For help or questions:
-1. Check [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for deployment help
-2. Check [backend/README.md](backend/README.md) for API docs
-3. Review troubleshooting section above
-4. Open an issue on GitHub
+This is a starter project. Feel free to:
+- Refactor into separate components
+- Add real backend integration
+- Implement actual encryption
+- Enhance UI/UX
+- Add more features
 
 ---
 
-Built with ❤️ for students worldwide 🎓
+**Happy Coding! 🎓**

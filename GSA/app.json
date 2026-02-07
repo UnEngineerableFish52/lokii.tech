@@ -1,37 +1,33 @@
 {
   "expo": {
-    "name": "Global Students Association",
-    "slug": "gsa-app",
+    "name": "GSA",
+    "slug": "gsa",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0a0a0f"
+      "backgroundColor": "#36393f"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.gsa.app"
+      "bundleIdentifier": "com.unengineerablefish52.gsa"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0a0a0f"
+        "backgroundColor": "#36393f"
       },
-      "package": "com.gsa.app"
+      "package": "com.unengineerablefish52.gsa",
+      "permissions": ["INTERNET"]
     },
     "web": {
-      "favicon": "./assets/favicon.png",
-      "bundler": "metro"
-    },
-    "extra": {
-      "apiUrl": "http://localhost:3000/api",
-      "socketUrl": "http://localhost:3001"
+      "favicon": "./assets/favicon.png"
     }
   }
 }

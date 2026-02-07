@@ -1,1062 +1,1772 @@
-import React, { useState, useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
   TextInput,
   TouchableOpacity,
+  ScrollView,
+  FlatList,
   ActivityIndicator,
-  RefreshControl,
-  Alert
+  Switch,
+  Alert,
+  Modal,
 } from 'react-native';
-import { authAPI, chatAPI, questionsAPI, privateChatsAPI, examsAPI, studentsAPI, tokenStorage } from './services/api';
-import socketService from './services/socket';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-export default function App() {
-  // Authentication state
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [authenticating, setAuthenticating] = useState(false);
-  const [showProfileSetup, setShowProfileSetup] = useState(false);
+// Theme Colors
+const COLORS = {
+  background: '#36393f',
+  card: '#2f3136',
+  text: '#dcddde',
+  textSecondary: '#b9bbbe',
+  primary: '#5865f2',
+  success: '#3ba55d',
+  danger: '#ed4245',
+  warning: '#faa61a',
+};
 
-  // UI state
-  const [activeTab, setActiveTab] = useState('chat'); // chat, questions, private, exams, students
+// Auth Context
+const AuthContext = createContext();
 
-  // Chat state
-  const [messages, setMessages] = useState([]);
-  const [messageInput, setMessageInput] = useState('');
-  const [sendingMessage, setSendingMessage] = useState(false);
+const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
 
-  // Questions state
-  const [questions, setQuestions] = useState([]);
-  const [questionTitle, setQuestionTitle] = useState('');
-  const [questionContent, setQuestionContent] = useState('');
-  const [questionSubject, setQuestionSubject] = useState('other');
-  const [creatingQuestion, setCreatingQuestion] = useState(false);
+// Mock API Functions
+const mockAPI = {
+  loginAnonymous: () => {
+    console.log('[API] loginAnonymous: Starting anonymous login...');
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const userId = 'anon_' + Math.random().toString(36).substr(2, 9);
+        console.log('[API] loginAnonymous: Success -', userId);
+        resolve({
+          userId,
+          username: 'Anonymous_' + userId.substr(5, 4),
+          verified: false,
+          gradeLevel: 10,
+        });
+      }, 1000);
+    });
+  },
 
-  // Private chats state
-  const [privateChats, setPrivateChats] = useState([]);
-  const [chatName, setChatName] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
+  loginOAuth: (provider) => {
+    console.log(`[API] loginOAuth: Starting ${provider} login...`);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log(`[API] loginOAuth: ${provider} login successful`);
+        resolve({
+          userId: `${provider}_user_123`,
+          username: `${provider}User`,
+          verified: true,
+          gradeLevel: 10,
+        });
+      }, 1500);
+    });
+  },
 
-  // Exams state
-  const [exams, setExams] = useState([]);
-  const [selectedExam, setSelectedExam] = useState(null);
-  const [examAnswers, setExamAnswers] = useState([]);
+  fetchGlobalChat: () => {
+    console.log('[API] fetchGlobalChat: Fetching global chat messages...');
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const messages = [
+          {
+            id: '1',
+            username: 'Student123',
+            message: 'What is the derivative of x^2?',
+            timestamp: new Date(Date.now() - 3600000).toISOString(),
+            verified: true,
+          },
+          {
+            id: '2',
+            username: 'MathHelper',
+            message: 'The derivative is 2x',
+            timestamp: new Date(Date.now() - 1800000).toISOString(),
+            verified: true,
+          },
+          {
+            id: '3',
+            username: 'NewStudent',
+            message: 'Can someone help with chemistry?',
+            timestamp: new Date(Date.now() - 600000).toISOString(),
+            verified: false,
+          },
+        ];
+        console.log('[API] fetchGlobalChat: Fetched', messages.length, 'messages');
+        resolve(messages);
+      }, 800);
+    });
+  },
 
-  // Refreshing state
-  const [refreshing, setRefreshing] = useState(false);
+  postQuestion: (question, user) => {
+    console.log('[API] postQuestion: Posting question...', question);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (!user.verified) {
+          console.log('[API] postQuestion: Failed - User not verified');
+          reject(new Error('Only verified users can post questions'));
+        } else {
+          console.log('[API] postQuestion: Success');
+          resolve({ id: Date.now().toString(), ...question });
+        }
+      }, 500);
+    });
+  },
 
-  // Students/Profile state
-  const [students, setStudents] = useState([]);
-  const [loadingStudents, setLoadingStudents] = useState(false);
-  const [profileData, setProfileData] = useState({
-    username: '',
-    gradeLevel: '',
-    bio: '',
-    interests: [],
-    subjects: []
-  });
+  postReply: (questionId, reply, user) => {
+    console.log('[API] postReply: Posting reply to question', questionId);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (!user.verified) {
+          console.log('[API] postReply: Failed - User not verified');
+          reject(new Error('Only verified users can post replies'));
+        } else {
+          console.log('[API] postReply: Success');
+          resolve({ id: Date.now().toString(), ...reply });
+        }
+      }, 500);
+    });
+  },
 
-  // Initialize app
-  useEffect(() => {
-    initializeApp();
-    return () => {
-      socketService.disconnect();
-    };
-  }, []);
+  fetchQuestions: () => {
+    console.log('[API] fetchQuestions: Fetching questions...');
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const questions = [
+          {
+            id: 'q1',
+            author: 'Student123',
+            content: 'How do I solve quadratic equations?',
+            timestamp: new Date(Date.now() - 7200000).toISOString(),
+            replies: [
+              {
+                id: 'r1',
+                author: 'MathTeacher',
+                content: 'Use the quadratic formula: x = (-b ± √(b²-4ac)) / 2a',
+                timestamp: new Date(Date.now() - 5400000).toISOString(),
+              },
+            ],
+          },
+          {
+            id: 'q2',
+            author: 'ScienceKid',
+            content: 'What is photosynthesis?',
+            timestamp: new Date(Date.now() - 3600000).toISOString(),
+            replies: [],
+          },
+        ];
+        console.log('[API] fetchQuestions: Fetched', questions.length, 'questions');
+        resolve(questions);
+      }, 800);
+    });
+  },
 
-  const initializeApp = async () => {
-    console.log('[App] Initializing...');
+  createPrivateChat: (name, inviteCode) => {
+    console.log('[API] createPrivateChat: Creating private chat...', name);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const chat = {
+          id: 'chat_' + Date.now(),
+          name,
+          inviteCode,
+          members: [],
+          messages: [],
+        };
+        console.log('[API] createPrivateChat: Created chat', chat.id);
+        resolve(chat);
+      }, 500);
+    });
+  },
+
+  joinPrivateChat: (inviteCode) => {
+    console.log('[API] joinPrivateChat: Joining with code', inviteCode);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (inviteCode.length < 4) {
+          console.log('[API] joinPrivateChat: Failed - Invalid code');
+          reject(new Error('Invalid invite code'));
+        } else {
+          const chat = {
+            id: 'chat_existing',
+            name: 'Study Group',
+            inviteCode,
+            members: ['user1', 'user2'],
+            messages: [
+              {
+                id: 'm1',
+                author: 'user1',
+                content: 'Welcome to the study group!',
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          };
+          console.log('[API] joinPrivateChat: Joined chat', chat.id);
+          resolve(chat);
+        }
+      }, 800);
+    });
+  },
+
+  sendPrivateMessage: (chatId, message) => {
+    console.log('[API] sendPrivateMessage: Sending to chat', chatId);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log('[API] sendPrivateMessage: Message sent');
+        resolve({ id: Date.now().toString(), ...message });
+      }, 500);
+    });
+  },
+
+  fetchExams: (gradeLevel) => {
+    console.log('[API] fetchExams: Fetching exams for grade', gradeLevel);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const exams = [
+          {
+            id: 'exam1',
+            title: 'Math Final Exam',
+            gradeLevel: 10,
+            questions: [
+              {
+                id: 'q1',
+                type: 'multiple_choice',
+                question: 'What is 2 + 2?',
+                options: ['3', '4', '5', '6'],
+                correctAnswer: 1,
+              },
+              {
+                id: 'q2',
+                type: 'multiple_choice',
+                question: 'What is the square root of 16?',
+                options: ['2', '3', '4', '5'],
+                correctAnswer: 2,
+              },
+              {
+                id: 'q3',
+                type: 'true_false',
+                question: 'Pi is approximately 3.14',
+                correctAnswer: true,
+              },
+              {
+                id: 'q4',
+                type: 'essay',
+                question: 'Explain the Pythagorean theorem.',
+              },
+            ],
+          },
+          {
+            id: 'exam2',
+            title: 'Science Quiz',
+            gradeLevel: 10,
+            questions: [
+              {
+                id: 'q1',
+                type: 'multiple_choice',
+                question: 'What is the chemical symbol for water?',
+                options: ['H2O', 'O2', 'CO2', 'N2'],
+                correctAnswer: 0,
+              },
+              {
+                id: 'q2',
+                type: 'true_false',
+                question: 'The Earth is flat.',
+                correctAnswer: false,
+              },
+            ],
+          },
+          {
+            id: 'exam3',
+            title: 'History Test',
+            gradeLevel: 11,
+            questions: [],
+          },
+        ];
+        const filtered = exams.filter((e) => e.gradeLevel === gradeLevel);
+        console.log('[API] fetchExams: Fetched', filtered.length, 'exams');
+        resolve(filtered);
+      }, 800);
+    });
+  },
+
+  submitExam: (examId, answers) => {
+    console.log('[API] submitExam: Submitting exam', examId);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockScore = Math.floor(Math.random() * 30) + 70;
+        console.log('[API] submitExam: Score calculated -', mockScore);
+        resolve({ score: mockScore, totalQuestions: answers.length });
+      }, 1000);
+    });
+  },
+};
+
+// Custom Components
+const CustomButton = ({ title, onPress, style, textStyle, disabled }) => (
+  <TouchableOpacity
+    style={[styles.button, style, disabled && styles.buttonDisabled]}
+    onPress={onPress}
+    disabled={disabled}
+  >
+    <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+  </TouchableOpacity>
+);
+
+const CustomTextInput = ({ placeholder, value, onChangeText, style, multiline, secureTextEntry }) => (
+  <TextInput
+    style={[styles.input, style, multiline && styles.inputMultiline]}
+    placeholder={placeholder}
+    placeholderTextColor={COLORS.textSecondary}
+    value={value}
+    onChangeText={onChangeText}
+    multiline={multiline}
+    secureTextEntry={secureTextEntry}
+  />
+);
+
+const CustomCard = ({ children, style }) => (
+  <View style={[styles.card, style]}>{children}</View>
+);
+
+const ChatMessage = ({ message }) => (
+  <CustomCard style={styles.messageCard}>
+    <View style={styles.messageHeader}>
+      <Text style={styles.messageUsername}>
+        {message.username} {message.verified ? '✓' : ''}
+      </Text>
+      <Text style={styles.messageTime}>
+        {new Date(message.timestamp).toLocaleTimeString()}
+      </Text>
+    </View>
+    <Text style={styles.messageContent}>{message.message}</Text>
+  </CustomCard>
+);
+
+const QuestionCard = ({ question, onPress }) => (
+  <TouchableOpacity onPress={onPress}>
+    <CustomCard style={styles.questionCard}>
+      <View style={styles.questionHeader}>
+        <Text style={styles.questionAuthor}>{question.author}</Text>
+        <Text style={styles.questionTime}>
+          {new Date(question.timestamp).toLocaleTimeString()}
+        </Text>
+      </View>
+      <Text style={styles.questionContent}>{question.content}</Text>
+      <Text style={styles.questionReplies}>
+        {question.replies?.length || 0} replies
+      </Text>
+    </CustomCard>
+  </TouchableOpacity>
+);
+
+// Login Screen
+const LoginScreen = ({ navigation }) => {
+  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  console.log('[Navigation] LoginScreen rendered');
+
+  const handleAnonymousLogin = async () => {
+    console.log('[User Action] Anonymous login clicked');
     setLoading(true);
-
     try {
-      // Check if user is already authenticated
-      const savedUser = await tokenStorage.getUser();
-      const savedToken = await tokenStorage.getToken();
-
-      if (savedUser && savedToken) {
-        console.log('[App] Found saved user:', savedUser.userId);
-        setUser(savedUser);
-        await setupSocketConnection(savedUser);
-      } else {
-        console.log('[App] No saved user, generating anonymous user');
-        await generateAnonymousUser();
-      }
+      const user = await mockAPI.loginAnonymous();
+      login(user);
+      console.log('[Navigation] Navigating to Dashboard');
+      navigation.replace('Dashboard');
     } catch (error) {
-      console.error('[App] Initialization error:', error);
-      Alert.alert('Error', 'Failed to initialize app. Please try again.');
+      console.error('[Error] Anonymous login failed:', error);
+      Alert.alert('Error', 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
-  const generateAnonymousUser = async () => {
-    setAuthenticating(true);
+  const handleOAuthLogin = async (provider) => {
+    console.log(`[User Action] ${provider} login clicked`);
+    setLoading(true);
     try {
-      const response = await authAPI.generateAnonymous();
-      const newUser = response.data.user;
-      setUser(newUser);
-      console.log('[App] Anonymous user created:', newUser.userId);
-      await setupSocketConnection(newUser);
+      const user = await mockAPI.loginOAuth(provider);
+      login(user);
+      console.log('[Navigation] Navigating to Dashboard');
+      navigation.replace('Dashboard');
     } catch (error) {
-      console.error('[App] Failed to generate anonymous user:', error);
-      Alert.alert('Error', 'Failed to authenticate. Please check your connection.');
+      console.error(`[Error] ${provider} login failed:`, error);
+      Alert.alert('Error', `${provider} login failed`);
     } finally {
-      setAuthenticating(false);
+      setLoading(false);
     }
   };
 
-  const setupSocketConnection = async (currentUser) => {
-    console.log('[App] Setting up socket connection');
-    
-    socketService.connect();
-    socketService.joinGlobalChat();
-    socketService.sendUserOnline(currentUser.userId, currentUser.username);
+  return (
+    <View style={styles.container}>
+      <Text style={styles.logo}>🌍 GSA</Text>
+      <Text style={styles.subtitle}>Global Students Association</Text>
 
-    // Listen for new messages
-    socketService.on('new-message', (message) => {
-      console.log('[App] Received new message:', message);
-      setMessages((prev) => [message, ...prev]);
-    });
+      <View style={styles.loginForm}>
+        <CustomButton
+          title="Continue as Anonymous"
+          onPress={handleAnonymousLogin}
+          disabled={loading}
+          style={styles.anonymousButton}
+        />
 
-    // Listen for new questions
-    socketService.on('new-question', (question) => {
-      console.log('[App] Received new question:', question);
-      setQuestions((prev) => [question, ...prev]);
-    });
+        <Text style={styles.orText}>OR</Text>
 
-    // Listen for new replies
-    socketService.on('new-reply', ({ questionId, reply }) => {
-      console.log('[App] Received new reply for question:', questionId);
-      setQuestions((prev) =>
-        prev.map((q) =>
-          q.questionId === questionId
-            ? { ...q, replies: [...(q.replies || []), reply] }
-            : q
-        )
-      );
-    });
+        <CustomButton
+          title="Login with Google"
+          onPress={() => handleOAuthLogin('Google')}
+          disabled={loading}
+          style={styles.googleButton}
+        />
 
-    // Load initial data
-    await loadGlobalMessages();
-    await loadQuestions();
-  };
+        <CustomButton
+          title="Login with Facebook"
+          onPress={() => handleOAuthLogin('Facebook')}
+          disabled={loading}
+          style={styles.facebookButton}
+        />
+      </View>
 
-  // Load data functions
-  const loadGlobalMessages = async () => {
+      {loading && <ActivityIndicator size="large" color={COLORS.primary} />}
+    </View>
+  );
+};
+
+// Dashboard Screen
+const DashboardScreen = ({ navigation }) => {
+  const { user, setUser, logout } = useAuth();
+  const [globalChat, setGlobalChat] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [publicNotifications, setPublicNotifications] = useState(true);
+  const [privateNotifications, setPrivateNotifications] = useState(true);
+  const [replyText, setReplyText] = useState('');
+
+  console.log('[Navigation] DashboardScreen rendered');
+
+  useEffect(() => {
+    loadGlobalChat();
+  }, []);
+
+  const loadGlobalChat = async () => {
+    console.log('[User Action] Loading global chat');
+    setLoading(true);
     try {
-      const response = await chatAPI.getGlobalMessages();
-      setMessages(response.data.messages.reverse());
-      console.log('[App] Loaded', response.data.messages.length, 'messages');
+      const messages = await mockAPI.fetchGlobalChat();
+      setGlobalChat(messages);
+      console.log('[State] Global chat loaded');
     } catch (error) {
-      console.error('[App] Failed to load messages:', error);
+      console.error('[Error] Failed to load global chat:', error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handlePostReply = async () => {
+    console.log('[User Action] Posting reply to global chat');
+    if (!user.verified) {
+      Alert.alert('Not Verified', 'Only verified users can post replies');
+      return;
+    }
+    if (!replyText.trim()) {
+      Alert.alert('Error', 'Please enter a message');
+      return;
+    }
+
+    try {
+      await mockAPI.postReply('global', { message: replyText }, user);
+      setReplyText('');
+      Alert.alert('Success', 'Reply posted!');
+      loadGlobalChat();
+    } catch (error) {
+      console.error('[Error] Failed to post reply:', error);
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  const handleLogout = () => {
+    console.log('[User Action] Logout clicked');
+    Alert.alert('Logout', 'Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Logout',
+        onPress: () => {
+          logout();
+          console.log('[Navigation] Navigating to Login');
+          navigation.replace('Login');
+        },
+      },
+    ]);
+  };
+
+  const toggleVerification = () => {
+    console.log('[User Action] Toggling verification (debug)');
+    setUser({ ...user, verified: !user.verified });
+    console.log('[State] User verification toggled');
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Dashboard</Text>
+        <Text style={styles.headerSubtitle}>
+          {user.username} {user.verified ? '✓' : '(Unverified)'}
+        </Text>
+      </View>
+
+      {/* Debug Verification Toggle */}
+      <CustomCard style={styles.debugCard}>
+        <Text style={styles.cardTitle}>🔧 Debug: Toggle Verification</Text>
+        <Switch
+          value={user.verified}
+          onValueChange={toggleVerification}
+          trackColor={{ false: '#767577', true: COLORS.success }}
+        />
+      </CustomCard>
+
+      {/* Global Public Chat */}
+      <CustomCard>
+        <Text style={styles.cardTitle}>💬 Global Public Chat</Text>
+        <Text style={styles.cardSubtitle}>
+          {user.verified
+            ? 'You can reply to questions'
+            : 'Read-only (verification required to post)'}
+        </Text>
+
+        {loading ? (
+          <ActivityIndicator size="small" color={COLORS.primary} />
+        ) : (
+          <View>
+            {globalChat.map((msg) => (
+              <ChatMessage key={msg.id} message={msg} />
+            ))}
+          </View>
+        )}
+
+        <CustomTextInput
+          placeholder="Type your reply..."
+          value={replyText}
+          onChangeText={setReplyText}
+          multiline
+          style={styles.replyInput}
+        />
+        <CustomButton
+          title="Post Reply"
+          onPress={handlePostReply}
+          disabled={!user.verified}
+          style={styles.smallButton}
+        />
+      </CustomCard>
+
+      {/* Notification Settings */}
+      <CustomCard>
+        <Text style={styles.cardTitle}>🔔 Notification Settings</Text>
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Public Chat Notifications</Text>
+          <Switch
+            value={publicNotifications}
+            onValueChange={(val) => {
+              console.log('[State] Public notifications toggled:', val);
+              setPublicNotifications(val);
+            }}
+            trackColor={{ false: '#767577', true: COLORS.success }}
+          />
+        </View>
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Private Chat Notifications</Text>
+          <Switch
+            value={privateNotifications}
+            onValueChange={(val) => {
+              console.log('[State] Private notifications toggled:', val);
+              setPrivateNotifications(val);
+            }}
+            trackColor={{ false: '#767577', true: COLORS.success }}
+          />
+        </View>
+      </CustomCard>
+
+      {/* Navigation */}
+      <CustomCard>
+        <Text style={styles.cardTitle}>📱 Navigation</Text>
+        <CustomButton
+          title="📝 Questions"
+          onPress={() => {
+            console.log('[Navigation] Navigating to Questions');
+            navigation.navigate('Questions');
+          }}
+          style={styles.navButton}
+        />
+        <CustomButton
+          title="💬 Private Servers"
+          onPress={() => {
+            console.log('[Navigation] Navigating to PrivateServers');
+            navigation.navigate('PrivateServers');
+          }}
+          style={styles.navButton}
+        />
+        <CustomButton
+          title="📚 Exams"
+          onPress={() => {
+            console.log('[Navigation] Navigating to Exams');
+            navigation.navigate('Exams');
+          }}
+          style={styles.navButton}
+        />
+        <CustomButton
+          title="🚪 Logout"
+          onPress={handleLogout}
+          style={[styles.navButton, styles.logoutButton]}
+        />
+      </CustomCard>
+    </ScrollView>
+  );
+};
+
+// Questions Screen
+const QuestionsScreen = ({ navigation }) => {
+  const { user } = useAuth();
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [replyText, setReplyText] = useState('');
+
+  console.log('[Navigation] QuestionsScreen rendered');
+
+  useEffect(() => {
+    loadQuestions();
+  }, []);
 
   const loadQuestions = async () => {
+    console.log('[User Action] Loading questions');
+    setLoading(true);
     try {
-      const response = await questionsAPI.getAllQuestions();
-      setQuestions(response.data.questions);
-      console.log('[App] Loaded', response.data.questions.length, 'questions');
+      const data = await mockAPI.fetchQuestions();
+      setQuestions(data);
+      console.log('[State] Questions loaded');
     } catch (error) {
-      console.error('[App] Failed to load questions:', error);
+      console.error('[Error] Failed to load questions:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const loadPrivateChats = async () => {
+  const handlePostQuestion = async () => {
+    console.log('[User Action] Posting new question');
+    if (!user.verified) {
+      Alert.alert('Not Verified', 'Only verified users can post questions');
+      return;
+    }
+    if (!newQuestion.trim()) {
+      Alert.alert('Error', 'Please enter a question');
+      return;
+    }
+
     try {
-      const response = await privateChatsAPI.getUserChats();
-      setPrivateChats(response.data.chats);
-      console.log('[App] Loaded', response.data.chats.length, 'private chats');
+      await mockAPI.postQuestion(
+        { content: newQuestion, author: user.username },
+        user
+      );
+      setNewQuestion('');
+      Alert.alert('Success', 'Question posted!');
+      loadQuestions();
     } catch (error) {
-      console.error('[App] Failed to load private chats:', error);
+      console.error('[Error] Failed to post question:', error);
+      Alert.alert('Error', error.message);
     }
   };
+
+  const handlePostReply = async () => {
+    console.log('[User Action] Posting reply to question', selectedQuestion.id);
+    if (!user.verified) {
+      Alert.alert('Not Verified', 'Only verified users can post replies');
+      return;
+    }
+    if (!replyText.trim()) {
+      Alert.alert('Error', 'Please enter a reply');
+      return;
+    }
+
+    try {
+      await mockAPI.postReply(
+        selectedQuestion.id,
+        { content: replyText, author: user.username },
+        user
+      );
+      setReplyText('');
+      setSelectedQuestion(null);
+      Alert.alert('Success', 'Reply posted!');
+      loadQuestions();
+    } catch (error) {
+      console.error('[Error] Failed to post reply:', error);
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => {
+            console.log('[Navigation] Going back');
+            navigation.goBack();
+          }}
+        >
+          <Text style={styles.backButton}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Questions & Answers</Text>
+      </View>
+
+      <ScrollView style={styles.scrollContent}>
+        {/* Post New Question */}
+        <CustomCard>
+          <Text style={styles.cardTitle}>Ask a Question</Text>
+          <CustomTextInput
+            placeholder="What's your question?"
+            value={newQuestion}
+            onChangeText={setNewQuestion}
+            multiline
+          />
+          <CustomButton
+            title="Post Question"
+            onPress={handlePostQuestion}
+            disabled={!user.verified}
+            style={styles.smallButton}
+          />
+        </CustomCard>
+
+        {/* Questions List */}
+        <CustomCard>
+          <Text style={styles.cardTitle}>Recent Questions</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color={COLORS.primary} />
+          ) : (
+            questions.map((q) => (
+              <QuestionCard
+                key={q.id}
+                question={q}
+                onPress={() => {
+                  console.log('[User Action] Viewing question', q.id);
+                  setSelectedQuestion(q);
+                }}
+              />
+            ))
+          )}
+        </CustomCard>
+      </ScrollView>
+
+      {/* Question Detail Modal */}
+      <Modal
+        visible={selectedQuestion !== null}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setSelectedQuestion(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {selectedQuestion && (
+              <>
+                <Text style={styles.modalTitle}>Question Thread</Text>
+                <ScrollView style={styles.modalScroll}>
+                  <CustomCard>
+                    <Text style={styles.questionAuthor}>
+                      {selectedQuestion.author}
+                    </Text>
+                    <Text style={styles.questionContent}>
+                      {selectedQuestion.content}
+                    </Text>
+                  </CustomCard>
+
+                  <Text style={styles.repliesTitle}>Replies:</Text>
+                  {selectedQuestion.replies.map((r) => (
+                    <CustomCard key={r.id} style={styles.replyCard}>
+                      <Text style={styles.replyAuthor}>{r.author}</Text>
+                      <Text style={styles.replyContent}>{r.content}</Text>
+                    </CustomCard>
+                  ))}
+
+                  <CustomTextInput
+                    placeholder="Write your reply..."
+                    value={replyText}
+                    onChangeText={setReplyText}
+                    multiline
+                  />
+                  <CustomButton
+                    title="Post Reply"
+                    onPress={handlePostReply}
+                    disabled={!user.verified}
+                    style={styles.smallButton}
+                  />
+                </ScrollView>
+                <CustomButton
+                  title="Close"
+                  onPress={() => setSelectedQuestion(null)}
+                  style={styles.closeButton}
+                />
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+// Private Servers Screen
+const PrivateServersScreen = ({ navigation }) => {
+  const { user } = useAuth();
+  const [chats, setChats] = useState([]);
+  const [chatName, setChatName] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [message, setMessage] = useState('');
+  const [showConsent, setShowConsent] = useState(false);
+  const [pendingInvite, setPendingInvite] = useState(null);
+
+  console.log('[Navigation] PrivateServersScreen rendered');
+
+  const handleCreateChat = async () => {
+    console.log('[User Action] Creating private chat');
+    if (!chatName.trim() || !inviteCode.trim()) {
+      Alert.alert('Error', 'Please enter chat name and invite code');
+      return;
+    }
+
+    try {
+      const chat = await mockAPI.createPrivateChat(chatName, inviteCode);
+      setChats([...chats, chat]);
+      setChatName('');
+      setInviteCode('');
+      Alert.alert('Success', 'Private chat created!');
+    } catch (error) {
+      console.error('[Error] Failed to create chat:', error);
+      Alert.alert('Error', 'Failed to create chat');
+    }
+  };
+
+  const handleJoinChat = async () => {
+    console.log('[User Action] Attempting to join chat');
+    if (!joinCode.trim()) {
+      Alert.alert('Error', 'Please enter invite code');
+      return;
+    }
+
+    // Simulate consent requirement
+    setPendingInvite(joinCode);
+    setShowConsent(true);
+  };
+
+  const handleConsentResponse = async (accepted) => {
+    console.log('[User Action] Consent response:', accepted);
+    setShowConsent(false);
+    if (accepted) {
+      try {
+        const chat = await mockAPI.joinPrivateChat(pendingInvite);
+        setChats([...chats, chat]);
+        setJoinCode('');
+        Alert.alert('Success', 'Joined private chat!');
+      } catch (error) {
+        console.error('[Error] Failed to join chat:', error);
+        Alert.alert('Error', error.message);
+      }
+    }
+    setPendingInvite(null);
+  };
+
+  const handleSendMessage = async () => {
+    console.log('[User Action] Sending message to chat', selectedChat.id);
+    if (!message.trim()) {
+      Alert.alert('Error', 'Please enter a message');
+      return;
+    }
+
+    try {
+      const newMsg = await mockAPI.sendPrivateMessage(selectedChat.id, {
+        author: user.username,
+        content: message,
+        timestamp: new Date().toISOString(),
+      });
+      selectedChat.messages.push(newMsg);
+      setMessage('');
+    } catch (error) {
+      console.error('[Error] Failed to send message:', error);
+      Alert.alert('Error', 'Failed to send message');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => {
+            console.log('[Navigation] Going back');
+            navigation.goBack();
+          }}
+        >
+          <Text style={styles.backButton}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Private Servers</Text>
+      </View>
+
+      <ScrollView style={styles.scrollContent}>
+        {/* Create Private Chat */}
+        <CustomCard>
+          <Text style={styles.cardTitle}>Create Private Chat</Text>
+          <Text style={styles.cardSubtitle}>
+            🔒 Encrypted & invite-only (mock encryption)
+          </Text>
+          <CustomTextInput
+            placeholder="Chat Name"
+            value={chatName}
+            onChangeText={setChatName}
+          />
+          <CustomTextInput
+            placeholder="Invite Code"
+            value={inviteCode}
+            onChangeText={setInviteCode}
+          />
+          <CustomButton
+            title="Create Chat"
+            onPress={handleCreateChat}
+            style={styles.smallButton}
+          />
+        </CustomCard>
+
+        {/* Join Private Chat */}
+        <CustomCard>
+          <Text style={styles.cardTitle}>Join Private Chat</Text>
+          <Text style={styles.cardSubtitle}>
+            ✋ Requires your consent to be added
+          </Text>
+          <CustomTextInput
+            placeholder="Enter Invite Code"
+            value={joinCode}
+            onChangeText={setJoinCode}
+          />
+          <CustomButton
+            title="Join Chat"
+            onPress={handleJoinChat}
+            style={styles.smallButton}
+          />
+        </CustomCard>
+
+        {/* My Chats */}
+        <CustomCard>
+          <Text style={styles.cardTitle}>My Private Chats</Text>
+          {chats.length === 0 ? (
+            <Text style={styles.emptyText}>No chats yet</Text>
+          ) : (
+            chats.map((chat) => (
+              <TouchableOpacity
+                key={chat.id}
+                onPress={() => {
+                  console.log('[User Action] Opening chat', chat.id);
+                  setSelectedChat(chat);
+                }}
+              >
+                <CustomCard style={styles.chatItem}>
+                  <Text style={styles.chatName}>{chat.name}</Text>
+                  <Text style={styles.chatCode}>Code: {chat.inviteCode}</Text>
+                  <Text style={styles.chatMembers}>
+                    {chat.messages.length} messages
+                  </Text>
+                </CustomCard>
+              </TouchableOpacity>
+            ))
+          )}
+        </CustomCard>
+      </ScrollView>
+
+      {/* Consent Modal */}
+      <Modal
+        visible={showConsent}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => handleConsentResponse(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.consentModal}>
+            <Text style={styles.consentTitle}>Join Private Chat?</Text>
+            <Text style={styles.consentText}>
+              You've been invited to join a private chat. Do you consent to be added?
+            </Text>
+            <View style={styles.consentButtons}>
+              <CustomButton
+                title="Accept"
+                onPress={() => handleConsentResponse(true)}
+                style={styles.consentAccept}
+              />
+              <CustomButton
+                title="Decline"
+                onPress={() => handleConsentResponse(false)}
+                style={styles.consentDecline}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Chat Messages Modal */}
+      <Modal
+        visible={selectedChat !== null}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setSelectedChat(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {selectedChat && (
+              <>
+                <Text style={styles.modalTitle}>{selectedChat.name}</Text>
+                <Text style={styles.modalSubtitle}>
+                  🔒 End-to-end encrypted (mock)
+                </Text>
+                <ScrollView style={styles.modalScroll}>
+                  {selectedChat.messages.map((msg) => (
+                    <CustomCard key={msg.id} style={styles.messageCard}>
+                      <Text style={styles.messageUsername}>{msg.author}</Text>
+                      <Text style={styles.messageContent}>{msg.content}</Text>
+                    </CustomCard>
+                  ))}
+                </ScrollView>
+                <CustomTextInput
+                  placeholder="Type a message..."
+                  value={message}
+                  onChangeText={setMessage}
+                />
+                <View style={styles.modalActions}>
+                  <CustomButton
+                    title="Send"
+                    onPress={handleSendMessage}
+                    style={styles.sendButton}
+                  />
+                  <CustomButton
+                    title="Close"
+                    onPress={() => setSelectedChat(null)}
+                    style={styles.closeButton}
+                  />
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+// Exams Screen
+const ExamsScreen = ({ navigation }) => {
+  const { user } = useAuth();
+  const [exams, setExams] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  console.log('[Navigation] ExamsScreen rendered');
+
+  useEffect(() => {
+    loadExams();
+  }, []);
 
   const loadExams = async () => {
+    console.log('[User Action] Loading exams for grade', user.gradeLevel);
+    setLoading(true);
     try {
-      const response = await examsAPI.getExams();
-      setExams(response.data.exams);
-      console.log('[App] Loaded', response.data.exams.length, 'exams');
+      const data = await mockAPI.fetchExams(user.gradeLevel);
+      setExams(data);
+      console.log('[State] Exams loaded');
     } catch (error) {
-      console.error('[App] Failed to load exams:', error);
-    }
-  };
-
-  const loadStudents = async () => {
-    if (!user || !user.gradeLevel) {
-      Alert.alert('Setup Required', 'Please set your grade level in profile to see classmates');
-      return;
-    }
-
-    setLoadingStudents(true);
-    try {
-      const response = await studentsAPI.getStudentsByGrade(user.gradeLevel);
-      setStudents(response.data.students);
-      console.log('[App] Loaded', response.data.students.length, 'students');
-    } catch (error) {
-      console.error('[App] Failed to load students:', error);
-      Alert.alert('Error', 'Failed to load students');
+      console.error('[Error] Failed to load exams:', error);
     } finally {
-      setLoadingStudents(false);
+      setLoading(false);
     }
   };
 
-  const handleProfileSetup = async () => {
-    if (!profileData.username || !profileData.gradeLevel) {
-      Alert.alert('Required Fields', 'Please fill in username and grade level');
-      return;
-    }
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => {
+            console.log('[Navigation] Going back');
+            navigation.goBack();
+          }}
+        >
+          <Text style={styles.backButton}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Exams</Text>
+      </View>
 
+      <ScrollView style={styles.scrollContent}>
+        <CustomCard>
+          <Text style={styles.cardTitle}>📚 Available Exams</Text>
+          <Text style={styles.cardSubtitle}>
+            Grade {user.gradeLevel} exams only
+          </Text>
+          {loading ? (
+            <ActivityIndicator size="small" color={COLORS.primary} />
+          ) : exams.length === 0 ? (
+            <Text style={styles.emptyText}>No exams available for your grade</Text>
+          ) : (
+            exams.map((exam) => (
+              <TouchableOpacity
+                key={exam.id}
+                onPress={() => {
+                  console.log('[Navigation] Starting exam', exam.id);
+                  navigation.navigate('TakeExam', { exam });
+                }}
+              >
+                <CustomCard style={styles.examCard}>
+                  <Text style={styles.examTitle}>{exam.title}</Text>
+                  <Text style={styles.examInfo}>
+                    Grade {exam.gradeLevel} • {exam.questions.length} questions
+                  </Text>
+                </CustomCard>
+              </TouchableOpacity>
+            ))
+          )}
+        </CustomCard>
+      </ScrollView>
+    </View>
+  );
+};
+
+// Take Exam Screen
+const TakeExamScreen = ({ navigation, route }) => {
+  const { exam } = route.params;
+  const [answers, setAnswers] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState(null);
+
+  console.log('[Navigation] TakeExamScreen rendered for exam', exam.id);
+
+  const handleAnswerChange = (questionId, answer) => {
+    console.log('[User Action] Answer changed for question', questionId);
+    setAnswers({ ...answers, [questionId]: answer });
+  };
+
+  const calculateScore = () => {
+    console.log('[User Action] Calculating score locally');
+    let correct = 0;
+    let total = 0;
+
+    exam.questions.forEach((q) => {
+      if (q.type === 'essay') return; // Skip essays (manual grading)
+      total++;
+      const userAnswer = answers[q.id];
+      if (q.type === 'multiple_choice' && userAnswer === q.correctAnswer) {
+        correct++;
+      } else if (q.type === 'true_false' && userAnswer === q.correctAnswer) {
+        correct++;
+      }
+    });
+
+    return total > 0 ? Math.round((correct / total) * 100) : 0;
+  };
+
+  const handleSubmit = async () => {
+    console.log('[User Action] Submitting exam', exam.id);
+    setSubmitting(true);
     try {
-      const response = await studentsAPI.updateProfile({
-        username: profileData.username,
-        gradeLevel: parseInt(profileData.gradeLevel),
-        bio: profileData.bio,
-        interests: profileData.interests,
-        subjects: profileData.subjects
-      });
-
-      const updatedUser = response.data.user;
-      setUser(updatedUser);
-      await tokenStorage.setUser(updatedUser);
-      setShowProfileSetup(false);
-      Alert.alert('Success', 'Profile updated successfully!');
+      const score = calculateScore();
+      await mockAPI.submitExam(exam.id, answers);
+      setResult({ score, total: exam.questions.filter((q) => q.type !== 'essay').length });
+      Alert.alert('Exam Submitted', `Your score: ${score}%`);
     } catch (error) {
-      console.error('[App] Failed to update profile:', error);
-      Alert.alert('Error', 'Failed to update profile');
-    }
-  };
-      const response = await examsAPI.getExams();
-      setExams(response.data.exams);
-      console.log('[App] Loaded', response.data.exams.length, 'exams');
-    } catch (error) {
-      console.error('[App] Failed to load exams:', error);
-    }
-  };
-
-  // Action handlers
-  const handleSendMessage = async () => {
-    if (!messageInput.trim()) return;
-
-    setSendingMessage(true);
-    try {
-      await chatAPI.sendGlobalMessage(messageInput.trim());
-      setMessageInput('');
-      console.log('[App] Message sent successfully');
-    } catch (error) {
-      console.error('[App] Failed to send message:', error);
-      Alert.alert('Error', 'Failed to send message. Please try again.');
+      console.error('[Error] Failed to submit exam:', error);
+      Alert.alert('Error', 'Failed to submit exam');
     } finally {
-      setSendingMessage(false);
+      setSubmitting(false);
     }
   };
 
-  const handleCreateQuestion = async () => {
-    if (!questionTitle.trim() || !questionContent.trim()) {
-      Alert.alert('Error', 'Please fill in both title and content');
-      return;
-    }
-
-    setCreatingQuestion(true);
-    try {
-      await questionsAPI.createQuestion(
-        questionTitle.trim(),
-        questionContent.trim(),
-        questionSubject
-      );
-      setQuestionTitle('');
-      setQuestionContent('');
-      setQuestionSubject('other');
-      Alert.alert('Success', 'Question created successfully!');
-      await loadQuestions();
-    } catch (error) {
-      console.error('[App] Failed to create question:', error);
-      Alert.alert('Error', 'Failed to create question. Please try again.');
-    } finally {
-      setCreatingQuestion(false);
-    }
-  };
-
-  const handleCreatePrivateChat = async () => {
-    if (!chatName.trim()) {
-      Alert.alert('Error', 'Please enter a chat name');
-      return;
-    }
-
-    try {
-      const response = await privateChatsAPI.createPrivateChat(chatName.trim());
-      setChatName('');
-      Alert.alert(
-        'Success',
-        `Chat created! Invite code: ${response.data.chat.inviteCode}`
-      );
-      await loadPrivateChats();
-    } catch (error) {
-      console.error('[App] Failed to create private chat:', error);
-      Alert.alert('Error', 'Failed to create chat. Please try again.');
-    }
-  };
-
-  const handleJoinWithCode = async () => {
-    if (!inviteCode.trim()) {
-      Alert.alert('Error', 'Please enter an invite code');
-      return;
-    }
-
-    try {
-      const response = await privateChatsAPI.joinWithInviteCode(inviteCode.trim());
-      setInviteCode('');
-      Alert.alert('Success', response.message);
-      await loadPrivateChats();
-    } catch (error) {
-      console.error('[App] Failed to join chat:', error);
-      Alert.alert('Error', error.response?.data?.message || 'Failed to join chat');
-    }
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    switch (activeTab) {
-      case 'chat':
-        await loadGlobalMessages();
-        break;
-      case 'questions':
-        await loadQuestions();
-        break;
-      case 'private':
-        await loadPrivateChats();
-        break;
-      case 'exams':
-        await loadExams();
-        break;
-      case 'students':
-        await loadStudents();
-        break;
-    }
-    setRefreshing(false);
-  };
-
-  // Render loading screen
-  if (loading) {
+  if (result) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#00f3ff" />
-        <Text style={styles.loadingText}>Loading GSA...</Text>
+        <View style={styles.resultContainer}>
+          <Text style={styles.resultTitle}>Exam Complete!</Text>
+          <Text style={styles.resultScore}>{result.score}%</Text>
+          <Text style={styles.resultText}>
+            Auto-graded questions: {result.total}
+          </Text>
+          <Text style={styles.resultText}>
+            Essay questions require manual grading by teacher
+          </Text>
+          <CustomButton
+            title="Back to Exams"
+            onPress={() => {
+              console.log('[Navigation] Going back to exams');
+              navigation.goBack();
+            }}
+            style={styles.backToExamsButton}
+          />
+        </View>
       </View>
     );
   }
 
-  // Render main app
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
-      
-      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Global Students Association</Text>
-        {user && (
-          <Text style={styles.headerSubtitle}>
-            {user.username} {user.isVerified ? '✓' : '(Anonymous)'}
-          </Text>
-        )}
+        <TouchableOpacity
+          onPress={() => {
+            console.log('[Navigation] Going back');
+            navigation.goBack();
+          }}
+        >
+          <Text style={styles.backButton}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{exam.title}</Text>
       </View>
 
-      {/* Tab Navigation */}
-      <View style={styles.tabBar}>
-        {['chat', 'questions', 'private', 'exams', 'students'].map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.tab, activeTab === tab && styles.activeTab]}
-            onPress={() => {
-              setActiveTab(tab);
-              if (tab === 'private' && privateChats.length === 0) loadPrivateChats();
-              if (tab === 'exams' && exams.length === 0) loadExams();
-              if (tab === 'students' && students.length === 0) loadStudents();
-            }}
-          >
-            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ScrollView style={styles.scrollContent}>
+        {exam.questions.map((q, index) => (
+          <CustomCard key={q.id} style={styles.questionContainer}>
+            <Text style={styles.questionNumber}>Question {index + 1}</Text>
+            <Text style={styles.questionText}>{q.question}</Text>
 
-      {/* Content */}
-      <ScrollView
-        style={styles.content}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00f3ff" />
-        }
-      >
-        {/* Global Chat Tab */}
-        {activeTab === 'chat' && (
-          <View style={styles.chatContainer}>
-            <Text style={styles.sectionTitle}>Global Chat</Text>
-            
-            {/* Message Input */}
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Type a message..."
-                placeholderTextColor="#666"
-                value={messageInput}
-                onChangeText={setMessageInput}
-                multiline
-              />
-              <TouchableOpacity
-                style={[styles.sendButton, sendingMessage && styles.sendButtonDisabled]}
-                onPress={handleSendMessage}
-                disabled={sendingMessage || !messageInput.trim()}
-              >
-                <Text style={styles.sendButtonText}>
-                  {sendingMessage ? '...' : 'Send'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Messages List */}
-            <View style={styles.messagesList}>
-              {messages.length === 0 ? (
-                <Text style={styles.emptyText}>No messages yet. Be the first to chat!</Text>
-              ) : (
-                messages.map((msg, index) => (
-                  <View key={msg.messageId || index} style={styles.messageItem}>
-                    <Text style={styles.messageUsername}>{msg.username}</Text>
-                    <Text style={styles.messageContent}>{msg.content}</Text>
-                    <Text style={styles.messageTime}>
-                      {new Date(msg.createdAt).toLocaleTimeString()}
+            {q.type === 'multiple_choice' && (
+              <View>
+                {q.options.map((option, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    onPress={() => handleAnswerChange(q.id, i)}
+                    style={[
+                      styles.optionButton,
+                      answers[q.id] === i && styles.optionSelected,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.optionText,
+                        answers[q.id] === i && styles.optionTextSelected,
+                      ]}
+                    >
+                      {option}
                     </Text>
-                  </View>
-                ))
-              )}
-            </View>
-          </View>
-        )}
-
-        {/* Questions Tab */}
-        {activeTab === 'questions' && (
-          <View style={styles.questionsContainer}>
-            <Text style={styles.sectionTitle}>Questions & Answers</Text>
-            
-            {/* Create Question Form */}
-            <View style={styles.questionForm}>
-              <TextInput
-                style={styles.input}
-                placeholder="Question title..."
-                placeholderTextColor="#666"
-                value={questionTitle}
-                onChangeText={setQuestionTitle}
-              />
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Question details..."
-                placeholderTextColor="#666"
-                value={questionContent}
-                onChangeText={setQuestionContent}
-                multiline
-                numberOfLines={4}
-              />
-              <TouchableOpacity
-                style={[styles.createButton, creatingQuestion && styles.createButtonDisabled]}
-                onPress={handleCreateQuestion}
-                disabled={creatingQuestion}
-              >
-                <Text style={styles.createButtonText}>
-                  {creatingQuestion ? 'Creating...' : 'Ask Question'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Questions List */}
-            <View style={styles.questionsList}>
-              {questions.length === 0 ? (
-                <Text style={styles.emptyText}>No questions yet. Ask the first one!</Text>
-              ) : (
-                questions.map((q, index) => (
-                  <View key={q.questionId || index} style={styles.questionItem}>
-                    <Text style={styles.questionTitle}>{q.title}</Text>
-                    <Text style={styles.questionContent}>{q.content}</Text>
-                    <Text style={styles.questionMeta}>
-                      By {q.username} • {q.subject} • {(q.replies || []).length} replies
-                    </Text>
-                  </View>
-                ))
-              )}
-            </View>
-          </View>
-        )}
-
-        {/* Private Chats Tab */}
-        {activeTab === 'private' && (
-          <View style={styles.privateContainer}>
-            <Text style={styles.sectionTitle}>Private Chats</Text>
-            
-            {/* Create Chat */}
-            <View style={styles.privateForm}>
-              <TextInput
-                style={styles.input}
-                placeholder="Chat name..."
-                placeholderTextColor="#666"
-                value={chatName}
-                onChangeText={setChatName}
-              />
-              <TouchableOpacity
-                style={styles.createButton}
-                onPress={handleCreatePrivateChat}
-              >
-                <Text style={styles.createButtonText}>Create Chat</Text>
-              </TouchableOpacity>
-
-              <View style={styles.separator} />
-
-              <TextInput
-                style={styles.input}
-                placeholder="Enter invite code..."
-                placeholderTextColor="#666"
-                value={inviteCode}
-                onChangeText={setInviteCode}
-              />
-              <TouchableOpacity
-                style={styles.createButton}
-                onPress={handleJoinWithCode}
-              >
-                <Text style={styles.createButtonText}>Join with Code</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Chats List */}
-            <View style={styles.chatsList}>
-              {privateChats.length === 0 ? (
-                <Text style={styles.emptyText}>No private chats yet. Create one!</Text>
-              ) : (
-                privateChats.map((chat, index) => (
-                  <View key={chat.chatId || index} style={styles.chatItem}>
-                    <Text style={styles.chatName}>{chat.name}</Text>
-                    <Text style={styles.chatMeta}>
-                      Code: {chat.inviteCode} • {chat.members.length} members
-                    </Text>
-                  </View>
-                ))
-              )}
-            </View>
-          </View>
-        )}
-
-        {/* Exams Tab */}
-        {activeTab === 'exams' && (
-          <View style={styles.examsContainer}>
-            <Text style={styles.sectionTitle}>Exams</Text>
-            
-            {user && !user.gradeLevel && (
-              <View style={styles.warningBox}>
-                <Text style={styles.warningText}>
-                  ⚠️ Set your grade level to access exams
-                </Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             )}
 
-            <View style={styles.examsList}>
-              {exams.length === 0 ? (
-                <Text style={styles.emptyText}>No exams available. Check back later!</Text>
-              ) : (
-                exams.map((exam, index) => (
-                  <View key={exam.examId || index} style={styles.examItem}>
-                    <Text style={styles.examTitle}>{exam.title}</Text>
-                    <Text style={styles.examMeta}>
-                      {exam.subject} • Grade {exam.gradeLevel} • {exam.questionCount} questions
-                    </Text>
-                    <Text style={styles.examDuration}>Duration: {exam.duration} minutes</Text>
-                  </View>
-                ))
-              )}
-            </View>
-          </View>
-        )}
-
-        {/* Students Tab */}
-        {activeTab === 'students' && (
-          <View style={styles.studentsContainer}>
-            <Text style={styles.sectionTitle}>Find Classmates</Text>
-            
-            {/* Profile Setup Button */}
-            <View style={styles.profileSection}>
-              <TouchableOpacity
-                style={styles.profileButton}
-                onPress={() => {
-                  setProfileData({
-                    username: user?.username || '',
-                    gradeLevel: user?.gradeLevel?.toString() || '',
-                    bio: user?.bio || '',
-                    interests: user?.interests || [],
-                    subjects: user?.subjects || []
-                  });
-                  setShowProfileSetup(true);
-                }}
-              >
-                <Text style={styles.profileButtonText}>
-                  {user?.gradeLevel ? '✏️ Edit Profile' : '⚙️ Setup Profile'}
-                </Text>
-              </TouchableOpacity>
-              
-              {user?.gradeLevel && (
-                <Text style={styles.profileInfo}>
-                  Grade {user.gradeLevel} • {user.username}
-                </Text>
-              )}
-            </View>
-
-            {/* Profile Setup Modal */}
-            {showProfileSetup && (
-              <View style={styles.profileSetupModal}>
-                <Text style={styles.modalTitle}>Setup Your Profile</Text>
-                
-                <TextInput
-                  style={styles.input}
-                  placeholder="Username"
-                  placeholderTextColor="#666"
-                  value={profileData.username}
-                  onChangeText={(text) => setProfileData({...profileData, username: text})}
-                />
-                
-                <TextInput
-                  style={styles.input}
-                  placeholder="Grade Level (1-12)"
-                  placeholderTextColor="#666"
-                  keyboardType="numeric"
-                  value={profileData.gradeLevel}
-                  onChangeText={(text) => setProfileData({...profileData, gradeLevel: text})}
-                />
-                
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  placeholder="Bio (optional)"
-                  placeholderTextColor="#666"
-                  multiline
-                  value={profileData.bio}
-                  onChangeText={(text) => setProfileData({...profileData, bio: text})}
-                />
-                
-                <View style={styles.modalButtons}>
-                  <TouchableOpacity
-                    style={[styles.createButton, { backgroundColor: '#ff006e' }]}
-                    onPress={() => setShowProfileSetup(false)}
+            {q.type === 'true_false' && (
+              <View style={styles.trueFalseContainer}>
+                <TouchableOpacity
+                  onPress={() => handleAnswerChange(q.id, true)}
+                  style={[
+                    styles.optionButton,
+                    answers[q.id] === true && styles.optionSelected,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      answers[q.id] === true && styles.optionTextSelected,
+                    ]}
                   >
-                    <Text style={styles.createButtonText}>Cancel</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={styles.createButton}
-                    onPress={handleProfileSetup}
-                  >
-                    <Text style={styles.createButtonText}>Save</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-
-            {/* Students List */}
-            {!user?.gradeLevel ? (
-              <View style={styles.warningBox}>
-                <Text style={styles.warningText}>
-                  📚 Set your grade level to find classmates
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.studentsList}>
-                {loadingStudents ? (
-                  <ActivityIndicator size="large" color="#00f3ff" />
-                ) : students.length === 0 ? (
-                  <Text style={styles.emptyText}>
-                    No students found in Grade {user.gradeLevel}. Be the first!
+                    True
                   </Text>
-                ) : (
-                  students.map((student, index) => (
-                    <View key={student.userId || index} style={styles.studentItem}>
-                      <View style={styles.studentInfo}>
-                        <Text style={styles.studentName}>
-                          {student.username}
-                          {student.isVerified && ' ✓'}
-                        </Text>
-                        <Text style={styles.studentMeta}>
-                          Grade {student.gradeLevel}
-                          {student.subjects && student.subjects.length > 0 && 
-                            ` • ${student.subjects.slice(0, 2).join(', ')}`
-                          }
-                        </Text>
-                        {student.bio && (
-                          <Text style={styles.studentBio}>{student.bio}</Text>
-                        )}
-                      </View>
-                      <TouchableOpacity
-                        style={styles.connectButton}
-                        onPress={() => Alert.alert('Connect', `Connect with ${student.username}? (Coming soon)`)}
-                      >
-                        <Text style={styles.connectButtonText}>Connect</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ))
-                )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleAnswerChange(q.id, false)}
+                  style={[
+                    styles.optionButton,
+                    answers[q.id] === false && styles.optionSelected,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      answers[q.id] === false && styles.optionTextSelected,
+                    ]}
+                  >
+                    False
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
-          </View>
-        )}
+
+            {q.type === 'essay' && (
+              <View>
+                <CustomTextInput
+                  placeholder="Type your answer here..."
+                  value={answers[q.id] || ''}
+                  onChangeText={(text) => handleAnswerChange(q.id, text)}
+                  multiline
+                  style={styles.essayInput}
+                />
+                <Text style={styles.essayNote}>
+                  📝 This will be manually graded by a teacher
+                </Text>
+              </View>
+            )}
+          </CustomCard>
+        ))}
+
+        <CustomButton
+          title={submitting ? 'Submitting...' : 'Submit Exam'}
+          onPress={handleSubmit}
+          disabled={submitting}
+          style={styles.submitExamButton}
+        />
       </ScrollView>
     </View>
   );
+};
+
+// Auth Provider
+const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+
+  const login = (userData) => {
+    console.log('[Auth] User logged in:', userData.username);
+    setUser(userData);
+  };
+
+  const logout = () => {
+    console.log('[Auth] User logged out');
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// Navigation Stack
+const Stack = createStackNavigator();
+
+const AppNavigator = () => {
+  const { user } = useAuth();
+
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyle: { backgroundColor: COLORS.background },
+      }}
+    >
+      {!user ? (
+        <Stack.Screen name="Login" component={LoginScreen} />
+      ) : (
+        <>
+          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen name="Questions" component={QuestionsScreen} />
+          <Stack.Screen name="PrivateServers" component={PrivateServersScreen} />
+          <Stack.Screen name="Exams" component={ExamsScreen} />
+          <Stack.Screen name="TakeExam" component={TakeExamScreen} />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+};
+
+// Main App Component
+export default function App() {
+  console.log('[App] Application started');
+  return (
+    <AuthProvider>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </AuthProvider>
+  );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0f',
+    backgroundColor: COLORS.background,
+    padding: 16,
+  },
+  scrollContent: {
+    flex: 1,
   },
   header: {
-    backgroundColor: '#1a1a2e',
-    padding: 20,
-    paddingTop: 50,
-    borderBottomWidth: 2,
-    borderBottomColor: '#00f3ff',
+    marginBottom: 20,
+    paddingTop: 40,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#00f3ff',
-    textAlign: 'center',
+    color: COLORS.text,
+    marginBottom: 4,
   },
   headerSubtitle: {
-    fontSize: 14,
-    color: '#8b00ff',
-    textAlign: 'center',
-    marginTop: 5,
-  },
-  loadingText: {
-    color: '#00f3ff',
-    marginTop: 10,
     fontSize: 16,
+    color: COLORS.textSecondary,
   },
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: '#1a1a2e',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
+  backButton: {
+    fontSize: 18,
+    color: COLORS.primary,
+    marginBottom: 10,
   },
-  tab: {
-    flex: 1,
-    padding: 15,
+  logo: {
+    fontSize: 64,
+    textAlign: 'center',
+    marginTop: 100,
+    marginBottom: 16,
+  },
+  subtitle: {
+    fontSize: 20,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 60,
+  },
+  loginForm: {
+    paddingHorizontal: 20,
+  },
+  orText: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  button: {
+    backgroundColor: COLORS.primary,
+    padding: 16,
+    borderRadius: 8,
+    marginVertical: 8,
     alignItems: 'center',
   },
-  activeTab: {
-    borderBottomWidth: 3,
-    borderBottomColor: '#00f3ff',
-  },
-  tabText: {
-    color: '#666',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  activeTabText: {
-    color: '#00f3ff',
-  },
-  content: {
-    flex: 1,
-  },
-  sectionTitle: {
-    fontSize: 20,
+  buttonText: {
+    color: COLORS.text,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#ff006e',
-    padding: 15,
   },
-  inputContainer: {
-    flexDirection: 'row',
-    padding: 15,
-    backgroundColor: '#1a1a2e',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  anonymousButton: {
+    backgroundColor: COLORS.textSecondary,
+  },
+  googleButton: {
+    backgroundColor: '#ea4335',
+  },
+  facebookButton: {
+    backgroundColor: '#4267B2',
   },
   input: {
-    flex: 1,
-    backgroundColor: '#0a0a0f',
-    color: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#333',
-    marginBottom: 10,
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  sendButton: {
-    backgroundColor: '#00f3ff',
-    padding: 10,
-    borderRadius: 8,
-    marginLeft: 10,
-    justifyContent: 'center',
-    minWidth: 70,
-  },
-  sendButtonDisabled: {
-    backgroundColor: '#333',
-  },
-  sendButtonText: {
-    color: '#0a0a0f',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  createButton: {
-    backgroundColor: '#8b00ff',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  createButtonDisabled: {
-    backgroundColor: '#333',
-  },
-  createButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  chatContainer: {
-    flex: 1,
-  },
-  messagesList: {
-    padding: 15,
-  },
-  messageItem: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: COLORS.card,
+    color: COLORS.text,
     padding: 12,
     borderRadius: 8,
-    marginBottom: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: '#00f3ff',
-  },
-  messageUsername: {
-    color: '#8b00ff',
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  messageContent: {
-    color: '#fff',
-    fontSize: 15,
-  },
-  messageTime: {
-    color: '#666',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  questionsContainer: {
-    flex: 1,
-  },
-  questionForm: {
-    padding: 15,
-    backgroundColor: '#1a1a2e',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-  },
-  questionsList: {
-    padding: 15,
-  },
-  questionItem: {
-    backgroundColor: '#1a1a2e',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: '#ff006e',
-  },
-  questionTitle: {
-    color: '#00f3ff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  questionContent: {
-    color: '#fff',
-    fontSize: 15,
-    marginBottom: 8,
-  },
-  questionMeta: {
-    color: '#666',
-    fontSize: 12,
-  },
-  privateContainer: {
-    flex: 1,
-  },
-  privateForm: {
-    padding: 15,
-    backgroundColor: '#1a1a2e',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#333',
-    marginVertical: 15,
-  },
-  chatsList: {
-    padding: 15,
-  },
-  chatItem: {
-    backgroundColor: '#1a1a2e',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: '#39ff14',
-  },
-  chatName: {
-    color: '#00f3ff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  chatMeta: {
-    color: '#666',
-    fontSize: 12,
-  },
-  examsContainer: {
-    flex: 1,
-  },
-  warningBox: {
-    backgroundColor: '#ff006e',
-    padding: 15,
-    margin: 15,
-    borderRadius: 8,
-  },
-  warningText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  examsList: {
-    padding: 15,
-  },
-  examItem: {
-    backgroundColor: '#1a1a2e',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: '#8b00ff',
-  },
-  examTitle: {
-    color: '#00f3ff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  examMeta: {
-    color: '#8b00ff',
-    fontSize: 14,
-    marginBottom: 3,
-  },
-  examDuration: {
-    color: '#666',
-    fontSize: 12,
-  },
-  emptyText: {
-    color: '#666',
-    fontSize: 16,
-    textAlign: 'center',
-    padding: 30,
-    fontStyle: 'italic',
-  },
-  studentsContainer: {
-    flex: 1,
-  },
-  profileSection: {
-    padding: 15,
-    backgroundColor: '#1a1a2e',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-  },
-  profileButton: {
-    backgroundColor: '#00f3ff',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  profileButtonText: {
-    color: '#0a0a0f',
-    fontWeight: 'bold',
+    marginVertical: 8,
     fontSize: 16,
   },
-  profileInfo: {
-    color: '#8b00ff',
-    textAlign: 'center',
-    fontSize: 14,
-    fontWeight: '600',
+  inputMultiline: {
+    minHeight: 80,
+    textAlignVertical: 'top',
   },
-  profileSetupModal: {
-    backgroundColor: '#1a1a2e',
-    padding: 20,
-    margin: 15,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#00f3ff',
+  card: {
+    backgroundColor: COLORS.card,
+    padding: 16,
+    borderRadius: 8,
+    marginVertical: 8,
   },
-  modalTitle: {
+  cardTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#00f3ff',
-    marginBottom: 15,
-    textAlign: 'center',
+    color: COLORS.text,
+    marginBottom: 8,
   },
-  modalButtons: {
+  cardSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 12,
+  },
+  debugCard: {
+    backgroundColor: '#44475a',
+    borderWidth: 2,
+    borderColor: COLORS.warning,
+  },
+  messageCard: {
+    marginVertical: 4,
+    padding: 12,
+  },
+  messageHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 10,
+    marginBottom: 4,
   },
-  studentsList: {
-    padding: 15,
+  messageUsername: {
+    color: COLORS.text,
+    fontWeight: 'bold',
+    fontSize: 14,
   },
-  studentItem: {
-    backgroundColor: '#1a1a2e',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: '#00f3ff',
+  messageTime: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+  },
+  messageContent: {
+    color: COLORS.text,
+    fontSize: 14,
+  },
+  replyInput: {
+    marginTop: 12,
+  },
+  smallButton: {
+    marginTop: 8,
+  },
+  settingRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: 12,
   },
-  studentInfo: {
+  settingLabel: {
+    color: COLORS.text,
+    fontSize: 16,
+  },
+  navButton: {
+    marginVertical: 6,
+  },
+  logoutButton: {
+    backgroundColor: COLORS.danger,
+    marginTop: 16,
+  },
+  questionCard: {
+    marginVertical: 6,
+  },
+  questionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  questionAuthor: {
+    color: COLORS.text,
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  questionTime: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+  },
+  questionContent: {
+    color: COLORS.text,
+    fontSize: 15,
+    marginBottom: 8,
+  },
+  questionReplies: {
+    color: COLORS.primary,
+    fontSize: 13,
+  },
+  modalOverlay: {
     flex: 1,
-    marginRight: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  studentName: {
-    color: '#00f3ff',
+  modalContent: {
+    backgroundColor: COLORS.background,
+    borderRadius: 12,
+    padding: 20,
+    width: '90%',
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 16,
+  },
+  modalScroll: {
+    maxHeight: 400,
+    marginBottom: 16,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  closeButton: {
+    backgroundColor: COLORS.textSecondary,
+    flex: 1,
+    marginLeft: 8,
+  },
+  sendButton: {
+    flex: 1,
+    marginRight: 8,
+  },
+  repliesTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 3,
+    color: COLORS.text,
+    marginTop: 16,
+    marginBottom: 8,
   },
-  studentMeta: {
-    color: '#8b00ff',
-    fontSize: 14,
-    marginBottom: 3,
+  replyCard: {
+    marginVertical: 4,
   },
-  studentBio: {
-    color: '#fff',
-    fontSize: 13,
-    marginTop: 5,
-  },
-  connectButton: {
-    backgroundColor: '#39ff14',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 6,
-  },
-  connectButtonText: {
-    color: '#0a0a0f',
+  replyAuthor: {
+    color: COLORS.text,
     fontWeight: 'bold',
     fontSize: 14,
+    marginBottom: 4,
+  },
+  replyContent: {
+    color: COLORS.text,
+    fontSize: 14,
+  },
+  chatItem: {
+    marginVertical: 4,
+  },
+  chatName: {
+    color: COLORS.text,
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  chatCode: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
+    marginBottom: 2,
+  },
+  chatMembers: {
+    color: COLORS.primary,
+    fontSize: 13,
+  },
+  emptyText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  consentModal: {
+    backgroundColor: COLORS.background,
+    borderRadius: 12,
+    padding: 24,
+    width: '80%',
+  },
+  consentTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  consentText: {
+    fontSize: 16,
+    color: COLORS.text,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  consentButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  consentAccept: {
+    backgroundColor: COLORS.success,
+    flex: 1,
+    marginRight: 8,
+  },
+  consentDecline: {
+    backgroundColor: COLORS.danger,
+    flex: 1,
+    marginLeft: 8,
+  },
+  examCard: {
+    marginVertical: 6,
+  },
+  examTitle: {
+    color: COLORS.text,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  examInfo: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+  },
+  questionContainer: {
+    marginVertical: 8,
+  },
+  questionNumber: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginBottom: 8,
+  },
+  questionText: {
+    fontSize: 16,
+    color: COLORS.text,
+    marginBottom: 12,
+  },
+  optionButton: {
+    backgroundColor: COLORS.background,
+    padding: 12,
+    borderRadius: 6,
+    marginVertical: 4,
+    borderWidth: 2,
+    borderColor: COLORS.card,
+  },
+  optionSelected: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.card,
+  },
+  optionText: {
+    color: COLORS.text,
+    fontSize: 15,
+  },
+  optionTextSelected: {
+    color: COLORS.primary,
+    fontWeight: 'bold',
+  },
+  trueFalseContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  essayInput: {
+    minHeight: 120,
+    marginBottom: 8,
+  },
+  essayNote: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    fontStyle: 'italic',
+  },
+  submitExamButton: {
+    marginTop: 20,
+    marginBottom: 40,
+    backgroundColor: COLORS.success,
+  },
+  resultContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  resultTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: 20,
+  },
+  resultScore: {
+    fontSize: 72,
+    fontWeight: 'bold',
+    color: COLORS.success,
+    marginBottom: 20,
+  },
+  resultText: {
+    fontSize: 16,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginVertical: 4,
+  },
+  backToExamsButton: {
+    marginTop: 40,
+    width: 200,
   },
 });
