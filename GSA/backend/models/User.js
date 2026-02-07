@@ -27,6 +27,19 @@ const userSchema = new mongoose.Schema({
     min: 1,
     max: 12
   },
+  bio: {
+    type: String,
+    maxlength: 500,
+    default: ''
+  },
+  interests: {
+    type: [String],
+    default: []
+  },
+  subjects: {
+    type: [String],
+    default: []
+  },
   oauthProvider: {
     type: String,
     enum: ['google', 'facebook', 'github', null],
@@ -104,6 +117,24 @@ const User = {
       inMemoryUsers.set(user.userId, user);
     }
     return { modifiedCount: user ? 1 : 0 };
+  },
+  
+  async find(query = {}) {
+    if (mongoose.connection.readyState === 1 && this.model) {
+      return await this.model.find(query);
+    }
+    // Fallback to in-memory
+    let users = Array.from(inMemoryUsers.values());
+    if (query.gradeLevel) {
+      users = users.filter(u => u.gradeLevel === query.gradeLevel);
+    }
+    if (query.userId && query.userId.$ne) {
+      users = users.filter(u => u.userId !== query.userId.$ne);
+    }
+    if (query.subjects) {
+      users = users.filter(u => u.subjects && u.subjects.includes(query.subjects));
+    }
+    return users;
   }
 };
 

@@ -11,7 +11,7 @@ import {
   RefreshControl,
   Alert
 } from 'react-native';
-import { authAPI, chatAPI, questionsAPI, privateChatsAPI, examsAPI, tokenStorage } from './services/api';
+import { authAPI, chatAPI, questionsAPI, privateChatsAPI, examsAPI, studentsAPI, tokenStorage } from './services/api';
 import socketService from './services/socket';
 
 export default function App() {
@@ -19,9 +19,10 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authenticating, setAuthenticating] = useState(false);
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
 
   // UI state
-  const [activeTab, setActiveTab] = useState('chat'); // chat, questions, private, exams
+  const [activeTab, setActiveTab] = useState('chat'); // chat, questions, private, exams, students
 
   // Chat state
   const [messages, setMessages] = useState([]);
@@ -47,6 +48,17 @@ export default function App() {
 
   // Refreshing state
   const [refreshing, setRefreshing] = useState(false);
+
+  // Students/Profile state
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [profileData, setProfileData] = useState({
+    username: '',
+    gradeLevel: '',
+    bio: '',
+    interests: [],
+    subjects: []
+  });
 
   // Initialize app
   useEffect(() => {
@@ -174,6 +186,58 @@ export default function App() {
     }
   };
 
+  const loadStudents = async () => {
+    if (!user || !user.gradeLevel) {
+      Alert.alert('Setup Required', 'Please set your grade level in profile to see classmates');
+      return;
+    }
+
+    setLoadingStudents(true);
+    try {
+      const response = await studentsAPI.getStudentsByGrade(user.gradeLevel);
+      setStudents(response.data.students);
+      console.log('[App] Loaded', response.data.students.length, 'students');
+    } catch (error) {
+      console.error('[App] Failed to load students:', error);
+      Alert.alert('Error', 'Failed to load students');
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+
+  const handleProfileSetup = async () => {
+    if (!profileData.username || !profileData.gradeLevel) {
+      Alert.alert('Required Fields', 'Please fill in username and grade level');
+      return;
+    }
+
+    try {
+      const response = await studentsAPI.updateProfile({
+        username: profileData.username,
+        gradeLevel: parseInt(profileData.gradeLevel),
+        bio: profileData.bio,
+        interests: profileData.interests,
+        subjects: profileData.subjects
+      });
+
+      const updatedUser = response.data.user;
+      setUser(updatedUser);
+      await tokenStorage.setUser(updatedUser);
+      setShowProfileSetup(false);
+      Alert.alert('Success', 'Profile updated successfully!');
+    } catch (error) {
+      console.error('[App] Failed to update profile:', error);
+      Alert.alert('Error', 'Failed to update profile');
+    }
+  };
+      const response = await examsAPI.getExams();
+      setExams(response.data.exams);
+      console.log('[App] Loaded', response.data.exams.length, 'exams');
+    } catch (error) {
+      console.error('[App] Failed to load exams:', error);
+    }
+  };
+
   // Action handlers
   const handleSendMessage = async () => {
     if (!messageInput.trim()) return;
@@ -269,6 +333,9 @@ export default function App() {
       case 'exams':
         await loadExams();
         break;
+      case 'students':
+        await loadStudents();
+        break;
     }
     setRefreshing(false);
   };
@@ -300,7 +367,7 @@ export default function App() {
 
       {/* Tab Navigation */}
       <View style={styles.tabBar}>
-        {['chat', 'questions', 'private', 'exams'].map((tab) => (
+        {['chat', 'questions', 'private', 'exams', 'students'].map((tab) => (
           <TouchableOpacity
             key={tab}
             style={[styles.tab, activeTab === tab && styles.activeTab]}
@@ -308,6 +375,7 @@ export default function App() {
               setActiveTab(tab);
               if (tab === 'private' && privateChats.length === 0) loadPrivateChats();
               if (tab === 'exams' && exams.length === 0) loadExams();
+              if (tab === 'students' && students.length === 0) loadStudents();
             }}
           >
             <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
@@ -506,6 +574,134 @@ export default function App() {
                 ))
               )}
             </View>
+          </View>
+        )}
+
+        {/* Students Tab */}
+        {activeTab === 'students' && (
+          <View style={styles.studentsContainer}>
+            <Text style={styles.sectionTitle}>Find Classmates</Text>
+            
+            {/* Profile Setup Button */}
+            <View style={styles.profileSection}>
+              <TouchableOpacity
+                style={styles.profileButton}
+                onPress={() => {
+                  setProfileData({
+                    username: user?.username || '',
+                    gradeLevel: user?.gradeLevel?.toString() || '',
+                    bio: user?.bio || '',
+                    interests: user?.interests || [],
+                    subjects: user?.subjects || []
+                  });
+                  setShowProfileSetup(true);
+                }}
+              >
+                <Text style={styles.profileButtonText}>
+                  {user?.gradeLevel ? '✏️ Edit Profile' : '⚙️ Setup Profile'}
+                </Text>
+              </TouchableOpacity>
+              
+              {user?.gradeLevel && (
+                <Text style={styles.profileInfo}>
+                  Grade {user.gradeLevel} • {user.username}
+                </Text>
+              )}
+            </View>
+
+            {/* Profile Setup Modal */}
+            {showProfileSetup && (
+              <View style={styles.profileSetupModal}>
+                <Text style={styles.modalTitle}>Setup Your Profile</Text>
+                
+                <TextInput
+                  style={styles.input}
+                  placeholder="Username"
+                  placeholderTextColor="#666"
+                  value={profileData.username}
+                  onChangeText={(text) => setProfileData({...profileData, username: text})}
+                />
+                
+                <TextInput
+                  style={styles.input}
+                  placeholder="Grade Level (1-12)"
+                  placeholderTextColor="#666"
+                  keyboardType="numeric"
+                  value={profileData.gradeLevel}
+                  onChangeText={(text) => setProfileData({...profileData, gradeLevel: text})}
+                />
+                
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Bio (optional)"
+                  placeholderTextColor="#666"
+                  multiline
+                  value={profileData.bio}
+                  onChangeText={(text) => setProfileData({...profileData, bio: text})}
+                />
+                
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={[styles.createButton, { backgroundColor: '#ff006e' }]}
+                    onPress={() => setShowProfileSetup(false)}
+                  >
+                    <Text style={styles.createButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={styles.createButton}
+                    onPress={handleProfileSetup}
+                  >
+                    <Text style={styles.createButtonText}>Save</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
+            {/* Students List */}
+            {!user?.gradeLevel ? (
+              <View style={styles.warningBox}>
+                <Text style={styles.warningText}>
+                  📚 Set your grade level to find classmates
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.studentsList}>
+                {loadingStudents ? (
+                  <ActivityIndicator size="large" color="#00f3ff" />
+                ) : students.length === 0 ? (
+                  <Text style={styles.emptyText}>
+                    No students found in Grade {user.gradeLevel}. Be the first!
+                  </Text>
+                ) : (
+                  students.map((student, index) => (
+                    <View key={student.userId || index} style={styles.studentItem}>
+                      <View style={styles.studentInfo}>
+                        <Text style={styles.studentName}>
+                          {student.username}
+                          {student.isVerified && ' ✓'}
+                        </Text>
+                        <Text style={styles.studentMeta}>
+                          Grade {student.gradeLevel}
+                          {student.subjects && student.subjects.length > 0 && 
+                            ` • ${student.subjects.slice(0, 2).join(', ')}`
+                          }
+                        </Text>
+                        {student.bio && (
+                          <Text style={styles.studentBio}>{student.bio}</Text>
+                        )}
+                      </View>
+                      <TouchableOpacity
+                        style={styles.connectButton}
+                        onPress={() => Alert.alert('Connect', `Connect with ${student.username}? (Coming soon)`)}
+                      >
+                        <Text style={styles.connectButtonText}>Connect</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))
+                )}
+              </View>
+            )}
           </View>
         )}
       </ScrollView>
@@ -770,5 +966,97 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 30,
     fontStyle: 'italic',
+  },
+  studentsContainer: {
+    flex: 1,
+  },
+  profileSection: {
+    padding: 15,
+    backgroundColor: '#1a1a2e',
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  profileButton: {
+    backgroundColor: '#00f3ff',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  profileButtonText: {
+    color: '#0a0a0f',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  profileInfo: {
+    color: '#8b00ff',
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  profileSetupModal: {
+    backgroundColor: '#1a1a2e',
+    padding: 20,
+    margin: 15,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#00f3ff',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#00f3ff',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  studentsList: {
+    padding: 15,
+  },
+  studentItem: {
+    backgroundColor: '#1a1a2e',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#00f3ff',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  studentInfo: {
+    flex: 1,
+    marginRight: 10,
+  },
+  studentName: {
+    color: '#00f3ff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 3,
+  },
+  studentMeta: {
+    color: '#8b00ff',
+    fontSize: 14,
+    marginBottom: 3,
+  },
+  studentBio: {
+    color: '#fff',
+    fontSize: 13,
+    marginTop: 5,
+  },
+  connectButton: {
+    backgroundColor: '#39ff14',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 6,
+  },
+  connectButtonText: {
+    color: '#0a0a0f',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });

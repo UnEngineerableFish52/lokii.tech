@@ -15,6 +15,7 @@ const chatRoutes = require('./routes/chat');
 const questionRoutes = require('./routes/questions');
 const privateChatRoutes = require('./routes/privateChats');
 const examRoutes = require('./routes/exams');
+const studentsRoutes = require('./routes/students');
 
 // Initialize Express app
 const app = express();
@@ -82,6 +83,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/private-chats', privateChatRoutes);
 app.use('/api/exams', examRoutes);
+app.use('/api/students', studentsRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -96,7 +98,8 @@ app.get('/', (req, res) => {
       chat: '/api/chat/*',
       questions: '/api/questions/*',
       privateChats: '/api/private-chats/*',
-      exams: '/api/exams/*'
+      exams: '/api/exams/*',
+      students: '/api/students/*'
     },
     socketUrl: `http://localhost:${SOCKET_PORT}`,
     documentation: 'See README.md for API documentation'

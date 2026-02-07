@@ -277,4 +277,50 @@ export const examsAPI = {
   }
 };
 
+// Students API
+export const studentsAPI = {
+  async getStudentsByGrade(gradeLevel) {
+    console.log('[Students API] Getting students by grade:', gradeLevel);
+    const response = await api.get('/students', { params: { gradeLevel } });
+    return response.data;
+  },
+
+  async searchStudents(criteria) {
+    console.log('[Students API] Searching students:', criteria);
+    const response = await api.get('/students/search', { params: criteria });
+    return response.data;
+  },
+
+  async updateProfile(profileData) {
+    console.log('[Students API] Updating profile');
+    const response = await api.put('/students/profile', profileData);
+    return response.data;
+  },
+
+  async getStudentProfile(userId) {
+    console.log('[Students API] Getting student profile:', userId);
+    const response = await api.get(`/students/${userId}`);
+    return response.data;
+  }
+};
+
+  async getExam(id) {
+    console.log('[Exams API] Getting exam:', id);
+    const response = await api.get(`/exams/${id}`);
+    return response.data;
+  },
+
+  async submitExam(id, answers) {
+    console.log('[Exams API] Submitting exam:', id);
+    const response = await api.post(`/exams/${id}/submit`, { answers });
+    return response.data;
+  },
+
+  async getExamResults(id) {
+    console.log('[Exams API] Getting exam results:', id);
+    const response = await api.get(`/exams/${id}/results`);
+    return response.data;
+  }
+};
+
 export default api;
