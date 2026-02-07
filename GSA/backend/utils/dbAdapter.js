@@ -17,8 +17,8 @@ class DatabaseAdapter {
       switch (this.type) {
         case 'mongodb':
           await mongoose.connect(connectionString, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 3000,
+            socketTimeoutMS: 3000,
           });
           this.connection = mongoose.connection;
           logger.log('MongoDB connected successfully');
