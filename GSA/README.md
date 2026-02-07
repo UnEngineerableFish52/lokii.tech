@@ -1,20 +1,21 @@
 # Global Students Association (GSA) App
 
-A complete React Native mobile application with a production-ready Node.js/Express backend for students worldwide.
+A complete React Native mobile application with a production-ready Node.js/Express backend for students worldwide to connect, learn, and collaborate.
 
-## Features
+## ✨ Key Features
 
-### 🎨 Custom Branding
-- Hexagonal neon "M" logo app icon
-- Dark cyberpunk theme (#0a0a0f background)
-- Neon gradient accents (#00f3ff, #ff006e, #8b00ff, #39ff14)
+### 🎓 **Student Discovery** (NEW!)
+- **Find Same-Grade Classmates** - Discover students in your grade for study groups
+- **Profile Setup** - Customize your profile with bio, interests, and subjects
+- **Subject-Based Matching** - See what subjects your peers excel in
+- **Easy Connection** - Connect with classmates to start private chats
 
 ### 🔐 Authentication
 - Anonymous user generation with JWT tokens
 - OAuth ready (Google, Facebook, GitHub)
 - Persistent sessions with AsyncStorage
 
-### 💬 Global Chat
+### 💬 Communication
 - Real-time messaging with Socket.io
 - Read-only for anonymous users
 - Full access for verified users
@@ -313,6 +314,24 @@ Contributions are welcome! Please:
 4. Test thoroughly
 5. Submit a pull request
 
+## Deployment
+
+The GSA app is **production-ready**! See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for:
+- Step-by-step deployment instructions
+- Backend hosting options (Heroku, AWS, DigitalOcean)
+- APK building for Android
+- Testing checklist
+- Troubleshooting guide
+
+### Quick Deploy
+```bash
+# Backend
+cd backend && npm install && npm start
+
+# Frontend
+cd .. && npm install && expo start
+```
+
 ## License
 
 MIT License - see LICENSE file for details
@@ -320,10 +339,11 @@ MIT License - see LICENSE file for details
 ## Support
 
 For help or questions:
-1. Check [backend/README.md](backend/README.md) for API docs
-2. Review troubleshooting section above
-3. Open an issue on GitHub
+1. Check [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for deployment help
+2. Check [backend/README.md](backend/README.md) for API docs
+3. Review troubleshooting section above
+4. Open an issue on GitHub
 
 ---
 
-Built with ❤️ for students worldwide
+Built with ❤️ for students worldwide 🎓
