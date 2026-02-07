@@ -2,26 +2,33 @@
 
 A complete React Native mobile application with a production-ready Node.js/Express backend for students worldwide to connect, learn, and collaborate.
 
-## 🚀 Quick Start (Deploy Now!)
+## 🚀 Deploy in 1 Minute!
 
-### Fastest Way to Get Started
+### ⚡ Super Simple Deployment
 ```bash
 cd GSA
-./deploy.sh
-# Choose option 1 for local development
+./start.sh
 ```
 
-**Or manually:**
+That's it! The script will:
+- ✅ Install all dependencies
+- ✅ Configure environment
+- ✅ Start backend & frontend
+- ✅ Show QR code to scan
+
+### 📱 Open on Your Phone
+1. Install **Expo Go** app (App Store or Play Store)
+2. Scan the QR code shown in terminal
+3. App loads automatically!
+
+### 🔴 To Stop
 ```bash
-# Terminal 1 - Backend
-cd GSA/backend && npm install && cp .env.example .env && npm start
-
-# Terminal 2 - Frontend
-cd GSA && npm install && npm start
-# Scan QR code with Expo Go app!
+./stop.sh
 ```
 
-📖 See [QUICKSTART.md](QUICKSTART.md) for detailed instructions and troubleshooting.
+📖 **New to this?** Read [START.md](START.md) - the easiest guide ever!
+
+---
 
 ## ✨ Key Features
 
